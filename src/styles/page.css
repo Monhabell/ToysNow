@@ -1,0 +1,26 @@
+/* Efectos especiales */
+.group-hover\:translate-x-1:hover {
+  transform: translateX(0.25rem);
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Transiciones sensuales */
+.transition-slow {
+  transition: all 0.5s ease;
+}
+
+/* Gradientes personalizados */
+.bg-sensual-gradient {
+  background: linear-gradient(135deg, rgba(212,175,55,0.1) 0%, rgba(255,0,255,0.2) 100%);
+}
+
+/* Sombras premium */
+.shadow-sensual {
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.15);
+}
+
+
+

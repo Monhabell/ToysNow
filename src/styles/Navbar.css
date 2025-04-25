@@ -1,0 +1,37 @@
+/* Colores base */
+
+  .br-superior{
+    background: #9b5f2a;
+    background: linear-gradient(90deg, rgba(155, 95, 42, 1) 0%, rgba(199, 186, 87, 1) 50%, rgba(237, 178, 83, 1) 100%);
+  }
+
+  .br-inferior{
+    background-color: var(--black);
+    color: var(--gold-600);
+  }
+  
+  /* Transiciones suaves */
+  a, button {
+    transition: all 0.3s ease;
+  }
+  
+  /* Efectos hover */
+  .hover\:text-magenta-400:hover {
+    color: var(--magenta-400);
+  }
+  
+  .hover\:text-magenta-600:hover {
+    color: var(--magenta-600);
+  }
+
+  /* Focus states */
+  input:focus, button:focus {
+    outline: none;
+  }
+  
+  /* Responsive tweaks */
+  @media (max-width: 768px) {
+    .mobile-hidden {
+      display: none;
+    }
+  }

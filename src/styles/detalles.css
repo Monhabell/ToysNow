@@ -1,0 +1,97 @@
+
+
+.imgProduct{
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    cursor: zoom-in;
+   
+}
+
+.imgProduct img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.2s ease;
+    height: auto;
+    object-fit: cover;    
+}
+
+.imgProduct:hover img {
+    transform: scale(2); /* Ajusta el zoom aquí */
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns:  0.3fr 1fr 1fr 1fr ;
+    grid-template-rows: auto auto;   
+    gap: 10px; /* espace entre les éléments */
+}
+
+.itemgrupImg{
+    grid-column-start: 1;
+    grid-column-end: 1;
+    padding: 10px;
+}
+
+.itemgrupImg img {
+    border-radius: 10px;
+    -webkit-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.17);
+    -moz-box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.17);
+    box-shadow: 5px 5px 5px 0px rgba(0,0,0,0.17);
+    cursor: pointer;
+    margin-top: 10px;
+
+}
+
+.itemImg {
+    padding: 20px;
+    grid-column-start: 2;
+    grid-column-end: 4;
+    display: inline;
+    text-align: center;
+    align-items: center;
+    width: 100%;
+}
+
+.itemImg img {
+    border-radius: 15px;
+    -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.17);
+    -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.17);
+    box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.17);
+}
+
+.itemProducRel{
+    grid-column-start: 1;
+    grid-column-end: 4;
+    grid-row: 2 / span 1;
+}
+
+.itemData{
+    padding: 10px;
+    border-radius: 10px;
+    grid-column-start: 4;
+    grid-row: 1 / span 2;
+}
+
+.border-Black{
+    border-width: 1px;
+    border-style: solid;
+    border-color: rgba(85, 85, 85, 0.37);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.seccion_top{
+    display: flex;
+    justify-content: space-between;
+}
+
+.detail_text{
+    font-size: 24px;
+    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    margin-bottom: 5px;
+}
+
+.valorPresio{
+    font-size: 34px;
+}

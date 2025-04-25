@@ -1,0 +1,170 @@
+'use client'
+import { useEffect, useState } from 'react'
+import Navbar from "@/components/Navbar"
+import ListaProductos from '@/components/ListaProductos'
+import ProductoDestacado from '@/components/ProductoDestacado'
+import Banner from '@/components/Banner'
+import { GoChevronRight, GoChevronLeft } from "react-icons/go";
+import { FiArrowRight } from "react-icons/fi";
+import Image from 'next/image';
+
+export default function Home() {
+
+  
+  const [promociones, setPromociones] = useState([])
+  const [productoDestacado, setProductoDestacado] = useState(null)
+
+
+  useEffect(() => {
+    const obtenerProductos = async () => {
+      try {
+        const res = await fetch('/api/productos')
+        const productos = await res.json()
+        const filtrados = productos.filter((p: any) => p.compare_price > 0)
+        setPromociones(filtrados)
+      } catch (error) {
+        console.error('Error al cargar productos:', error)
+      }
+    }
+    obtenerProductos()
+  }, [])
+
+
+  useEffect(() => {
+    const obtenerDestacado = async () => {
+      try {
+        const res = await fetch('/api/productos')
+        const productos = await res.json()
+        const destacado = productos.find((p: any) => p.destacado > 0)
+        
+        if (!destacado) {
+          console.log('No se encontraron productos destacados')
+          return
+        }
+        
+        setProductoDestacado(destacado)
+      } catch (error) {
+        console.error('Error al cargar producto destacado:', error)
+      }
+    }
+    obtenerDestacado()
+  }, [])
+
+  const scrollLeft = () => {
+    const slider = document.getElementById('slider');
+    slider?.scrollBy({ left: -300, behavior: 'smooth' });
+  };
+
+  const scrollRight = () => {
+    const slider = document.getElementById('slider');
+    slider?.scrollBy({ left: 500, behavior: 'smooth' });
+  };
+
+  const imgDestacada = productoDestacado;
+  console.log(imgDestacada)
+
+  
+
+  return (
+    <>
+      <Navbar />
+      <div className="relative bg-black min-h-screen">
+        {/* Banner ajustado para mobile */}
+        <div className="  sm:h-[70vh]  sm:min-h-[500px] overflow-hidden">
+          <Banner />
+          <div className="inset-0 bg-gradient-to-t from-black via-black/70 to-transparent z-1"></div>
+          <div className=" bottom-10 sm:bottom-20 left-0 right-0 text-center z-2 px-4">
+            <button className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transform hover:scale-105 transition-all duration-300 shadow-lg shadow-magenta-900/50">
+              DESCUBRE TUS FANTASÍAS
+            </button>
+          </div>
+        </div>
+
+        {/* Contenido principal con ajuste mobile */}
+        <main className="z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-5 sm:-mt-20">
+
+          {/* Sección Ofertas con padding ajustado */}
+          <section className="mb-12 sm:mb-20 pt-4 sm:pt-0">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end pb-6 sm:pb-8 border-b-2 border-gold-500/30">
+              <div className="mb-4 sm:mb-0">
+                <h2 className="text-2xl sm:text-3xl font-bold text-gold-600 mb-1 sm:mb-2">OFERTAS CALIENTES</h2>
+                <p className="text-sm sm:text-base text-gold-500">Productos que despertarán tus sentidos</p>
+              </div>
+              <a href="#" className="self-end sm:self-auto flex items-center text-sm sm:text-base text-gold-600 hover:text-gold-300 group transition-colors">
+                Ver todas
+                <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </div>
+
+            {/* Slider ajustado para mobile */}
+            <div className=" mt-2 sm:mt-8 content">
+
+              {/* producto destacado */}
+              {productoDestacado &&(
+                  <ProductoDestacado
+                  img={productoDestacado.img[0]}
+                  name={productoDestacado.name}
+                  price ={productoDestacado.price}
+                />
+              )}
+              <button
+                onClick={scrollLeft}
+                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-gold-400 hover:text-black rounded-full p-2 sm:p-3 shadow-lg transition-all"
+              >
+                <GoChevronLeft size={20} className="sm:w-6 sm:h-6" />
+              </button>
+
+              <div
+                id="slider"
+                className="overflow-x-auto py-4 sm:py-6 scroll-smooth scrollbar-hide space-x-4 sm:space-x-6"
+              >
+                <ListaProductos productos={promociones} isSlider />
+              </div>
+
+              <button
+                onClick={scrollRight}
+                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-gold-400 hover:text-black rounded-full p-2 sm:p-3 shadow-lg transition-all"
+              >
+                <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
+              </button>
+            </div>
+          </section>
+
+          {/* Categorías en columna para mobile */}
+          <section className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-12 sm:mb-20">
+            {[/* tus categorías */].map((categoria, index) => (
+              <div key={index} className="relative group overflow-hidden rounded-xl h-60 sm:h-80">
+                {/* Contenido de categoría */}
+              </div>
+            ))}
+          </section>
+
+          {/* Destacado del mes ajustado */}
+          <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
+            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
+            <img
+              src="/images/destacado.jpg"
+              alt="Producto destacado"
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">
+              <span className="text-sm sm:text-base text-magenta-400 font-semibold">DESTACADO DEL MES</span>
+              <h2 className="text-2xl sm:text-4xl font-bold text-gold-300 my-2 sm:my-4">Colección Éxtasis Noir</h2>
+              <p className="text-xs sm:text-base text-gold-100 mb-4 sm:mb-6">Descubre la elegancia de lo prohibido...</p>
+              <button className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group">
+                DESCUBRIR
+                <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </div>
+          </section>
+        </main>
+
+        {/* Newsletter ajustado */}
+        <div className="bg-gradient-to-r from-black to-purple-900 py-10 sm:py-16 px-4">
+          {/* Contenido del newsletter */}
+        </div>
+      </div>
+    </>
+  )
+
+}

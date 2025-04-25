@@ -1,0 +1,17 @@
+.grid-product{
+    display: grid;
+    grid-template-columns: 0.3fr 1fr;
+    gap: 10px; 
+  
+}
+
+.itemproduct{
+    grid-column-start: 2;
+    grid-column-end: 2;
+}
+
+.itemfilter{
+    margin-top: 35px;
+    grid-column-start: 1;
+    grid-column-end: 1;
+}

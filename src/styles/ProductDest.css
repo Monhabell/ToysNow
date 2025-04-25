@@ -1,0 +1,38 @@
+.productDestacado{
+    display: inline;
+    text-align: center;
+    background: #ff0000;
+    background: linear-gradient(90deg, rgba(155, 95, 42, 1) 0%, rgba(199, 186, 87, 1) 50%, rgba(237, 178, 83, 1) 100%);
+    /* background: linear-gradient(135deg, #4a0033 0%, #b30059 35%, #ff004f 70%, #ff6a00 100%); */
+    color: rgb(255, 255, 255);
+    width: 35%;
+    height: auto;
+    padding: 12px;
+  }
+
+.of-day{
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 30px;
+    width: 100%;
+}
+
+img {
+    border-radius: 10px;
+    margin-bottom: 10px;
+    
+}
+
+.Name-Of{
+    display: flex;
+    text-align: center;
+    background-color: rgb(43, 38, 0);
+    width: 100%;
+    padding: 5px;
+    border-radius: 10px;
+}  
+.price{
+    display: flex;
+    text-align: center;
+    align-items: center;
+}
+

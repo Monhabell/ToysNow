@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+:root {
+  --gold-500: #FFD700;
+  --gold-600: #D4AF37;
+  --black: #000000;
+  --magenta-400: #FF66FF;
+  --magenta-500: #FF00FF;
+  --magenta-600: #CC00CC;
+}
+
+.text-gold-600{
+  color: var(--gold-600)
+}
+
+.text-gold-500{
+  color: var(--gold-500)
+}
+
+.fondo {
+  background-color: var(--black);
+}
+
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--black) ;
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background:var(--black);
+    --foreground: #000000;
+  }
+}
+
+body {
+  background: var(--black);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.links {
+  color: blue;
+}
+
+ul {
+  list-style-type: disc;
+  padding-left: 20px; /* importante para que los puntos no queden fuera de la vista */
+}
+
+.btnsed{
+  width: 100%;
+  height: 40px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+  color: white;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.btnsed:hover{
+  transform: scale(1.05);     /* pequeño zoom */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);  /* sombra más fuerte */
+}
+
+.slider-btn {
+  position: absolute;
+  z-index: 20;
+  background: white;
+  border: none;
+  font-size: 45px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  width: 60px;
+  height: 60px;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  display: inline;
+  align-items: flex-end;
+  text-align: center;
+  padding: .4rem 0.5rem;
+  color: rgba(0, 0, 0, 0.651);
+
+}
+
+.slider-btn:hover {
+  transform: scale(1.1);
+}
+
+.slider-btn.left {
+  left: -40px;
+}
+
+.slider-btn.right {
+  right: -40px;
+}
+
+/* Ocultar scrollbar en navegadores modernos */
+.scrollbar-hide::-webkit-scrollbar {
+display: none;
+}
+.scrollbar-hide {
+-ms-overflow-style: none;  /* IE y Edge */
+scrollbar-width: none;     /* Firefox */
+}
+
+
+.slider-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.slider-content {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 1rem;
+  padding: 10px 0;
+}
+
+.slider-content::-webkit-scrollbar {
+  height: 8px;
+}
+
+.slider-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.content {
+  display: flex;
+  flex-direction: row; /* por defecto */
+  background-color: rgb(36, 36, 36);
+  color: rgb(0, 0, 0);
+  margin-top: 20px;
+  height: 90%;
+  padding: 15px;
+  border-radius: 15px;
+}
+
+.content-detalle {
+  display: flex;
+  flex-direction: row; /* por defecto */
+  background-color: rgb(36, 36, 36);
+  color: rgb(255, 255, 255);
+  margin-top: 20px;
+  height: 90%;
+  padding: 15px;
+  border-radius: 15px;
+}
+
+/* Para pantallas pequeñas (móviles) */
+@media (max-width: 768px) {
+  .content {
+    flex-direction: column;
+  }
+}
+
+
