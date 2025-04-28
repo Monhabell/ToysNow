@@ -44,7 +44,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price 
           <div className='price-of'>
             {price && (
               <span className="inline-block px-4 py-1.5 bg-black/90 text-amber-400 font-bold rounded-full  backdrop-blur-sm border border-amber-800/50 mt-1">
-                ${price.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                ${price.toLocaleString()}
               </span>
             )}
           </div>

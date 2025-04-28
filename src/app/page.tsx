@@ -1,18 +1,35 @@
 'use client'
 import { useEffect, useState } from 'react'
 import Navbar from "@/components/Navbar"
-import ListaProductos from '@/components/ListaProductos'
+import ListaProductos from '@/components/productos/ListaProductos'
+import Category from '@/components/Categorias/Category'
 import ProductoDestacado from '@/components/ProductoDestacado'
 import Banner from '@/components/Banner'
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import { FiArrowRight } from "react-icons/fi";
 import Image from 'next/image';
 
-export default function Home() {
+type Producto = {
+  id: string | number
+  name: string
+  price: number
+  compare_price: number
+  stock: number
+  img: string[]
+  created_at: string | Date
+  quialification?: number
+  destacado?: number
+}
 
-  
-  const [promociones, setPromociones] = useState([])
-  const [productoDestacado, setProductoDestacado] = useState(null)
+type ProductoDestacadoType = {
+  img: string[]
+  name: string
+  price: number
+} | null
+
+export default function Home() {
+  const [promociones, setPromociones] = useState<Producto[]>([])
+  const [productoDestacado, setProductoDestacado] = useState<ProductoDestacadoType>(null)
 
 
   useEffect(() => {
@@ -39,10 +56,14 @@ export default function Home() {
         
         if (!destacado) {
           console.log('No se encontraron productos destacados')
+          const destacado = productos.find((p: any) => p.id == 1)
+          setProductoDestacado(destacado)
           return
+        }else{
+          setProductoDestacado(destacado)
         }
         
-        setProductoDestacado(destacado)
+        
       } catch (error) {
         console.error('Error al cargar producto destacado:', error)
       }
@@ -68,9 +89,9 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <div className="relative bg-black min-h-screen">
+      <div className="relative bg-black min-h-screen mt-32">
         {/* Banner ajustado para mobile */}
-        <div className="  sm:h-[70vh]  sm:min-h-[500px] overflow-hidden">
+        <div className=" overflow-hidden">
           <Banner />
           <div className="inset-0 bg-gradient-to-t from-black via-black/70 to-transparent z-1"></div>
           <div className=" bottom-10 sm:bottom-20 left-0 right-0 text-center z-2 px-4">
@@ -80,8 +101,27 @@ export default function Home() {
           </div>
         </div>
 
+        <div className='z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 content flex justify-between items-start'>
+          <div className='mr-5'>
+            <Category />
+          </div>
+
+          
+          {/* producto destacado */}
+          {productoDestacado && (
+            <ProductoDestacado
+              img={productoDestacado.img[0]}
+              name={productoDestacado.name}
+              price={productoDestacado.price.toString()} // Convertir a string
+            />
+          )}
+          
+          
+        </div>
+
+
         {/* Contenido principal con ajuste mobile */}
-        <main className="z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-5 sm:-mt-20">
+        <main className="z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
 
           {/* Sección Ofertas con padding ajustado */}
           <section className="mb-12 sm:mb-20 pt-4 sm:pt-0">
@@ -99,14 +139,7 @@ export default function Home() {
             {/* Slider ajustado para mobile */}
             <div className=" mt-2 sm:mt-8 content">
 
-              {/* producto destacado */}
-              {productoDestacado &&(
-                  <ProductoDestacado
-                  img={productoDestacado.img[0]}
-                  name={productoDestacado.name}
-                  price ={productoDestacado.price}
-                />
-              )}
+              
               <button
                 onClick={scrollLeft}
                 className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-gold-400 hover:text-black rounded-full p-2 sm:p-3 shadow-lg transition-all"

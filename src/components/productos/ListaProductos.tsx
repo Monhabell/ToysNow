@@ -6,9 +6,28 @@ import StarRating from '@/components/StarRating';
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation';
-import '../styles/Listaproductos.css'
 
-export default function ListaProductos({ productos, isSlider = false }) {
+import '../../styles/Listaproductos.css'
+
+// Definición de tipos
+type Producto = {
+  id: string | number;
+  name: string;
+  price: number;
+  compare_price: number;
+  stock: number;
+  img: string[];
+  created_at: string | Date;
+  quialification?: number;
+  // Agrega aquí cualquier otra propiedad que uses
+};
+
+type ListaProductosProps = {
+  productos: Producto[];
+  isSlider?: boolean;
+};
+
+export default function ListaProductos({ productos, isSlider = false }: ListaProductosProps)  {
 
   const [rating, setRating] = useState(0);
   const handleRating = (value: any) => {

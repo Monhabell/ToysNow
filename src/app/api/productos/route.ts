@@ -17,7 +17,7 @@ const productos = [
     brand: "Telaquito",
     shipment: 5000,
     is_available: true, // no mostrsrlo o mostrlo pero como no disponible
-    created_at: "15/04/2025",
+    created_at: "12/03/2025",
     color: ["red", "blue", "Orange"],
     destacado: 0
   },
@@ -103,7 +103,7 @@ const productos = [
     brand: "DreamSleep",
     shipment: "gratis",
     created_at: "21/12/2024",
-    destacado: 1
+    destacado: 0
 
   },
   { 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { CiHeart } from "react-icons/ci";
-import ListaProductos from '@/components/ListaProductos';
+import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
 import { GoChevronRight , GoChevronLeft } from "react-icons/go";
 import React from 'react';

@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
-import ListaProductos from '@/components/ListaProductos'
+import ListaProductos from '@/components/productos/ListaProductos'
 import '../../styles/productos.css';
 
 export default function ProductosPage() {

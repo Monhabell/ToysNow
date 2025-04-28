@@ -19,7 +19,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="w-full border-b border-gold-500">
+    <div className="w-full border-b border-gold-500 fixed top-0 left-0 right-0 z-50 bg-white">
       {/* Top bar - Barra superior negra */}
       <div className="br-superior  py-2 px-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -106,8 +106,8 @@ export default function Navbar() {
             <nav className="flex flex-col mr-5 md:flex-row space-y-3 md:space-y-0 md:space-x-8 font-medium">
               <Link href="/" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Inicio</Link>
               <Link href="/productos" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Productos</Link>
-              <Link href="/colecciones" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Colecciones</Link>
-              <Link href="/guia-tallas" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Guía de tallas</Link>
+              {/* <Link href="/colecciones" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Colecciones</Link>
+              <Link href="/guia-tallas" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Guía de tallas</Link> */}
               
             </nav>
           </div>
