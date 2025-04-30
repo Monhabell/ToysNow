@@ -18,39 +18,61 @@ export default function ProductosPage() {
   const [condicion, setCondicion] = useState('');
   const [envioGratis, setEnvioGratis] = useState(false);
 
+  const normalizarTexto = (texto: string) =>
+    texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  
 
   useEffect(() => {
     const obtenerProductos = async () => {
       try {
         const res = await fetch('/api/productos')
         const data = await res.json()
-
-        if (searchTerm) {
+  
+        const termino = normalizarTexto(searchTerm || '');
+  
+        if (termino) {
           const filtrados = data.filter((producto: any) => {
-            const termino = searchTerm.toLowerCase();
-            const enCategory = typeof producto.category === 'string' && producto.category.toLowerCase().includes(termino);
-            const enNombre = typeof producto.name === 'string' && producto.name.toLowerCase().includes(termino);
-            const enDetails = Array.isArray(producto.is_feature)
-              ? producto.is_feature.some((detalle: string) => typeof detalle === 'string' && detalle.toLowerCase().includes(termino))
-              : false;
-            return enCategory || enNombre || enDetails;
+            const categoria = normalizarTexto(producto.category || '');
+            const description = normalizarTexto(producto.description || '');
+            const nombre = normalizarTexto(producto.name || '');
+            const brand = normalizarTexto(producto.brand || '');
+            
+            const color = Array.isArray(producto.color)
+            ? producto.color.map((d: string) => normalizarTexto(d)).join(' ')
+            : '';
+
+            const detalles = Array.isArray(producto.is_feature)
+              ? producto.is_feature.map((d: string) => normalizarTexto(d)).join(' ')
+              : '';
+  
+            return categoria.includes(termino) || nombre.includes(termino) 
+            || detalles.includes(termino) || description.includes(termino) 
+            || brand.includes(termino) || color.includes(termino);
           });
-          setProductos(filtrados)
+  
+          setProductos(filtrados);
         } else {
-          setProductos(data)
+          setProductos(data);
         }
       } catch (error) {
-        console.error('Error al obtener productos:', error)
+        console.error('Error al obtener productos:', error);
       }
-    }
-    obtenerProductos()
-  }, [searchTerm])
+    };
+  
+    const normalizarTexto = (texto: string) =>
+      texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  
+    obtenerProductos();
+  }, [searchTerm]);
+  
+
+  
 
   return (
     <>
       <Navbar />
-      <div className='grid-product max-w-6xl mx-auto '>
-        <div className='itemfilter p-4 bg-white rounded shadow mb-4'>
+      <div className='grid-product max-w-6xl mx-auto mt-32  '>
+        <div className='itemfilter p-4 bg-white rounded shadow mb-4 '>
           <h2 className='text-lg font-bold mb-2'>Filtros</h2>
 
           <div className='mb-2'>
@@ -109,7 +131,7 @@ export default function ProductosPage() {
           </div>
         </div>
 
-        <div className='itemproduct'>
+        <div className='itemproduct content-product'>
           <div className="p-6 grid grid-cols-1 md:grid-cols-1 gap-12">
             <ListaProductos productos={productos} />
           </div>

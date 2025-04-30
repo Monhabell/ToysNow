@@ -88,7 +88,7 @@ export default function Navbar() {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="¿Qué deseas explorar esta noche...?"
+                placeholder="¿Qué deseas explorar...?"
                 className="w-full py-2.5 px-5 pr-12 rounded-full border-2 border-gold-400 focus:outline-none focus:border-magenta-500 bg-black bg-opacity-70 text-gold-100 placeholder-gold-400 shadow-lg hover:bg-opacity-90 transition-all duration-300"
               />
               <button 

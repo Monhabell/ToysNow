@@ -25,6 +25,7 @@ type ProductoDestacadoType = {
   img: string[]
   name: string
   price: number
+  id: string | number
 } | null
 
 export default function Home() {
@@ -112,7 +113,8 @@ export default function Home() {
             <ProductoDestacado
               img={productoDestacado.img[0]}
               name={productoDestacado.name}
-              price={productoDestacado.price.toString()} // Convertir a string
+              price={productoDestacado.price.toString()}
+              id={productoDestacado.id}
             />
           )}
           
@@ -137,12 +139,12 @@ export default function Home() {
             </div>
 
             {/* Slider ajustado para mobile */}
-            <div className=" mt-2 sm:mt-8 content">
+            <div className=" mt-2 sm:mt-8 content relative">
 
               
               <button
                 onClick={scrollLeft}
-                className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-gold-400 hover:text-black rounded-full p-2 sm:p-3 shadow-lg transition-all"
+                className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronLeft size={20} className="sm:w-6 sm:h-6" />
               </button>
@@ -156,10 +158,11 @@ export default function Home() {
 
               <button
                 onClick={scrollRight}
-                className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-gold-400 hover:text-black rounded-full p-2 sm:p-3 shadow-lg transition-all"
+                className="absolute right-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
               </button>
+
             </div>
           </section>
 
@@ -176,14 +179,14 @@ export default function Home() {
           <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
             <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
             <img
-              src="/images/destacado.jpg"
+              src="/images/productos/producto2.1.jpg" //imagen destacada de coleccion
               alt="Producto destacado"
               className="w-full h-full object-cover"
             />
             <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">
-              <span className="text-sm sm:text-base text-magenta-400 font-semibold">DESTACADO DEL MES</span>
-              <h2 className="text-2xl sm:text-4xl font-bold text-gold-300 my-2 sm:my-4">Colección Éxtasis Noir</h2>
-              <p className="text-xs sm:text-base text-gold-100 mb-4 sm:mb-6">Descubre la elegancia de lo prohibido...</p>
+              <span className="text-sm sm:text-base text-white font-semibold">DESTACADO DEL MES</span>
+              <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">Colección Éxtasis Noir</h2>
+              <p className="text-xs sm:text-base text-white mb-4 sm:mb-6">Descubre la elegancia de lo prohibido...</p>
               <button className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group">
                 DESCUBRIR
                 <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />

@@ -8,7 +8,7 @@ export default function CarritoPage() {
   return (
     <>
       <Navbar />
-      <div className="p-6 bg-gray-100 min-h-screen">
+      <div className="p-6 bg-gray-100 min-h-screen mt-32">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Columna de Productos */}

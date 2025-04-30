@@ -53,7 +53,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
           const fechaCreacion = new Date(p.created_at);
           const hoy = new Date();
           const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
-          const nuevoOk = diffDias <= 30; // producto es nuevo si se creó hace menos de 30 días.
+          const nuevoOk = diffDias <= 15; // producto es nuevo si se creó hace menos de 30 días.
 
           const cantUs =  1
           const qualifi = p.quialification >= 0

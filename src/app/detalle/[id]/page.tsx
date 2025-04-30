@@ -148,8 +148,8 @@ export default function ProductoDetalle({ params }: Props) {
         <Navbar />
       </div>
 
-      <div>
-        <div className='max-w-6xl mx-auto content-detalle'>
+      <div className='mt-32'>
+        <div className='max-w-6xl mx-auto content-detalle mt-32'>
           <div className='grid-container'>
             <div className='itemgrupImg'>
 

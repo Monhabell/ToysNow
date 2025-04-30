@@ -8,6 +8,7 @@ type Producto = {
   compare_price: number
   img: string
   stock: number
+  color: string
   shipment: number // Costo de envío
 }
 

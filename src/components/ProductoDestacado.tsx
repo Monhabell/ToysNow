@@ -1,13 +1,17 @@
 import '../styles/ProductDest.css';
+import { useRouter } from 'next/navigation';
+
 
 
 interface ProductoDestacadoProps {
+  id: string | number;
   img: string;
   name: string;
   price?: string; // Propiedad opcional para el precio
 }
 
-const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price }) => {
+const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price, id}) => {
+  const router = useRouter();
   return (
     <div className="relative productDestacado overflow-hidden rounded-2xl group h-full w-full">
       {/* Fondo dorado con efecto de profundidad */}
@@ -24,20 +28,21 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price 
 
         {/* Contenedor de la imagen con efecto flotante */}
         <div className="relative z-20">
-          <div className='title-Oferta'>
-            <h1 className='of-day'>Oferta del dia</h1>
+          <div className='title-Oferta mb-3'>
+            <h2 className='text-amber-400 font-bold text-black'>¡Solo por hoy!</h2>
           </div>
 
           <img
             src={img}
             alt={name}
-            className=""
+            onClick={() => router.push(`/detalle/${id}`)}
           />
 
           {/* Información del producto */}
-          <div className="Name-Of">
-            <span >
-              {name}
+          <div className='info-producto'>
+            <h2 className='text-amber-400 font-bold text-gold-500'>Producto destacado</h2>
+            <span className="text-lg font-bold text-black group-hover:text-red transition-colors duration-300">
+              {name.length > 20 ? `${name.slice(0, 20)}...` : name}
             </span>
           </div>
           
@@ -48,8 +53,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price 
               </span>
             )}
           </div>
-          
-
+    
         </div>
 
         

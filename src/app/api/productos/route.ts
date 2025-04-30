@@ -7,7 +7,7 @@ const productos = [
     id: 1, 
     name: 'DADOS ERÓTICOS LUMINOSOS X 2', 
     price: 100000, 
-    compare_price: 200000, 
+    compare_price: 0, 
     description: "Cama doble",
     stock: 20,
     is_feature: ['Cama plus', 'Cómoda'],
@@ -19,7 +19,7 @@ const productos = [
     is_available: true, // no mostrsrlo o mostrlo pero como no disponible
     created_at: "12/03/2025",
     color: ["red", "blue", "Orange"],
-    destacado: 0
+    destacado: 1
   },
   { 
     id: 2, 
@@ -28,7 +28,7 @@ const productos = [
     compare_price: 420000, 
     description: "Sofá de 3 plazas",
     stock: 12,
-    is_feature: ['Tela Premium', 'Espuma Densa'],
+    is_feature: ['Tela Premium', 'Bodys'],
     img: ['/images/productos/producto2.1.jpg', '/images/productos/producto2-1.jpg', '/images/productos/producto2-2.jpg'],
     quialification: 4,
     category: 'Sofá',
@@ -40,7 +40,7 @@ const productos = [
   },
   { 
     id: 3, 
-    name: 'Silla Ergonómica Oficina Executive', 
+    name: 'Silla Ergonómica Oficina Bodys', 
     price: 80000, 
     compare_price: 95000, 
     description: "Silla para escritorio",
@@ -52,7 +52,7 @@ const productos = [
     brand: "ErgoStyle",
     shipment: 0,
     created_at: "05/02/2025",
-    destacado: 0
+    destacado: 1
 
   },
   { 
@@ -82,7 +82,7 @@ const productos = [
     is_feature: ['Compacto', 'Resistente'],
     img: ['/images/productos/producto5.1.jpg', '/images/productos/producto5-1.jpg'],
     quialification: 4,
-    category: 'Cama',
+    category: 'Bodys',
     brand: "DecoSmart",
     shipment: "pago",
     created_at: "10/01/2025",

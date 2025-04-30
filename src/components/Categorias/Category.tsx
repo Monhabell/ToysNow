@@ -45,7 +45,7 @@ export default function CategoryMenu() {
     return (
         <div className="category">
             <div className="container mx-auto px-4 py-8">
-                <h2 className="text-2xl font-serif font-bold mb-8 text-gold-500 border-b border-gold-500 pb-2">
+                <h2 className="text-2xl font-semibold font-bold mb-8 text-gold-500 border-b border-gold-500 pb-2">
                     Nuestras Categorías
                 </h2>
                 
@@ -69,7 +69,6 @@ export default function CategoryMenu() {
                         </ul>
                     </div>
 
-
                     {/* Panel de subcategorías */}
                     <div className="panel_SubCategory">
                         {selectedCategory ? (
@@ -78,6 +77,7 @@ export default function CategoryMenu() {
                                     <button 
                                         onClick={() => setSelectedCategory(null)}
                                         className="mr-4 hover:text-gold-300"
+
                                     >
                                         ‹
                                     </button>
@@ -89,7 +89,7 @@ export default function CategoryMenu() {
                                         {selectedCategory.subcategory_id.map((subcategory) => (
                                             <Link
                                                 key={subcategory.id}
-                                                href={`/${selectedCategory.slug}/${subcategory.slug}`}
+                                                href={`/productos?buscar=${subcategory.name}`}
                                                 className="block p-4 border border-gold-500/20 rounded-lg hover:bg-gold-500/10 hover:border-gold-500/40 transition-all group"
                                             >
                                                 <h4 className="font-medium text-gold-400 group-hover:text-gold-300">
