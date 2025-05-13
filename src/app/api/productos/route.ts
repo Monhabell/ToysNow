@@ -24,8 +24,8 @@ const productos = [
   { 
     id: 2, 
     name: 'Moderno Sofá Seccional de Lujo', 
-    price: 350000, 
-    compare_price: 420000, 
+    price: 32000, 
+    compare_price: 55000, 
     description: "Sofá de 3 plazas",
     stock: 12,
     is_feature: ['Tela Premium', 'Bodys'],

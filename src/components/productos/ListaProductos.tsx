@@ -19,6 +19,9 @@ type Producto = {
   img: string[];
   created_at: string | Date;
   quialification?: number;
+  category?: string;
+  brand?: string;
+  shipment?: number;  
   // Agrega aquí cualquier otra propiedad que uses
 };
 
@@ -47,7 +50,8 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
       >
         {productos.map((p: any) => {
           const tieneDescuento = p.compare_price > 0
-          const precioFinal = p.compare_price - p.price
+          const precioFinal = p.compare_price !== 0 ? p.compare_price - p.price : p.price;
+
           const stockBajo = p.stock <= 5
 
           const fechaCreacion = new Date(p.created_at);
