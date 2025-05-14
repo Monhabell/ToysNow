@@ -1,6 +1,6 @@
 .stars {
     display: inline-block;
-    font-size: 2rem;
+    font-size: 1rem;
     unicode-bidi: bidi-override;
     /* direction: rtl; */
   }
@@ -12,11 +12,11 @@
   }
   
   .star.full {
-    color: gold;
+    color: rgb(255, 187, 0);
   }
   
   .star.half {
-    background: linear-gradient(90deg, rgb(255, 255, 253) 50%, #fbff00 50%);
+    background: linear-gradient(90deg, rgb(255, 255, 253) 50%, #ffd000 50%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

@@ -5,6 +5,7 @@ import Navbar from '@/components/Navbar'
 import ListaProductos from '@/components/productos/ListaProductos'
 import '../../styles/productos.css';
 
+
 export default function ProductosPage() {
   const [allProductos, setAllProductos] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,9 +37,18 @@ export default function ProductosPage() {
         const data = await res.json();
         setAllProductos(data);
         
-        // Extraer categorías únicas
-        const cats = Array.from(new Set(data.map((p: any) => p.category).filter(Boolean)));
+        
+        const cats  = Array.from(
+          new Set(
+            data
+              .flatMap((p: any) => p.category || []) 
+              .filter(Boolean) 
+          )
+        );
+        console.log(cats);
         setCategorias(cats as string[]);
+
+
         
         // Extraer marcas únicas
         const marcas = Array.from(new Set(data.map((p: any) => p.brand).filter(Boolean)));
@@ -55,8 +65,13 @@ export default function ProductosPage() {
   }, []);
 
   // Normalizar texto para búsquedas
-  const normalizarTexto = (texto: string) =>
-    texto.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+  const normalizarTexto = (texto: any) => {
+  if (!texto) return ''; // Si es null, undefined o vacío, retorna cadena vacía
+  return String(texto) // Convierte a string por si es un número u otro tipo
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+};
 
   // Filtrar productos
   const productosFiltrados = useMemo(() => {
@@ -87,16 +102,32 @@ export default function ProductosPage() {
 
     // Filtro por categoría
     if (categoriaSeleccionada) {
-      filtrados = filtrados.filter(producto => 
-        normalizarTexto(producto.category || '') === normalizarTexto(categoriaSeleccionada)
-    )}
+      filtrados = filtrados.filter(producto =>
+        (producto.category || []).some((cat: string) =>
+          normalizarTexto(cat) === normalizarTexto(categoriaSeleccionada)
+        )
+      );
+    }
+
 
     // Filtro por precio
     if (precioMin !== '') {
-      filtrados = filtrados.filter(producto => producto.price >= precioMin);
+      console.log(precioMin);  
+      filtrados = filtrados.filter(producto =>
+        (producto.compare_price === 0 
+          ? producto.price 
+          : producto.compare_price - producto.price
+        ) >= precioMin
+      );
+
     }
+
     if (precioMax !== '') {
-      filtrados = filtrados.filter(producto => producto.price <= precioMax);
+      filtrados = filtrados.filter(producto => 
+        (producto.compare_price === 0
+          ? producto.price
+          : producto.compare_price - producto.price
+        ) <= precioMax);
     }
 
     // Filtro por marca
@@ -183,8 +214,14 @@ export default function ProductosPage() {
   const contadorPorCategoria = useMemo(() => {
     const counts: Record<string, number> = {};
     categorias.forEach(cat => {
-      counts[cat] = productosFiltrados.filter(p => 
-        normalizarTexto(p.category || '') === normalizarTexto(cat)).length;
+      counts[cat] = productosFiltrados.filter(p => {
+        const categoriasProducto = Array.isArray(p.category) 
+          ? p.category 
+          : [p.category];
+        return categoriasProducto.some((c: any) => 
+          normalizarTexto(c) === normalizarTexto(cat)
+        );
+      }).length;
     });
     return counts;
   }, [productosFiltrados, categorias]);
@@ -207,7 +244,7 @@ export default function ProductosPage() {
        
         <div className='flex flex-col md:flex-row gap-6'>
           {/* Panel de Filtros */}
-          <div className='w-full md:w-64 bg-white p-4 rounded shadow-md'>
+          <div className='filter'>
             <div className="flex justify-between items-center mb-4">
               <h2 className='text-lg font-bold'>Filtros</h2>
               <button 
@@ -223,14 +260,14 @@ export default function ProductosPage() {
               <h3 className="font-semibold mb-2">Categorías</h3>
               <div className="space-y-2 max-h-60 overflow-y-auto">
                 {categorias.map(cat => (
-                  <div key={cat} className="flex items-center">
+                  <div key={cat} className="flex items-center input-radio-Category">
                     <input
                       type="radio"
                       id={`cat-${cat}`}
                       name="categoria"
                       checked={normalizarTexto(categoriaSeleccionada) === normalizarTexto(cat)}
                       onChange={() => setCategoriaSeleccionada(cat)}
-                      className="mr-2"
+                      className="mr-2 "
                     />
                     <label htmlFor={`cat-${cat}`} className="flex-1">
                       {cat} <span className="text-gray-500 text-sm">({contadorPorCategoria[cat] || 0})</span>

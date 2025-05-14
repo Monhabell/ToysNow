@@ -54,6 +54,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
 
           const stockBajo = p.stock <= 5
 
+          const EnvioGratis = p.shipment <= 0
           const fechaCreacion = new Date(p.created_at);
           const hoy = new Date();
           const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
@@ -66,7 +67,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
           return (
             <motion.div
               key={p.id}
-              className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl cursor-pointer min-w-[250px]"
+              className="targetProducto"
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
@@ -89,9 +90,12 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
               </div>
 
               <div className="p-4 space-y-2">
-                <h2 className="text_title_product">{p.name}</h2>
-                {stockBajo && <p className="text-sm ">¡Últimas unidades!</p>}
-
+                <h2 className="text_title_product">{p.name.length > 22 ? p.name.slice(0, 22) + '...' : p.name}</h2>
+                <div className='flex items-center justify-between'>
+                  {stockBajo && <p className="text-sm ">¡Últimas unidades!</p>}
+                  {EnvioGratis && <p className="text-sm ">¡Envio Gratis!</p>}
+                </div>
+                
                 <div className="text-md">
                   {tieneDescuento ? (
                     <div className="flex items-center space-x-2">
@@ -99,13 +103,12 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                         $ {precioFinal.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                       </span>
                       <span className="valorAnterior line-through">
-                       
                         $ {p.compare_price.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                       </span>
 
                     </div>
                   ) : (
-                    <span className="text-gray-800 font-medium"> 
+                    <span className=" font-medium"> 
                       $ {precioFinal.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                     </span>
                   )}
