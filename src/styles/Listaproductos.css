@@ -10,13 +10,14 @@
 }
 
 .text_title_product{
+    color: var(--gold-600);
     font-size: 15px;
     font-family:Verdana, Geneva, Tahoma, sans-serif
 }
 
 .star_qualifications{
     display: flex;
-    justify-content: space-between;
+    font-size: 1px;
     text-align: center;
     align-items: center;
 }

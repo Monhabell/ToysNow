@@ -64,7 +64,7 @@ export default function Navbar() {
             </Link>
             
             <div className="flex items-center space-x-4 md:hidden">
-              <button onClick={() => setIsOpen(!isOpen)} className="text-black focus:outline-none">
+              <button onClick={() => setIsOpen(!isOpen)} className="text-white focus:outline-none cursor-pointer">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   {isOpen ? (
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

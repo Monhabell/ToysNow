@@ -4,6 +4,18 @@ import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ListaProductos from '@/components/productos/ListaProductos'
 import '../../styles/productos.css';
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import { Separator } from "@/components/ui/separator"
+
 
 
 export default function ProductosPage() {
@@ -26,7 +38,7 @@ export default function ProductosPage() {
 
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const productosPerPage = 6;
+  const productosPerPage = 12;
 
   // Obtener productos al cargar
   useEffect(() => {
@@ -36,24 +48,24 @@ export default function ProductosPage() {
         const res = await fetch('/api/productos');
         const data = await res.json();
         setAllProductos(data);
-        
-        
-        const cats  = Array.from(
+
+
+        const cats = Array.from(
           new Set(
             data
-              .flatMap((p: any) => p.category || []) 
-              .filter(Boolean) 
+              .flatMap((p: any) => p.category || [])
+              .filter(Boolean)
           )
         );
         console.log(cats);
         setCategorias(cats as string[]);
 
 
-        
+
         // Extraer marcas únicas
         const marcas = Array.from(new Set(data.map((p: any) => p.brand).filter(Boolean)));
         setMarcasDisponibles(marcas as string[]);
-        
+
       } catch (error) {
         console.error('Error al obtener productos:', error);
       } finally {
@@ -66,12 +78,12 @@ export default function ProductosPage() {
 
   // Normalizar texto para búsquedas
   const normalizarTexto = (texto: any) => {
-  if (!texto) return ''; // Si es null, undefined o vacío, retorna cadena vacía
-  return String(texto) // Convierte a string por si es un número u otro tipo
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase();
-};
+    if (!texto) return ''; // Si es null, undefined o vacío, retorna cadena vacía
+    return String(texto) // Convierte a string por si es un número u otro tipo
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  };
 
   // Filtrar productos
   const productosFiltrados = useMemo(() => {
@@ -85,7 +97,7 @@ export default function ProductosPage() {
         const description = normalizarTexto(producto.description || '');
         const nombre = normalizarTexto(producto.name || '');
         const brand = normalizarTexto(producto.brand || '');
-        
+
         const color = Array.isArray(producto.color)
           ? producto.color.map((d: string) => normalizarTexto(d)).join(' ')
           : '';
@@ -94,8 +106,8 @@ export default function ProductosPage() {
           ? producto.is_feature.map((d: string) => normalizarTexto(d)).join(' ')
           : '';
 
-        return categoria.includes(termino) || nombre.includes(termino) 
-          || detalles.includes(termino) || description.includes(termino) 
+        return categoria.includes(termino) || nombre.includes(termino)
+          || detalles.includes(termino) || description.includes(termino)
           || brand.includes(termino) || color.includes(termino);
       });
     }
@@ -112,10 +124,10 @@ export default function ProductosPage() {
 
     // Filtro por precio
     if (precioMin !== '') {
-      console.log(precioMin);  
+      console.log(precioMin);
       filtrados = filtrados.filter(producto =>
-        (producto.compare_price === 0 
-          ? producto.price 
+        (producto.compare_price === 0
+          ? producto.price
           : producto.compare_price - producto.price
         ) >= precioMin
       );
@@ -123,7 +135,7 @@ export default function ProductosPage() {
     }
 
     if (precioMax !== '') {
-      filtrados = filtrados.filter(producto => 
+      filtrados = filtrados.filter(producto =>
         (producto.compare_price === 0
           ? producto.price
           : producto.compare_price - producto.price
@@ -132,7 +144,7 @@ export default function ProductosPage() {
 
     // Filtro por marca
     if (marca) {
-      filtrados = filtrados.filter(producto => 
+      filtrados = filtrados.filter(producto =>
         normalizarTexto(producto.brand || '') === normalizarTexto(marca));
     }
 
@@ -141,7 +153,7 @@ export default function ProductosPage() {
       if (condicion === 'nuevo') {
         const treintaDiasAtras = new Date();
         treintaDiasAtras.setDate(treintaDiasAtras.getDate() - 30);
-        
+
         filtrados = filtrados.filter(producto => {
           const fechaProducto = new Date(producto.created_at);
           return fechaProducto > treintaDiasAtras;
@@ -151,7 +163,7 @@ export default function ProductosPage() {
       if (condicion === 'descuento') {
         filtrados = filtrados.filter(producto => {
           if (!producto.compare_price) return false;
-          
+
           const precioOriginal = parseFloat(producto.compare_price);
           const precioActual = parseFloat(producto.price);
           return precioOriginal > precioActual;
@@ -166,19 +178,19 @@ export default function ProductosPage() {
 
     // Filtro por rating mínimo
     if (ratingMinimo !== '') {
-      filtrados = filtrados.filter(producto => 
+      filtrados = filtrados.filter(producto =>
         producto.quialification >= ratingMinimo);
     }
 
     return filtrados;
   }, [
-    allProductos, 
-    searchTerm, 
+    allProductos,
+    searchTerm,
     categoriaSeleccionada,
-    precioMin, 
-    precioMax, 
-    marca, 
-    condicion, 
+    precioMin,
+    precioMax,
+    marca,
+    condicion,
     envioGratis,
     ratingMinimo
   ]);
@@ -205,7 +217,7 @@ export default function ProductosPage() {
   const contadorPorMarca = useMemo(() => {
     const counts: Record<string, number> = {};
     marcasDisponibles.forEach(marca => {
-      counts[marca] = productosFiltrados.filter(p => 
+      counts[marca] = productosFiltrados.filter(p =>
         normalizarTexto(p.brand || '') === normalizarTexto(marca)).length;
     });
     return counts;
@@ -215,10 +227,10 @@ export default function ProductosPage() {
     const counts: Record<string, number> = {};
     categorias.forEach(cat => {
       counts[cat] = productosFiltrados.filter(p => {
-        const categoriasProducto = Array.isArray(p.category) 
-          ? p.category 
+        const categoriasProducto = Array.isArray(p.category)
+          ? p.category
           : [p.category];
-        return categoriasProducto.some((c: any) => 
+        return categoriasProducto.some((c: any) =>
           normalizarTexto(c) === normalizarTexto(cat)
         );
       }).length;
@@ -237,17 +249,33 @@ export default function ProductosPage() {
     setRatingMinimo('');
   };
 
+  const toggleFilter = () => {
+    const menu = document.getElementById("filterMenu");
+    if (menu) {
+      console.log(menu)
+      
+      menu.classList.toggle("active");
+    }
+  };
+
   return (
     <>
       <Navbar />
       <div className='max-w-7xl mx-auto mt-32 px-4 content-producto'>
-       
+
         <div className='flex flex-col md:flex-row gap-6'>
           {/* Panel de Filtros */}
-          <div className='filter'>
+          <button 
+            className="btn-toggle-filter"
+            onClick={toggleFilter}
+          >
+            ☰ Filtros
+          </button>
+
+          <div className='filter' id="filterMenu">
             <div className="flex justify-between items-center mb-4">
-              <h2 className='text-lg font-bold'>Filtros</h2>
-              <button 
+              <h2 className='text-lg text-gold-600'>Filtros</h2>
+              <button
                 onClick={limpiarFiltros}
                 className="text-xs text-blue-500 hover:underline"
               >
@@ -256,9 +284,9 @@ export default function ProductosPage() {
             </div>
 
             {/* Filtro por Categoría */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Categorías</h3>
-              <div className="space-y-2 max-h-60 overflow-y-auto">
+            <div className="mb-6 mt-6">
+              <h3 className="font-semibold text-gold-600 mb-2">Categorías</h3>
+              <div className="space-y-2  ">
                 {categorias.map(cat => (
                   <div key={cat} className="flex items-center input-radio-Category">
                     <input
@@ -277,9 +305,11 @@ export default function ProductosPage() {
               </div>
             </div>
 
+            <Separator />
+
             {/* Filtro por Precio */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Precio</h3>
+            <div className="mb-6 mt-6">
+              <h3 className="font-semibold text-gold-600 mb-2">Precio</h3>
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-sm mb-1">Mínimo</label>
@@ -304,11 +334,13 @@ export default function ProductosPage() {
               </div>
             </div>
 
+            <Separator />
+
             {/* Filtro por Marca */}
             {marcasDisponibles.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-semibold mb-2">Marcas</h3>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
+              <div className="mb-6 mt-6">
+                <h3 className="font-semibold mb-2 text-gold-600">Marcas</h3>
+                <div className="space-y-2 ">
                   {marcasDisponibles.map(m => (
                     <div key={m} className="flex items-center">
                       <input
@@ -328,9 +360,11 @@ export default function ProductosPage() {
               </div>
             )}
 
+            <Separator />
+
             {/* Filtro por Condición */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Condición</h3>
+            <div className="mb-6 mt-6">
+              <h3 className="font-semibold text-gold-600 mb-2">Condición</h3>
               <select
                 value={condicion}
                 onChange={(e) => setCondicion(e.target.value)}
@@ -342,9 +376,11 @@ export default function ProductosPage() {
               </select>
             </div>
 
+            <Separator />
+
             {/* Filtro por Envío */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Envío</h3>
+            <div className="mb-6 mt-6">
+              <h3 className="font-semibold text-gold-600 mb-2">Envío</h3>
               <div className="flex items-center">
                 <input
                   type="checkbox"
@@ -357,9 +393,11 @@ export default function ProductosPage() {
               </div>
             </div>
 
+            <Separator />
+
             {/* Filtro por Rating */}
-            <div className="mb-6">
-              <h3 className="font-semibold mb-2">Calificación</h3>
+            <div className="mb-6 mt-6">
+              <h3 className="font-semibold text-gold-600 mb-2">Calificación</h3>
               <select
                 value={ratingMinimo}
                 onChange={(e) => setRatingMinimo(e.target.value ? parseInt(e.target.value) : '')}
@@ -375,46 +413,78 @@ export default function ProductosPage() {
             </div>
           </div>
 
+
+
           {/* Lista de Productos */}
           <div className='flex-1'>
-            <div className="bg-white p-4 rounded shadow-md mb-4">
+            <div className="title-producto">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold">
+                <h2 className="text-xl font-bold text-gold-600">
                   {categoriaSeleccionada || 'Todos los productos'}
-                  <span className="text-gray-500 text-sm font-normal ml-2">
+                  <span className="text-gray-200 text-sm font-normal ml-2">
                     ({productosFiltrados.length} resultados)
                   </span>
                 </h2>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm">Ordenar por:</span>
-                  <select
-                    className="border p-2 rounded"
-                    onChange={(e) => {
-                      const orden = e.target.value;
-                      if (orden === 'precio') {
-                        setAllProductos(prev => [...prev].sort((a, b) => a.price - b.price));
-                      } else if (orden === 'calificacion') {
-                        setAllProductos(prev => [...prev].sort((a, b) => b.quialification - a.quialification));
-                      }
-                    }}
-                  >
-                    <option value="relevancia">Relevancia</option>
-                    <option value="precio">Precio</option>
-                    <option value="calificacion">Calificación</option>
-                  </select>
+                  <Select
+                      onValueChange={(value) => {
+                        if (value === 'precio') {
+                          setAllProductos(prev => [...prev].sort((a, b) => a.price - b.price));
+                        } else if (value === 'calificacion') {
+                          setAllProductos(prev => [...prev].sort((a, b) => b.quialification - a.quialification));
+                        } else {
+                          // Opcional: Resetear al orden original si es "relevancia"
+                          setAllProductos(prev => [...prev]); 
+                        }
+                      }}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder="Ordenar por" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectLabel>Criterios</SelectLabel>
+                          <SelectItem value="relevancia">Relevancia</SelectItem>
+                          <SelectItem value="precio">Precio (Menor a Mayor)</SelectItem>
+                          <SelectItem value="calificacion">Calificación (Mayor a Menor)</SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                 </div>
               </div>
             </div>
 
             {isLoading ? (
-              <div className="flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              <div className="flex  space-y-3">
+                <div className="flex flex-col space-y-3 m-5">
+                  <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+                <div className='flex flex-col space-y-3 m-5'>
+                  <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
+                <div className='flex flex-col space-y-3 m-5'>
+                  <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+                  <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                  </div>
+                </div>
               </div>
+
+      
             ) : productosFiltrados.length === 0 ? (
               <div className="bg-white p-8 rounded shadow-md text-center">
                 <h3 className="text-lg font-semibold mb-2">No se encontraron productos</h3>
                 <p className="text-gray-600 mb-4">Intenta ajustar tus filtros de búsqueda</p>
-                <button 
+                <button
                   onClick={limpiarFiltros}
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
                 >
@@ -422,61 +492,65 @@ export default function ProductosPage() {
                 </button>
               </div>
             ) : (
-              <div className="">
+              <div>
                 <ListaProductos productos={productosPaginados} />
-                
-                {/* Paginación */}
-                {productosFiltrados.length > productosPerPage && (
-                  <div className="flex justify-center mt-8">
-                    {/* Botón Anterior */}
-                    {currentPage > 1 && (
-                      <button
-                        onClick={() => paginate(currentPage - 1)}
-                        className="mx-1 px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
-                      >
-                        &laquo; Anterior
-                      </button>
-                    )}
-
-                    {/* Números de página */}
-                    {Array.from({ 
-                      length: Math.ceil(productosFiltrados.length / productosPerPage) 
-                    }).map((_, index) => {
-                      const pageNumber = index + 1;
-                      // Mostrar solo páginas cercanas a la actual
-                      if (
-                        pageNumber === 1 || 
-                        pageNumber === Math.ceil(productosFiltrados.length / productosPerPage) ||
-                        (pageNumber >= currentPage - 2 && pageNumber <= currentPage + 2)
-                      ) {
-                        return (
+                <div className='contenedor-paginacion'>
+                  <div className='pagination'>
+                    {/* Paginación */}
+                    {productosFiltrados.length > productosPerPage && (
+                      <div className="flex justify-center">
+                        {/* Botón Anterior */}
+                        {currentPage > 1 && (
                           <button
-                            key={index}
-                            onClick={() => paginate(pageNumber)}
-                            className={`mx-1 px-3 py-1 rounded ${
-                              currentPage === pageNumber
-                                ? 'bg-blue-500 text-white'
-                                : 'bg-gray-200 hover:bg-gray-300'
-                            }`}
+                            onClick={() => paginate(currentPage - 1)}
+                            className="btn-paginacion-back "
                           >
-                            {pageNumber}
+                            &laquo; 
                           </button>
-                        );
-                      }
-                      return null;
-                    })}
+                        )}
 
-                    {/* Botón Siguiente */}
-                    {currentPage < Math.ceil(productosFiltrados.length / productosPerPage) && (
-                      <button
-                        onClick={() => paginate(currentPage + 1)}
-                        className="mx-1 px-3 py-1 rounded bg-gray-200 hover:bg-gray-300"
-                      >
-                        Siguiente &raquo;
-                      </button>
+                        {/* Números de página */}
+                        {Array.from({
+                          length: Math.ceil(productosFiltrados.length / productosPerPage)
+                        }).map((_, index) => {
+                          const pageNumber = index + 1;
+                          // Mostrar solo páginas cercanas a la actual
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === Math.ceil(productosFiltrados.length / productosPerPage) ||
+                            (pageNumber >= currentPage - 2 && pageNumber <= currentPage + 2)
+                          ) {
+                            return (
+                              <button
+                                key={index}
+                                onClick={() => paginate(pageNumber)}
+                                className={`mx-1 px-3 py-1 rounded ${currentPage === pageNumber
+                                  ? 'active-page'
+                                  : 'bg-gray-200 hover:bg-gray-300'
+                                  }`}
+                              >
+                                {pageNumber}
+                              </button>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        {/* Botón Siguiente */}
+                        {currentPage < Math.ceil(productosFiltrados.length / productosPerPage) && (
+                          <button
+                            onClick={() => paginate(currentPage + 1)}
+                            className=" btn-paginacion-next"
+                          >
+                             &raquo;
+                          </button>
+                        )}
+                      </div>
                     )}
                   </div>
-                )}
+                </div>
+
+
               </div>
             )}
           </div>

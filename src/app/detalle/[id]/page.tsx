@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { useCart } from '@/context/CartContext';
 import { CiHeart } from "react-icons/ci";
 import ListaProductos from '@/components/productos/ListaProductos';
@@ -21,17 +21,25 @@ interface Producto {
   category: string;
   is_feature: string[]; // <-- Aquí lo agregas
   created_at:string;
+  color: string[]; 
+  shipment: string;
+  
 }
 
 interface Props {
   params: {
     id: string;
+    img: string;
+    color: string[];
+    shipment?: string;
+    [key: string]: any;
   };
 }
 
 export default function ProductoDetalle({ params }: Props) {
-
-  const { id } = params;
+  // Unwrap the params promise first
+  const unwrappedParams = use(params);
+  const { id } = unwrappedParams;
 
 
   const { agregarProducto } = useCart();
@@ -138,10 +146,13 @@ export default function ProductoDetalle({ params }: Props) {
   const nuevoOk = diffDias <= 30; // producto es nuevo si se creó hace menos de 30 días.
 
   const textoNuevo = (nuevoOk === true ? 'Nuevo' : '') + ' | +5 vendidos';
-  const valor =  producto.compare_price - producto.price ;
+  const valor =  producto.price - producto.compare_price ;
   const star = producto.quialification;
 
- 
+  const descuento = Math.round((producto.compare_price / producto.price) * 100);
+
+  const color = producto.color === null ? [] : producto.color;
+
   return (
     <>
       <div className="relative">
@@ -184,21 +195,15 @@ export default function ProductoDetalle({ params }: Props) {
                   </div>
                 </div>
 
-                <h1 className='detail_text'>Detalles del producto: {producto.name}</h1>
-
-                <div>
-                  {Array(star).fill(0).map((_, index) => (
-                    <span key={index}>⭐</span>
-                  ))}
-                </div>
-                <p>Calificación: {star} estrellas</p>
+                <h1 className='detail_text text-gold-600'>{producto.name}</h1>
 
                 <p className='valorPresio'>$ {valor.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</p>
-                <p>{Math.round((producto.price / producto.compare_price) * 100)}% OFF</p>
-
-                <a className='links' href="#">Ver los medios de pago</a>
-
-                <p>Stock: {producto.stock}</p>
+                
+                {descuento > 0 && (
+                  <p>{descuento}% OFF</p>
+                )}
+                
+                <p>Existencias: {producto.stock}</p>
 
                 <button className="btnsed">Comprar ahora</button>
 
@@ -215,12 +220,39 @@ export default function ProductoDetalle({ params }: Props) {
                 {producto.is_feature && producto.is_feature.length > 0 && (
                   <>
                     <p className='mt-5 mb-3'>Lo que tienes que saber de este producto</p>
-                    <ul>
+                    <ul className=' mb-5'>
                       {producto.is_feature.map((detalle, index) => (
                         <li key={index}>{detalle}</li>
                       ))}
                     </ul>
                   </>
+                )}
+
+                {color.map((col, index) => (
+                  <div 
+                    key={index} 
+                    className={`color-option `}
+                    // onClick={() => handleColorSelect(index)}
+                  >
+                    <div 
+                      className="color-swatch" 
+                      style={{ 
+                        backgroundColor: col,
+                        
+                      }}
+                    >
+                    </div>
+                    <p className="color-code">{col}</p>
+                  </div>
+                ))}
+
+                { star != null && (
+                  <div>
+                    {Array(star).fill(0).map((_, index) => (
+                      <span key={index}>⭐</span>
+                    ))}
+                    <p>Calificación: {star === null ? 0 : star} </p>
+                  </div>
                 )}
 
               </div>

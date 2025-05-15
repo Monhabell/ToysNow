@@ -54,7 +54,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
 
           const stockBajo = p.stock <= 5
 
-          const EnvioGratis = p.shipment <= 0
+          const EnvioGratis = p.shipment > 0
           const fechaCreacion = new Date(p.created_at);
           const hoy = new Date();
           const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
@@ -117,7 +117,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                 {qualifi && (
                   <div className='star_qualifications'>
                     <StarRating rating={TotalCalifi} onRate={handleRating} />
-                    <p>({cantUs})</p>
+                    <p className='ml-2 mt-1'>({cantUs})</p>
                     
                   </div>
                 )}

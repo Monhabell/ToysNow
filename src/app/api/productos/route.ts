@@ -5,7 +5,7 @@ import { BiCategory } from 'react-icons/bi'
 const productos = [
   { 
     id: 1, 
-    name: 'DADOS ERÓTICOS LUMINOSOS X 2', 
+    name: 'Dados eóticos Liminosos de 6 caras', 
     price: 100000, 
     compare_price: 0, 
     description: "Cama doble",
@@ -35,7 +35,9 @@ const productos = [
     brand: "Muebles&Co",
     shipment: 5000,
     created_at: "12/03/2025",
-    destacado: 0
+    destacado: 0,
+    color: null,
+
 
   },
   { 
