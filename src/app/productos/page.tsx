@@ -53,7 +53,7 @@ export default function ProductosPage() {
         const cats = Array.from(
           new Set(
             data
-              .flatMap((p: any) => p.category || [])
+              .flatMap((p: any) => p.categories || [])
               .filter(Boolean)
           )
         );
@@ -93,7 +93,7 @@ export default function ProductosPage() {
     // Filtro por término de búsqueda
     if (termino) {
       filtrados = filtrados.filter((producto) => {
-        const categoria = normalizarTexto(producto.category || '');
+        const categoria = normalizarTexto(producto.categories || '');
         const description = normalizarTexto(producto.description || '');
         const nombre = normalizarTexto(producto.name || '');
         const brand = normalizarTexto(producto.brand || '');
@@ -115,7 +115,7 @@ export default function ProductosPage() {
     // Filtro por categoría
     if (categoriaSeleccionada) {
       filtrados = filtrados.filter(producto =>
-        (producto.category || []).some((cat: string) =>
+        (producto.categories || []).some((cat: string) =>
           normalizarTexto(cat) === normalizarTexto(categoriaSeleccionada)
         )
       );
@@ -227,9 +227,9 @@ export default function ProductosPage() {
     const counts: Record<string, number> = {};
     categorias.forEach(cat => {
       counts[cat] = productosFiltrados.filter(p => {
-        const categoriasProducto = Array.isArray(p.category)
-          ? p.category
-          : [p.category];
+        const categoriasProducto = Array.isArray(p.categories)
+          ? p.categories
+          : [p.categories];
         return categoriasProducto.some((c: any) =>
           normalizarTexto(c) === normalizarTexto(cat)
         );

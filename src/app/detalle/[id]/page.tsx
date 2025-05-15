@@ -8,29 +8,37 @@ import Navbar from "@/components/Navbar";
 import { GoChevronRight , GoChevronLeft } from "react-icons/go";
 import React from 'react';
 import '../../../styles/detalles.css';
+import { div } from 'framer-motion/client';
+
+interface Feature {
+  color?: {
+    [key: string]: {
+      price: number;
+      images: string[];
+    };
+  };
+}
 
 interface Producto {
   id: number;
   name: string;
   price: number;
   compare_price: number;
+  features: Feature[];  // <-- Cambiado a array de Feature
   img: string[];
   nuevo: number;
   stock: number;
   quialification: number;
-  category: string;
-  is_feature: string[]; // <-- Aquí lo agregas
-  created_at:string;
-  color: string[]; 
+  categories: string;
+  is_feature: string[];
+  created_at: string;
   shipment: string;
-  
 }
 
 interface Props {
   params: {
     id: string;
     img: string;
-    color: string[];
     shipment?: string;
     [key: string]: any;
   };
@@ -75,9 +83,11 @@ export default function ProductoDetalle({ params }: Props) {
       try {
         const res = await fetch('/api/productos');
         const productos: Producto[] = await res.json();
-        const relacionados = productos.filter(
-          (p) => p.category === producto.category && p.id !== producto.id
+        const relacionados = productos.filter((p) =>
+          p.id !== producto.id &&
+          p.categories.some((cat) => producto.categories.includes(cat))
         );
+
         setRelaciones(relacionados);
       } catch (error) {
         console.error('Error al cargar productos relacionados:', error);
@@ -151,7 +161,9 @@ export default function ProductoDetalle({ params }: Props) {
 
   const descuento = Math.round((producto.compare_price / producto.price) * 100);
 
-  const color = producto.color === null ? [] : producto.color;
+  const colores = producto.features && producto.features.length > 0 && producto.features[0].color
+  ? Object.keys(producto.features[0].color)
+  : [];
 
   return (
     <>
@@ -228,23 +240,30 @@ export default function ProductoDetalle({ params }: Props) {
                   </>
                 )}
 
-                {color.map((col, index) => (
-                  <div 
-                    key={index} 
-                    className={`color-option `}
-                    // onClick={() => handleColorSelect(index)}
-                  >
+                {colores.length > 0 && (
+                  <div className='mt-5'>
+                    <h3>Colores Disponibles</h3>
+                    {colores.map((col, index) => (
                     <div 
-                      className="color-swatch" 
-                      style={{ 
-                        backgroundColor: col,
-                        
-                      }}
+                      key={index} 
+                      className={`color-option mt-5 `}
+                      // onClick={() => handleColorSelect(index)}
                     >
+                      <div 
+                        className="color-swatch" 
+                        style={{ 
+                          backgroundColor: col,
+                          
+                        }}
+                      >
+                      </div>
                     </div>
-                    <p className="color-code">{col}</p>
-                  </div>
+                  
                 ))}
+                  </div>
+                )}
+
+               
 
                 { star != null && (
                   <div>
