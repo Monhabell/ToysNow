@@ -311,10 +311,7 @@ export default function ProductoDetalle({ params }: Props) {
 
                   <a href="#" className="enlace">Conoce otros medios de pago</a>
                 </div>
-
               </div>
-              
-
             </div>
             
             <div className='itemProducRel'>
@@ -337,11 +334,7 @@ export default function ProductoDetalle({ params }: Props) {
 
               </div>
             </div>
-
-            
           </div>
-
-
         </div>
 
         <div className='max-w-6xl mx-auto mt-10 content'>
@@ -375,7 +368,6 @@ export default function ProductoDetalle({ params }: Props) {
             <p>Aún no hay preguntas sobre este producto.</p>
           )}
         </div>
-
 
         {/* <div className='max-w-6xl mx-auto mt-10'>
           <h2 className="text-xl font-bold">Opiniones del producto</h2>

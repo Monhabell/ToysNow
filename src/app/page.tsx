@@ -53,7 +53,7 @@ export default function Home() {
       try {
         const res = await fetch('/api/productos')
         const productos = await res.json()
-        const destacado = productos.find((p: any) => p.destacado > 0)
+        const destacado = productos.find((p: any) => p.destacado)
         
         if (!destacado) {
           console.log('No se encontraron productos destacados')
