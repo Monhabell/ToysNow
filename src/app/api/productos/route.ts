@@ -8,7 +8,7 @@ const productos = [
       name: 'Dados eóticos Liminosos de 6 caras',
       price: 100000,
       compare_price: 0,
-      description: "Cama doble",
+      description: "Cama Doble – Comodidad y Estilo para Tu Descanso Disfruta de un descanso reparador con nuestra cama doble, ideal para parejas o para quienes buscan mayor espacio y confort al dormir. Su estructura robusta garantiza durabilidad, mientras que su diseño elegante se adapta perfectamente a cualquier estilo de habitación. Compatible con colchones estándar de tamaño matrimonial, esta cama ofrece el equilibrio perfecto entre funcionalidad y estética. ¡Haz de tu dormitorio un lugar de descanso y armonía!",
       features: [
         {
           color: {

@@ -9,9 +9,17 @@ import { GoChevronRight , GoChevronLeft } from "react-icons/go";
 import React from 'react';
 import '../../../styles/detalles.css';
 import { div } from 'framer-motion/client';
+import { Separator } from "@/components/ui/separator"
+
 
 interface Feature {
   color?: {
+    [key: string]: {
+      price: number;
+      images: string[];
+    };
+  };
+  size?: {
     [key: string]: {
       price: number;
       images: string[];
@@ -23,6 +31,7 @@ interface Producto {
   id: number;
   name: string;
   price: number;
+  description: string;
   compare_price: number;
   features: Feature[];  // <-- Cambiado a array de Feature
   img: string[];
@@ -164,6 +173,12 @@ export default function ProductoDetalle({ params }: Props) {
   const colores = producto.features && producto.features.length > 0 && producto.features[0].color
   ? Object.keys(producto.features[0].color)
   : [];
+
+  const sizeProduct = producto.features && producto.features.length > 0 && producto.features[0].size
+  ? Object.keys(producto.features[0].size)
+  : [];
+
+  const detalles = producto.description
 
   return (
     <>
@@ -318,8 +333,20 @@ export default function ProductoDetalle({ params }: Props) {
             </div>
             
             <div className='itemProducRel'>
-              <div className='d-flex'>
-                <h1>Productos relacionados</h1>
+              <div className='d-flex mb-3'>
+                <h1 className='mb-5 text-gold-600'>Detalles del producto</h1>
+                {detalles && detalles.length > 0 && (
+                  <div className='text-sm'>
+                    <p>{detalles}</p>
+                  </div>
+                )}
+              </div>
+
+              <Separator />
+
+
+              <div className='d-flex mt-5'>
+                <h1 className='text-gold-600'>Productos relacionados</h1>
               </div>
               <div className="slider-container">
 
