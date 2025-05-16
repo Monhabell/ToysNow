@@ -4,18 +4,18 @@ import { NextResponse } from 'next/server'
 import { BiCategory } from 'react-icons/bi'
 const productos = [
   {
-    "id": 2, 
-    "name": "Nepe",
-    "price": 10000,
-    "compare_price": 10000,
-    "slug": "nepe-1000",
-    "description": "aadadasdasdasdasd",
-    "brand": "Algo",
-    "stock": 6,
-    "shipment": 10000,
-    "is_available": true,
-    "is_feature": true,
-    "features": [
+    id: 2, 
+    name: "Nepe",
+    price: 10000,
+    compare_price: 10000,
+    slug: "nepe-1000",
+    description: "aadadasdasdasdasd",
+    brand: "Algo",
+    stock: 6,
+    shipment: 10000,
+    is_available: true,
+    is_feature: true,
+    features: [
         {
             "variants": [
                 {
@@ -53,19 +53,19 @@ const productos = [
             ]
         }
     ],
-    "img": [
+    img: [
         "#",
         "#"
     ],
-    "categories": [
+    categories: [
         {"id": 2, "name": "consoladores"}, 
         {"id": 5, "name": "lubricantes"}
     ],
-    "subcategories": [
+    subcategories: [
         {"id": 985, "name": "Nepe pequeño"},
         {"id": 85, "name": "Aja"}
     ],
-    "qualification": {
+    qualification: {
         "count_users": {
             "5": 20,
             "4": 10,
@@ -73,23 +73,23 @@ const productos = [
             "2": 1,
             "1": 25
         },
-        "comments": [
+        comments: [
             {
                 "text": "Muy bueno",
                 "date": "14/04/2025",
             }
         ] //Ordenado mas reciente al mas antiguo
     },
-    "questions": [
+    questions: [
         {"user_id": 5,"question": "Por que tan caro", "answer": "Algo", "is_approved": false, "created_at": "14/04/2025"},
         {"user_id": 4, "question": "Por que tan barato", "answer": "Por que si", "is_approved": true, "created_at": "14/04/2025"}
     ],
-    "seo": {
+    seo: {
         "meta_title": "Nepe - Tienda de Juguetes",
         "meta_description": "Descripción para motores de búsqueda",
         "keywords": ["nepe", "juguete adulto"]
     },
-    "created_at": "14/04/2025"
+    created_at: "14/04/2025"
   },
   {
     id: 2,
