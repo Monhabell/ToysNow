@@ -119,7 +119,7 @@ export default function ProductosPage() {
         setCategorias(cats);
 
         // Extraer marcas únicas
-        const marcas = Array.from(new Set(data.map((p: Producto) => p.brand).filter(Boolean)));
+        const marcas = Array.from(new Set(data.map((p: Producto) => p.brand).filter(Boolean))) as string[];
         setMarcasDisponibles(marcas);
 
       } catch (error) {

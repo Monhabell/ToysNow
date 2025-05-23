@@ -154,6 +154,9 @@ const productos = [
     "is_available": true,
     "is_feature": false,
     "features": [],
+    "dimensions": "4x112",
+    "size": "Sm",
+    "weight": "15kg",
     "img": ["/images/productos/lubricante1.jpg"],
     "categories": [{"id": 5, "name": "lubricantes"}],
     "subcategories": [],
@@ -170,11 +173,6 @@ const productos = [
     "created_at": "01/05/2025"
   },
 
-  // Puedes generar más productos cambiando `id`, `name`, `price`, `slug`, `description`,
-  // `brand`, `stock`, `features`, y demás campos únicos o variados.
-  
-  // Para simplificarte la vida, dime si quieres que te los dé directamente en un archivo JSON,
-  // o te los genero con valores aleatorios programáticamente en un script (por ejemplo, en Python o JavaScript).
 ]
 ;
 
