@@ -5,59 +5,88 @@ import { useCart } from '@/context/CartContext';
 import { CiHeart } from "react-icons/ci";
 import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
-import { GoChevronRight , GoChevronLeft } from "react-icons/go";
+import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import React from 'react';
 import '../../../styles/detalles.css';
-import { div } from 'framer-motion/client';
 import { Separator } from "@/components/ui/separator"
 
+interface Variant {
+  color?: string;
+  size?: string;
+  weight?: string;
+  cost_shipping?: number;
+  dimensions?: string;
+  price: number;
+  compare_price: number;
+  stock: number;
+  images: string[];
+}
 
 interface Feature {
-  color?: {
-    [key: string]: {
-      price: number;
-      images: string[];
-    };
+  variants: Variant[];
+}
+
+interface Qualification {
+  count_users: {
+    [key: string]: number;
   };
-  size?: {
-    [key: string]: {
-      price: number;
-      images: string[];
-    };
-  };
+  comments: {
+    text: string;
+    date: string;
+  }[];
+}
+
+interface Question {
+  user_id: number;
+  question: string;
+  answer: string;
+  is_approved: boolean;
+  created_at: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface SEO {
+  meta_title: string;
+  meta_description: string;
+  keywords: string[];
 }
 
 interface Producto {
   id: number;
   name: string;
   price: number;
-  description: string;
   compare_price: number;
-  features: Feature[];  // <-- Cambiado a array de Feature
-  img: string[];
-  nuevo: number;
+  slug: string;
+  description: string;
+  brand: string;
   stock: number;
-  quialification: number;
-  categories: string;
-  is_feature: string[];
+  shipment: number;
+  is_available: boolean;
+  is_feature: boolean;
+  features: Feature[];
+  img: string[];
+  categories: Category[];
+  subcategories: Category[];
+  qualification: Qualification;
+  questions: Question[];
+  seo: SEO;
   created_at: string;
-  shipment: string;
 }
 
 interface Props {
   params: {
     id: string;
-    img: string;
-    shipment?: string;
     [key: string]: any;
   };
 }
 
 export default function ProductoDetalle({ params }: Props) {
-  // Unwrap the params promise first
   const unwrappedParams = use(params);
   const { id } = unwrappedParams;
-
 
   const { agregarProducto } = useCart();
 
@@ -68,8 +97,7 @@ export default function ProductoDetalle({ params }: Props) {
   const [imgSeleccionada, setImgSeleccionada] = useState(0);
   const [preguntas, setPreguntas] = useState<{ pregunta: string; respuesta: string }[]>([]);
   const [nuevaPregunta, setNuevaPregunta] = useState('');
-
-
+  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
 
   useEffect(() => {
     const obtenerProducto = async () => {
@@ -78,6 +106,11 @@ export default function ProductoDetalle({ params }: Props) {
         const productos: Producto[] = await response.json();
         const encontrado = productos.find((prod) => prod.id.toString() === id);
         setProducto(encontrado || null);
+        
+        // Set the first variant as default if available
+        if (encontrado?.features?.[0]?.variants?.[0]) {
+          setSelectedVariant(encontrado.features[0].variants[0]);
+        }
       } catch (error) {
         console.error('Error al obtener los productos:', error);
       }
@@ -92,10 +125,12 @@ export default function ProductoDetalle({ params }: Props) {
       try {
         const res = await fetch('/api/productos');
         const productos: Producto[] = await res.json();
+        
         const relacionados = productos.filter((p) =>
           p.id !== producto.id &&
-          p.categories.some((cat) => producto.categories.includes(cat))
-        );
+          p.categories.some((cat) => 
+            producto.categories.some(pCat => pCat.id === cat.id)
+        ));
 
         setRelaciones(relacionados);
       } catch (error) {
@@ -106,7 +141,6 @@ export default function ProductoDetalle({ params }: Props) {
     obtenerRelacionados();
   }, [producto]);
 
-  // Verificar si el slider necesita scroll
   useEffect(() => {
     const comprobarScroll = () => {
       const slider = document.getElementById('slider');
@@ -121,18 +155,12 @@ export default function ProductoDetalle({ params }: Props) {
     return () => window.removeEventListener('resize', comprobarScroll);
   }, [relacionados]);
 
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
     const x = ((e.pageX - left - window.scrollX) / width) * 100;
     const y = ((e.pageY - top - window.scrollY) / height) * 100;
     setPosicion({ x, y });
   };
-
-  if (!producto) {
-    return <div>Cargando...</div>;
-  }
-
-  // Eslider de botones 
 
   const scrollLeft = () => {
     const slider = document.getElementById('slider');
@@ -144,12 +172,9 @@ export default function ProductoDetalle({ params }: Props) {
     slider?.scrollBy({ left: 500, behavior: 'smooth' });
   };
 
-  //  Seccion de preguntas y respuestas 
-
   const enviarPregunta = () => {
     if (nuevaPregunta.trim() === '') return;
   
-    // Simulando una respuesta automática
     const nueva = {
       pregunta: nuevaPregunta,
       respuesta: "¡Gracias por tu pregunta! Pronto alguien del equipo te responderá."
@@ -158,27 +183,52 @@ export default function ProductoDetalle({ params }: Props) {
     setPreguntas([...preguntas, nueva]);
     setNuevaPregunta('');
   };
-  
+
+  if (!producto) {
+    return <div>Cargando...</div>;
+  }
+
   const fechaCreacion = new Date(producto.created_at);
   const hoy = new Date();
   const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
-  const nuevoOk = diffDias <= 30; // producto es nuevo si se creó hace menos de 30 días.
+  const nuevoOk = diffDias <= 30;
 
-  const textoNuevo = (nuevoOk === true ? 'Nuevo' : '') + ' | +5 vendidos';
-  const valor =  producto.price - producto.compare_price ;
-  const star = producto.quialification;
+  const textoNuevo = (nuevoOk ? 'Nuevo' : '') + ' | +5 vendidos';
+  
+  const currentPrice = selectedVariant?.price || producto.price;
+  const currentComparePrice = selectedVariant?.compare_price || producto.compare_price;
+  const valor = currentPrice;
+  const descuento = currentComparePrice > currentPrice 
+    ? Math.round(((currentComparePrice - currentPrice) / currentComparePrice) * 100)
+    : 0;
 
-  const descuento = Math.round((producto.compare_price / producto.price) * 100);
+  // Calculate average qualification
+  const qualificationCounts = producto.qualification?.count_users || {};
+  const totalRatings = Object.values(qualificationCounts).reduce((a, b) => a + b, 0);
+  const weightedSum = Object.entries(qualificationCounts).reduce((sum, [stars, count]) => {
+    return sum + (parseInt(stars) * count);
+  }, 0);
+  const averageRating = totalRatings > 0 ? (weightedSum / totalRatings) : 0;
 
-  const colores = producto.features && producto.features.length > 0 && producto.features[0].color
-  ? Object.keys(producto.features[0].color)
-  : [];
+  // Get approved questions from the product
+  const approvedQuestions = producto.questions?.filter(q => q.is_approved) || [];
 
-  const sizeProduct = producto.features && producto.features.length > 0 && producto.features[0].size
-  ? Object.keys(producto.features[0].size)
-  : [];
+  // Get available colors and sizes from variants
+  const colors = Array.from(new Set(
+    producto.features?.flatMap(feature => 
+      feature.variants
+        .filter(v => v.color)
+        .map(v => v.color as string)
+    ) || []
+  ));
 
-  const detalles = producto.description
+  const sizes = Array.from(new Set(
+    producto.features?.flatMap(feature => 
+      feature.variants
+        .filter(v => v.size)
+        .map(v => v.size as string)
+    ) || []
+  ));
 
   return (
     <>
@@ -190,24 +240,23 @@ export default function ProductoDetalle({ params }: Props) {
         <div className='max-w-6xl mx-auto content-detalle mt-32'>
           <div className='grid-container'>
             <div className='itemgrupImg'>
-
-            {producto.img.map((img, index) => (
-              <img 
-                key={index}
-                src={img} 
-                alt={producto.name}
-                onClick={() => setImgSeleccionada(index)} // cuando hacen click
-              />
-            ))}
-
+              {producto.img.map((img, index) => (
+                <img 
+                  key={index}
+                  src={img} 
+                  alt={producto.name}
+                  onClick={() => setImgSeleccionada(index)}
+                />
+              ))}
             </div>
+            
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
               <img 
                 src={producto.img[imgSeleccionada]} 
-
                 style={{
                   transformOrigin: `${posicion.x}% ${posicion.y}%`
                 }}
+                alt={producto.name}
               />
             </div>
 
@@ -224,71 +273,96 @@ export default function ProductoDetalle({ params }: Props) {
 
                 <h1 className='detail_text text-gold-600'>{producto.name}</h1>
 
-                <p className='valorPresio'>$ {valor.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}</p>
-                
                 {descuento > 0 && (
-                  <p>{descuento}% OFF</p>
+                  <div className='flex items-center gap-2'>
+                    <p className='valorPresio'>${currentPrice.toLocaleString('en-CO')}</p>
+                    <p className='text-gray-500 line-through'>${currentComparePrice.toLocaleString('en-CO')}</p>
+                    <p className='text-red-500'>{descuento}% OFF</p>
+                  </div>
                 )}
                 
-                <p>Existencias: {producto.stock}</p>
+                {descuento <= 0 && (
+                  <p className='valorPresio'>${valor.toLocaleString('en-CO')}</p>
+                )}
+                
+                <p>Existencias: {selectedVariant?.stock || producto.stock}</p>
+
+                {/* Color selection */}
+                {colors.length > 0 && (
+                  <div className='mt-4'>
+                    <h3 className='font-medium'>Colores:</h3>
+                    <div className='flex gap-2 mt-2'>
+                      {colors.map((color, index) => (
+                        <button
+                          key={index}
+                          className={`w-8 h-8 rounded-full border ${selectedVariant?.color === color ? 'ring-2 ring-blue-500' : ''}`}
+                          style={{ backgroundColor: color }}
+                          onClick={() => {
+                            const variant = producto.features[0].variants.find(v => v.color === color);
+                            if (variant) setSelectedVariant(variant);
+                          }}
+                          title={color}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Size selection */}
+                {sizes.length > 0 && (
+                  <div className='mt-4'>
+                    <h3 className='font-medium'>Tamaños:</h3>
+                    <div className='flex gap-2 mt-2'>
+                      {sizes.map((size, index) => (
+                        <button
+                          key={index}
+                          className={`px-3 py-1 border rounded ${selectedVariant?.size === size ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+                          onClick={() => {
+                            const variant = producto.features[0].variants.find(v => v.size === size);
+                            if (variant) setSelectedVariant(variant);
+                          }}
+                        >
+                          {size}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 <button className="btnsed">Comprar ahora</button>
 
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    agregarProducto(producto);
+                    agregarProducto({
+                      ...producto,
+                      price: currentPrice,
+                      selectedVariant
+                    });
                   }}
                   className="btnsed"
                 >
                   🛒 Agregar al carrito
                 </button>
 
-                {producto.is_feature && producto.is_feature.length > 0 && (
-                  <>
-                    <p className='mt-5 mb-3'>Lo que tienes que saber de este producto</p>
-                    <ul className=' mb-5'>
-                      {producto.is_feature.map((detalle, index) => (
-                        <li key={index}>{detalle}</li>
-                      ))}
-                    </ul>
-                  </>
-                )}
-
-                {colores.length > 0 && (
+                {producto.description && (
                   <div className='mt-5'>
-                    <h3>Colores Disponibles</h3>
-                    {colores.map((col, index) => (
-                    <div 
-                      key={index} 
-                      className={`color-option mt-5 `}
-                      // onClick={() => handleColorSelect(index)}
-                    >
-                      <div 
-                        className="color-swatch" 
-                        style={{ 
-                          backgroundColor: col,
-                          
-                        }}
-                      >
-                      </div>
+                    <p className='font-medium'>Descripción:</p>
+                    <p>{producto.description}</p>
+                  </div>
+                )}
+
+                {averageRating > 0 && (
+                  <div className='mt-4'>
+                    <div className='flex items-center'>
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i}>{i < Math.round(averageRating) ? '⭐' : '☆'}</span>
+                      ))}
+                      <span className='ml-2'>({averageRating.toFixed(1)})</span>
                     </div>
-                  
-                ))}
+                    <p>{totalRatings} calificaciones</p>
                   </div>
                 )}
-
-               
-
-                { star != null && (
-                  <div>
-                    {Array(star).fill(0).map((_, index) => (
-                      <span key={index}>⭐</span>
-                    ))}
-                    <p>Calificación: {star === null ? 0 : star} </p>
-                  </div>
-                )}
-
               </div>
 
               <div className='border-Black mt-5'>
@@ -332,21 +406,19 @@ export default function ProductoDetalle({ params }: Props) {
             <div className='itemProducRel'>
               <div className='d-flex mb-3'>
                 <h1 className='mb-5 text-gold-600'>Detalles del producto</h1>
-                {detalles && detalles.length > 0 && (
+                {producto.description && (
                   <div className='text-sm'>
-                    <p>{detalles}</p>
+                    <p>{producto.description}</p>
                   </div>
                 )}
               </div>
 
               <Separator />
 
-
               <div className='d-flex mt-5'>
                 <h1 className='text-gold-600'>Productos relacionados</h1>
               </div>
               <div className="slider-container">
-
                 {mostrarBotones && (
                   <button className="slider-btn left" onClick={scrollLeft}><GoChevronLeft /></button>
                 )}
@@ -358,14 +430,28 @@ export default function ProductoDetalle({ params }: Props) {
                 {mostrarBotones && (
                   <button className="slider-btn right" onClick={scrollRight}><GoChevronRight /></button>
                 )}
-
               </div>
             </div>
           </div>
         </div>
 
+        {/* Questions section */}
         <div className='max-w-6xl mx-auto mt-10 content'>
           <h2 className="text-xl font-bold">Preguntas y respuestas</h2>
+          
+          {/* Approved questions from the product */}
+          {approvedQuestions.length > 0 && (
+            <ul className="space-y-4 mb-6">
+              {approvedQuestions.map((item, index) => (
+                <li key={index} className="border p-3 rounded">
+                  <p className="font-semibold">❓ {item.question}</p>
+                  <p className="text-green-700">💬 {item.answer}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+          
+          {/* User questions */}
           <div className="mb-4">
             <input
               type="text"
@@ -392,14 +478,9 @@ export default function ProductoDetalle({ params }: Props) {
               ))}
             </ul>
           ) : (
-            <p>Aún no hay preguntas sobre este producto.</p>
+            approvedQuestions.length === 0 && <p>Aún no hay preguntas sobre este producto.</p>
           )}
         </div>
-
-        {/* <div className='max-w-6xl mx-auto mt-10'>
-          <h2 className="text-xl font-bold">Opiniones del producto</h2>
-          <p>Opiniones de clientes sobre este producto...</p>
-        </div> */}
       </div>
     </>
   );

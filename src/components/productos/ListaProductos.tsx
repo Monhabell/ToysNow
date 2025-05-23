@@ -18,11 +18,25 @@ type Producto = {
   stock: number;
   img: string[];
   created_at: string | Date;
-  quialification?: number;
-  category?: string;
+  qualification?: {
+    count_users: {
+      [key: string]: number;
+    };
+    comments: Array<{
+      text: string;
+      date: string;
+    }>;
+  };
   brand?: string;
-  shipment?: number;  
-  // Agrega aquí cualquier otra propiedad que uses
+  shipment?: number;
+  features?: Array<{
+    variants: Array<{
+      price?: number;
+      compare_price?: number;
+      stock?: number;
+      [key: string]: any;
+    }>;
+  }>;
 };
 
 type ListaProductosProps = {
@@ -30,13 +44,11 @@ type ListaProductosProps = {
   isSlider?: boolean;
 };
 
-export default function ListaProductos({ productos, isSlider = false }: ListaProductosProps)  {
-
+export default function ListaProductos({ productos, isSlider = false }: ListaProductosProps) {
   const [rating, setRating] = useState(0);
   const handleRating = (value: any) => {
     setRating(value);
     console.log('Usuario calificó con:', value);
-    // agrgar la calificacion del producto por un fetch
   };
 
   const router = useRouter();
@@ -46,23 +58,51 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
       <div className={isSlider
         ? "flex gap-6 p-4 flex-nowrap"
         : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4"
-      }
-      >
-        {productos.map((p: any) => {
-          const tieneDescuento = p.compare_price > 0
-          const precioFinal = p.compare_price !== 0 ? p.compare_price - p.price : p.price;
+      }>
+        {productos.map((p) => {
+          // Calcular precio y stock considerando variantes
+          const basePrice = p.price;
+          const baseComparePrice = p.compare_price;
+          const baseStock = p.stock;
+          
+          // Obtener el primer precio de variante si existe
+          const variantPrice = p.features?.[0]?.variants?.[0]?.price;
+          const variantComparePrice = p.features?.[0]?.variants?.[0]?.compare_price;
+          const variantStock = p.features?.[0]?.variants?.[0]?.stock;
+          
+          const finalPrice = variantPrice || basePrice;
+          const finalComparePrice = variantComparePrice || baseComparePrice;
+          const finalStock = variantStock || baseStock;
 
-          const stockBajo = p.stock <= 5
+          const tieneDescuento = finalComparePrice > finalPrice;
+          const precioFinal = tieneDescuento ? finalComparePrice : finalPrice;
 
-          const EnvioGratis = p.shipment > 0
+          const stockBajo = finalStock <= 5;
+          const EnvioGratis = p.shipment === 0;
+          
           const fechaCreacion = new Date(p.created_at);
           const hoy = new Date();
           const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
-          const nuevoOk = diffDias <= 15; // producto es nuevo si se creó hace menos de 30 días.
+          const nuevoOk = diffDias <= 15;
 
-          const cantUs =  1
-          const qualifi = p.quialification >= 0
-          const TotalCalifi = p.quialification / cantUs
+          // Calcular calificación promedio
+          let TotalCalifi = 0;
+          let cantUs = 0;
+          
+          if (p.qualification) {
+            const counts = p.qualification.count_users;
+            let total = 0;
+            let count = 0;
+            
+            for (const [key, value] of Object.entries(counts)) {
+              const ratingValue = parseInt(key);
+              total += ratingValue * value;
+              count += value;
+            }
+            
+            TotalCalifi = total / count;
+            cantUs = count;
+          }
 
           return (
             <motion.div
@@ -73,15 +113,15 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
             >
               <div className="relative h-52">
                 <Image
-                  src={p.img[0]} //toma siempre la primera imagen del producto
+                  src={p.img[0] || '#'} // Usa '#' como fallback
                   alt={p.name}
                   fill
                   className="object-cover"
-                  onClick={() => router.push(`/detalle/${p.id}`)}  // <-- Navegará a la nueva página
+                  onClick={() => router.push(`/detalle/${p.id}`)}
                 />
                 {tieneDescuento && (
                   <span className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full shadow">
-                    -{Math.round((p.price / p.compare_price) * 100)}%
+                    -{Math.round(((finalComparePrice - finalPrice) / finalComparePrice) * 100)}%
                   </span>
                 )}
                 {nuevoOk && (
@@ -100,33 +140,30 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                   {tieneDescuento ? (
                     <div className="flex items-center space-x-2">
                       <span className="font-bold">
-                        $ {precioFinal.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        $ {finalPrice.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                       </span>
                       <span className="valorAnterior line-through">
-                        $ {p.compare_price.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                        $ {finalComparePrice.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                       </span>
-
                     </div>
                   ) : (
-                    <span className=" font-medium"> 
-                      $ {precioFinal.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
+                    <span className="font-medium"> 
+                      $ {finalPrice.toLocaleString('en-CO', { minimumFractionDigits: 0, maximumFractionDigits: 2 })}
                     </span>
                   )}
                 </div>
 
-                {qualifi && (
+                {p.qualification && (
                   <div className='star_qualifications'>
                     <StarRating rating={TotalCalifi} onRate={handleRating} />
                     <p className='ml-2 mt-1'>({cantUs})</p>
-                    
                   </div>
                 )}
               </div>
             </motion.div>
-          )
+          );
         })}
       </div>
-
     </>
-  )
+  );
 }

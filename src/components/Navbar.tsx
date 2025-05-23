@@ -6,6 +6,8 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import '../styles/Navbar.css';
 
+
+
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -20,6 +22,7 @@ export default function Navbar() {
 
   return (
     <div className="w-full border-b border-gold-500 fixed top-0 left-0 right-0 z-50 bg-white">
+      
       {/* Top bar - Barra superior negra */}
       <div className="br-superior  py-2 px-4">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -36,7 +39,7 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center space-x-4">
-            <Link href="/cuenta" className="hover:text-magenta-400 transition-colors flex items-center">
+            <Link href="/login" className="hover:text-magenta-400 transition-colors flex items-center">
               <User className="w-4 h-4 mr-1" />
               <span className="text-xs md:text-sm">Mi cuenta</span>
             </Link>

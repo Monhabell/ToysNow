@@ -16,10 +16,68 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 
+interface Variant {
+  color?: string;
+  size?: string;
+  weight?: string;
+  cost_shipping?: number;
+  dimensions?: string;
+  price: number;
+  compare_price: number;
+  stock: number;
+  images: string[];
+}
 
+interface Feature {
+  variants: Variant[];
+}
+
+interface Qualification {
+  count_users: {
+    [key: string]: number;
+  };
+  comments: {
+    text: string;
+    date: string;
+  }[];
+}
+
+interface Question {
+  user_id: number;
+  question: string;
+  answer: string;
+  is_approved: boolean;
+  created_at: string;
+}
+
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface Producto {
+  id: number;
+  name: string;
+  price: number;
+  compare_price: number;
+  slug: string;
+  description: string;
+  brand: string;
+  stock: number;
+  shipment: number;
+  is_available: boolean;
+  is_feature: boolean;
+  features: Feature[];
+  img: string[];
+  categories: Category[];
+  subcategories: Category[];
+  qualification: Qualification;
+  questions: Question[];
+  created_at: string;
+}
 
 export default function ProductosPage() {
-  const [allProductos, setAllProductos] = useState<any[]>([]);
+  const [allProductos, setAllProductos] = useState<Producto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get('buscar')?.toLowerCase() || '';
@@ -31,7 +89,7 @@ export default function ProductosPage() {
   const [marca, setMarca] = useState('');
   const [condicion, setCondicion] = useState('');
   const [envioGratis, setEnvioGratis] = useState(false);
-  const [categorias, setCategorias] = useState<string[]>([]);
+  const [categorias, setCategorias] = useState<Category[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(categoriaParam);
   const [marcasDisponibles, setMarcasDisponibles] = useState<string[]>([]);
   const [ratingMinimo, setRatingMinimo] = useState<number | ''>('');
@@ -49,22 +107,20 @@ export default function ProductosPage() {
         const data = await res.json();
         setAllProductos(data);
 
-
-        const cats = Array.from(
+        // Extraer categorías únicas
+        const cats: Category[] = Array.from(
           new Set(
-            data
-              .flatMap((p: any) => p.categories || [])
-              .filter(Boolean)
+            data.flatMap((p: Producto) => p.categories || [])
+              .filter((cat: Category) => cat?.id && cat?.name)
+              .map((cat: Category) => JSON.stringify(cat))
           )
-        );
-        console.log(cats);
-        setCategorias(cats as string[]);
+        ).map(str => JSON.parse(str));
 
-
+        setCategorias(cats);
 
         // Extraer marcas únicas
-        const marcas = Array.from(new Set(data.map((p: any) => p.brand).filter(Boolean)));
-        setMarcasDisponibles(marcas as string[]);
+        const marcas = Array.from(new Set(data.map((p: Producto) => p.brand).filter(Boolean)));
+        setMarcasDisponibles(marcas);
 
       } catch (error) {
         console.error('Error al obtener productos:', error);
@@ -78,11 +134,24 @@ export default function ProductosPage() {
 
   // Normalizar texto para búsquedas
   const normalizarTexto = (texto: any) => {
-    if (!texto) return ''; // Si es null, undefined o vacío, retorna cadena vacía
-    return String(texto) // Convierte a string por si es un número u otro tipo
+    if (!texto) return '';
+    return String(texto)
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase();
+  };
+
+  // Calcular rating promedio para un producto
+  const calcularRatingPromedio = (producto: Producto) => {
+    const qualificationCounts = producto.qualification?.count_users || {};
+    const totalRatings = Object.values(qualificationCounts).reduce((a, b) => a + b, 0);
+    if (totalRatings === 0) return 0;
+    
+    const weightedSum = Object.entries(qualificationCounts).reduce((sum, [stars, count]) => {
+      return sum + (parseInt(stars) * count);
+    }, 0);
+    
+    return weightedSum / totalRatings;
   };
 
   // Filtrar productos
@@ -93,53 +162,45 @@ export default function ProductosPage() {
     // Filtro por término de búsqueda
     if (termino) {
       filtrados = filtrados.filter((producto) => {
-        const categoria = normalizarTexto(producto.categories || '');
+        const categoriasStr = producto.categories?.map(c => c.name).join(' ') || '';
         const description = normalizarTexto(producto.description || '');
         const nombre = normalizarTexto(producto.name || '');
         const brand = normalizarTexto(producto.brand || '');
 
-        const color = Array.isArray(producto.color)
-          ? producto.color.map((d: string) => normalizarTexto(d)).join(' ')
-          : '';
+        // Buscar en variantes de color
+        const colores = producto.features?.flatMap(f => 
+          f.variants.filter(v => v.color).map(v => v.color)
+          .join(' ') || '');
 
-        const detalles = Array.isArray(producto.is_feature)
-          ? producto.is_feature.map((d: string) => normalizarTexto(d)).join(' ')
-          : '';
-
-        return categoria.includes(termino) || nombre.includes(termino)
-          || detalles.includes(termino) || description.includes(termino)
-          || brand.includes(termino) || color.includes(termino);
+        return normalizarTexto(categoriasStr).includes(termino) || 
+               nombre.includes(termino) ||
+               description.includes(termino) ||
+               brand.includes(termino) ||
+               normalizarTexto(colores).includes(termino);
       });
     }
 
     // Filtro por categoría
     if (categoriaSeleccionada) {
       filtrados = filtrados.filter(producto =>
-        (producto.categories || []).some((cat: string) =>
-          normalizarTexto(cat) === normalizarTexto(categoriaSeleccionada)
-        )
-      );
+        producto.categories?.some(cat => 
+          normalizarTexto(cat.name) === normalizarTexto(categoriaSeleccionada)
+      ));
     }
 
-
-    // Filtro por precio
+    // Filtro por precio (usando el precio base o el primer variant)
     if (precioMin !== '') {
-      console.log(precioMin);
-      filtrados = filtrados.filter(producto =>
-        (producto.compare_price === 0
-          ? producto.price
-          : producto.compare_price - producto.price
-        ) >= precioMin
-      );
-
+      filtrados = filtrados.filter(producto => {
+        const precio = producto.features?.[0]?.variants?.[0]?.price || producto.price;
+        return precio >= precioMin;
+      });
     }
 
     if (precioMax !== '') {
-      filtrados = filtrados.filter(producto =>
-        (producto.compare_price === 0
-          ? producto.price
-          : producto.compare_price - producto.price
-        ) <= precioMax);
+      filtrados = filtrados.filter(producto => {
+        const precio = producto.features?.[0]?.variants?.[0]?.price || producto.price;
+        return precio <= precioMax;
+      });
     }
 
     // Filtro por marca
@@ -162,24 +223,27 @@ export default function ProductosPage() {
 
       if (condicion === 'descuento') {
         filtrados = filtrados.filter(producto => {
-          if (!producto.compare_price) return false;
-
-          const precioOriginal = parseFloat(producto.compare_price);
-          const precioActual = parseFloat(producto.price);
-          return precioOriginal > precioActual;
+          const precioBase = producto.price;
+          const precioComparacion = producto.compare_price;
+          return precioComparacion > precioBase;
         });
       }
     }
 
     // Filtro por envío gratis
     if (envioGratis) {
-      filtrados = filtrados.filter(producto => producto.shipment > 0);
+      filtrados = filtrados.filter(producto => 
+        producto.features?.some(f => 
+          f.variants.some(v => v.cost_shipping === 0)
+        ) || producto.shipment === 0
+      );
     }
 
     // Filtro por rating mínimo
     if (ratingMinimo !== '') {
-      filtrados = filtrados.filter(producto =>
-        producto.quialification >= ratingMinimo);
+      filtrados = filtrados.filter(producto => 
+        calcularRatingPromedio(producto) >= ratingMinimo
+      );
     }
 
     return filtrados;
@@ -226,14 +290,8 @@ export default function ProductosPage() {
   const contadorPorCategoria = useMemo(() => {
     const counts: Record<string, number> = {};
     categorias.forEach(cat => {
-      counts[cat] = productosFiltrados.filter(p => {
-        const categoriasProducto = Array.isArray(p.categories)
-          ? p.categories
-          : [p.categories];
-        return categoriasProducto.some((c: any) =>
-          normalizarTexto(c) === normalizarTexto(cat)
-        );
-      }).length;
+      counts[cat.name] = productosFiltrados.filter(p => 
+        p.categories?.some(c => c.id === cat.id)).length;
     });
     return counts;
   }, [productosFiltrados, categorias]);
@@ -252,17 +310,43 @@ export default function ProductosPage() {
   const toggleFilter = () => {
     const menu = document.getElementById("filterMenu");
     if (menu) {
-      console.log(menu)
-      
       menu.classList.toggle("active");
     }
+  };
+
+  // Función para ordenar productos
+  const ordenarProductos = (criterio: string) => {
+    const productosOrdenados = [...allProductos];
+    
+    switch(criterio) {
+      case 'precio':
+        productosOrdenados.sort((a, b) => {
+          const precioA = a.features?.[0]?.variants?.[0]?.price || a.price;
+          const precioB = b.features?.[0]?.variants?.[0]?.price || b.price;
+          return precioA - precioB;
+        });
+        break;
+        
+      case 'calificacion':
+        productosOrdenados.sort((a, b) => {
+          const ratingA = calcularRatingPromedio(a);
+          const ratingB = calcularRatingPromedio(b);
+          return ratingB - ratingA;
+        });
+        break;
+        
+      default:
+        // Mantener orden original
+        break;
+    }
+    
+    setAllProductos(productosOrdenados);
   };
 
   return (
     <>
       <Navbar />
       <div className='max-w-7xl mx-auto mt-32 px-4 content-producto'>
-
         <div className='flex flex-col md:flex-row gap-6'>
           {/* Panel de Filtros */}
           <button 
@@ -286,19 +370,19 @@ export default function ProductosPage() {
             {/* Filtro por Categoría */}
             <div className="mb-6 mt-6">
               <h3 className="font-semibold text-gold-600 mb-2">Categorías</h3>
-              <div className="space-y-2  ">
+              <div className="space-y-2">
                 {categorias.map(cat => (
-                  <div key={cat} className="flex items-center input-radio-Category">
+                  <div key={cat.id} className="flex items-center input-radio-Category">
                     <input
                       type="radio"
-                      id={`cat-${cat}`}
+                      id={`cat-${cat.id}`}
                       name="categoria"
-                      checked={normalizarTexto(categoriaSeleccionada) === normalizarTexto(cat)}
-                      onChange={() => setCategoriaSeleccionada(cat)}
-                      className="mr-2 "
+                      checked={normalizarTexto(categoriaSeleccionada) === normalizarTexto(cat.name)}
+                      onChange={() => setCategoriaSeleccionada(cat.name)}
+                      className="mr-2"
                     />
-                    <label htmlFor={`cat-${cat}`} className="flex-1">
-                      {cat} <span className="text-gray-500 text-sm">({contadorPorCategoria[cat] || 0})</span>
+                    <label htmlFor={`cat-${cat.id}`} className="flex-1">
+                      {cat.name} <span className="text-gray-500 text-sm">({contadorPorCategoria[cat.name] || 0})</span>
                     </label>
                   </div>
                 ))}
@@ -340,7 +424,7 @@ export default function ProductosPage() {
             {marcasDisponibles.length > 0 && (
               <div className="mb-6 mt-6">
                 <h3 className="font-semibold mb-2 text-gold-600">Marcas</h3>
-                <div className="space-y-2 ">
+                <div className="space-y-2">
                   {marcasDisponibles.map(m => (
                     <div key={m} className="flex items-center">
                       <input
@@ -413,8 +497,6 @@ export default function ProductosPage() {
             </div>
           </div>
 
-
-
           {/* Lista de Productos */}
           <div className='flex-1'>
             <div className="title-producto">
@@ -427,36 +509,27 @@ export default function ProductosPage() {
                 </h2>
                 <div className="flex items-center space-x-2">
                   <Select
-                      onValueChange={(value) => {
-                        if (value === 'precio') {
-                          setAllProductos(prev => [...prev].sort((a, b) => a.price - b.price));
-                        } else if (value === 'calificacion') {
-                          setAllProductos(prev => [...prev].sort((a, b) => b.quialification - a.quialification));
-                        } else {
-                          // Opcional: Resetear al orden original si es "relevancia"
-                          setAllProductos(prev => [...prev]); 
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Ordenar por" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Criterios</SelectLabel>
-                          <SelectItem value="relevancia">Relevancia</SelectItem>
-                          <SelectItem value="precio">Precio (Menor a Mayor)</SelectItem>
-                          <SelectItem value="calificacion">Calificación (Mayor a Menor)</SelectItem>
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
+                    onValueChange={ordenarProductos}
+                  >
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Ordenar por" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Criterios</SelectLabel>
+                        <SelectItem value="relevancia">Relevancia</SelectItem>
+                        <SelectItem value="precio">Precio (Menor a Mayor)</SelectItem>
+                        <SelectItem value="calificacion">Calificación (Mayor a Menor)</SelectItem>
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </div>
 
             {isLoading ? (
-              <div className="flex  space-y-3 ">
-                <div className="flex flex-col space-y-3 m-5 ">
+              <div className="flex space-y-3">
+                <div className="flex flex-col space-y-3 m-5">
                   <Skeleton className="h-[125px] w-[250px] rounded-xl bg-gray-900" />
                   <div className="space-y-2">
                     <Skeleton className="h-4 w-[250px]" />
@@ -478,8 +551,6 @@ export default function ProductosPage() {
                   </div>
                 </div>
               </div>
-
-      
             ) : productosFiltrados.length === 0 ? (
               <div className="bg-white p-8 rounded shadow-md text-center">
                 <h3 className="text-lg font-semibold mb-2">No se encontraron productos</h3>
@@ -496,25 +567,21 @@ export default function ProductosPage() {
                 <ListaProductos productos={productosPaginados} />
                 <div className='contenedor-paginacion'>
                   <div className='pagination'>
-                    {/* Paginación */}
                     {productosFiltrados.length > productosPerPage && (
                       <div className="flex justify-center">
-                        {/* Botón Anterior */}
                         {currentPage > 1 && (
                           <button
                             onClick={() => paginate(currentPage - 1)}
-                            className="btn-paginacion-back "
+                            className="btn-paginacion-back"
                           >
                             &laquo; 
                           </button>
                         )}
 
-                        {/* Números de página */}
                         {Array.from({
                           length: Math.ceil(productosFiltrados.length / productosPerPage)
                         }).map((_, index) => {
                           const pageNumber = index + 1;
-                          // Mostrar solo páginas cercanas a la actual
                           if (
                             pageNumber === 1 ||
                             pageNumber === Math.ceil(productosFiltrados.length / productosPerPage) ||
@@ -536,21 +603,18 @@ export default function ProductosPage() {
                           return null;
                         })}
 
-                        {/* Botón Siguiente */}
                         {currentPage < Math.ceil(productosFiltrados.length / productosPerPage) && (
                           <button
                             onClick={() => paginate(currentPage + 1)}
-                            className=" btn-paginacion-next"
+                            className="btn-paginacion-next"
                           >
-                             &raquo;
+                            &raquo;
                           </button>
                         )}
                       </div>
                     )}
                   </div>
                 </div>
-
-
               </div>
             )}
           </div>
