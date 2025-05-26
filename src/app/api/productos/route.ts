@@ -52,12 +52,12 @@ const productos = [
       "/images/productos/producto2-2.jpg"
     ],
     "categories": [
-      {"id": 2, "name": "consoladores"},
-      {"id": 5, "name": "lubricantes"}
+      { "id": 2, "name": "consoladores" },
+      { "id": 5, "name": "lubricantes" }
     ],
     "subcategories": [
-      {"id": 985, "name": "Nepe pequeño"},
-      {"id": 85, "name": "Aja"}
+      { "id": 985, "name": "Nepe pequeño" },
+      { "id": 85, "name": "Aja" }
     ],
     "qualification": {
       "count_users": {
@@ -79,7 +79,7 @@ const productos = [
         "user_id": 5,
         "question": "Por qué tan caro",
         "answer": "Algo",
-        "is_approved": false,
+        "is_approved": true,
         "created_at": "14/04/2025"
       },
       {
@@ -126,11 +126,11 @@ const productos = [
       }
     ],
     "img": ["/images/productos/dildo1.jpg"],
-    "categories": [{"id": 2, "name": "consoladores"}],
-    "subcategories": [{"id": 986, "name": "Estándar"}],
+    "categories": [{ "id": 2, "name": "consoladores" }],
+    "subcategories": [{ "id": 986, "name": "Estándar" }],
     "qualification": {
-      "count_users": {"5": 5, "4": 2, "3": 0, "2": 0, "1": 1},
-      "comments": [{"text": "Excelente calidad", "date": "12/03/2025"}]
+      "count_users": { "5": 5, "4": 2, "3": 0, "2": 0, "1": 1 },
+      "comments": [{ "text": "Excelente calidad", "date": "12/03/2025" }]
     },
     "questions": [],
     "seo": {
@@ -158,11 +158,11 @@ const productos = [
     "size": "Sm",
     "weight": "15kg",
     "img": ["/images/productos/lubricante1.jpg"],
-    "categories": [{"id": 5, "name": "lubricantes"}],
+    "categories": [{ "id": 5, "name": "lubricantes" }],
     "subcategories": [],
     "qualification": {
-      "count_users": {"5": 10, "4": 8, "3": 2, "2": 0, "1": 0},
-      "comments": [{"text": "Muy suave y duradero", "date": "01/05/2025"}]
+      "count_users": { "5": 10, "4": 8, "3": 2, "2": 0, "1": 0 },
+      "comments": [{ "text": "Muy suave y duradero", "date": "01/05/2025" }]
     },
     "questions": [],
     "seo": {
@@ -174,7 +174,7 @@ const productos = [
   },
 
 ]
-;
+  ;
 
 
 export async function GET() {

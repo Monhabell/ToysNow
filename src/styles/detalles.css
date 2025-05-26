@@ -151,3 +151,37 @@
   font-weight: 700;
   color: #000;
 }
+
+.metodos-pago {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 600px;
+  margin: auto;
+}
+
+.metodos-pago h3 {
+  color: #333;
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.promo {
+  background-color: #d1ecf1;
+  color: #0c5460;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+.seccion {
+  margin-top: 15px;
+}
+
+.iconos {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  margin-top: 10px;
+}

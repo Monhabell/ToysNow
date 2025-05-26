@@ -2,11 +2,10 @@
 
 import { useEffect, useState, use } from 'react';
 import { useCart } from '@/context/CartContext';
-import { CiHeart } from "react-icons/ci";
+import { CiHeart, CiShoppingCart } from "react-icons/ci";
+import { FaHeart, FaShoppingCart, FaStar, FaRegStar, FaChevronRight, FaChevronLeft } from "react-icons/fa";
 import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
-import { GoChevronRight, GoChevronLeft } from "react-icons/go";
-import React from 'react';
 import '../../../styles/detalles.css';
 import { Separator } from "@/components/ui/separator"
 
@@ -106,7 +105,7 @@ export default function ProductoDetalle({ params }: Props) {
         const productos: Producto[] = await response.json();
         const encontrado = productos.find((prod) => prod.id.toString() === id);
         setProducto(encontrado || null);
-        
+
         // Set the first variant as default if available
         if (encontrado?.features?.[0]?.variants?.[0]) {
           setSelectedVariant(encontrado.features[0].variants[0]);
@@ -125,12 +124,12 @@ export default function ProductoDetalle({ params }: Props) {
       try {
         const res = await fetch('/api/productos');
         const productos: Producto[] = await res.json();
-        
+
         const relacionados = productos.filter((p) =>
           p.id !== producto.id &&
-          p.categories.some((cat) => 
+          p.categories.some((cat) =>
             producto.categories.some(pCat => pCat.id === cat.id)
-        ));
+          ));
 
         setRelaciones(relacionados);
       } catch (error) {
@@ -174,12 +173,12 @@ export default function ProductoDetalle({ params }: Props) {
 
   const enviarPregunta = () => {
     if (nuevaPregunta.trim() === '') return;
-  
+
     const nueva = {
       pregunta: nuevaPregunta,
       respuesta: "¡Gracias por tu pregunta! Pronto alguien del equipo te responderá."
     };
-  
+
     setPreguntas([...preguntas, nueva]);
     setNuevaPregunta('');
   };
@@ -194,11 +193,11 @@ export default function ProductoDetalle({ params }: Props) {
   const nuevoOk = diffDias <= 30;
 
   const textoNuevo = (nuevoOk ? 'Nuevo' : '') + ' | +5 vendidos';
-  
+
   const currentPrice = selectedVariant?.price || producto.price;
   const currentComparePrice = selectedVariant?.compare_price || producto.compare_price;
   const valor = currentPrice;
-  const descuento = currentComparePrice > currentPrice 
+  const descuento = currentComparePrice > currentPrice
     ? Math.round(((currentComparePrice - currentPrice) / currentComparePrice) * 100)
     : 0;
 
@@ -215,7 +214,7 @@ export default function ProductoDetalle({ params }: Props) {
 
   // Get available colors and sizes from variants
   const colors = Array.from(new Set(
-    producto.features?.flatMap(feature => 
+    producto.features?.flatMap(feature =>
       feature.variants
         .filter(v => v.color)
         .map(v => v.color as string)
@@ -223,7 +222,7 @@ export default function ProductoDetalle({ params }: Props) {
   ));
 
   const sizes = Array.from(new Set(
-    producto.features?.flatMap(feature => 
+    producto.features?.flatMap(feature =>
       feature.variants
         .filter(v => v.size)
         .map(v => v.size as string)
@@ -241,18 +240,18 @@ export default function ProductoDetalle({ params }: Props) {
           <div className='grid-container'>
             <div className='itemgrupImg'>
               {producto.img.map((img, index) => (
-                <img 
+                <img
                   key={index}
-                  src={img} 
+                  src={img}
                   alt={producto.name}
                   onClick={() => setImgSeleccionada(index)}
                 />
               ))}
             </div>
-            
+
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
-              <img 
-                src={producto.img[imgSeleccionada]} 
+              <img
+                src={producto.img[imgSeleccionada]}
                 style={{
                   transformOrigin: `${posicion.x}% ${posicion.y}%`
                 }}
@@ -280,11 +279,11 @@ export default function ProductoDetalle({ params }: Props) {
                     <p className='text-red-500'>{descuento}% OFF</p>
                   </div>
                 )}
-                
+
                 {descuento <= 0 && (
                   <p className='valorPresio'>${valor.toLocaleString('en-CO')}</p>
                 )}
-                
+
                 <p>Existencias: {selectedVariant?.stock || producto.stock}</p>
 
                 {/* Color selection */}
@@ -316,7 +315,7 @@ export default function ProductoDetalle({ params }: Props) {
                       {sizes.map((size, index) => (
                         <button
                           key={index}
-                          className={`px-3 py-1 border rounded ${selectedVariant?.size === size ? 'bg-blue-500 text-white' : 'bg-gray-100'}`}
+                          className={` cursor-pointer px-3 py-1 border rounded ${selectedVariant?.size === size ? 'bg-blue-500 text-white' : 'bg-gray-400'}`}
                           onClick={() => {
                             const variant = producto.features[0].variants.find(v => v.size === size);
                             if (variant) setSelectedVariant(variant);
@@ -345,12 +344,7 @@ export default function ProductoDetalle({ params }: Props) {
                   🛒 Agregar al carrito
                 </button>
 
-                {producto.description && (
-                  <div className='mt-5'>
-                    <p className='font-medium'>Descripción:</p>
-                    <p>{producto.description}</p>
-                  </div>
-                )}
+
 
                 {averageRating > 0 && (
                   <div className='mt-4'>
@@ -368,41 +362,25 @@ export default function ProductoDetalle({ params }: Props) {
               <div className='border-Black mt-5'>
                 <div className="metodos-pago">
                   <h3>Medios de pago</h3>
+
                   <div className="promo">
-                    <span>💳</span> ¡Paga en hasta 6 cuotas con 0% interés!
+                    <span role="img" aria-label="tarjeta">💳</span> ¡Paga en hasta 6 cuotas con 0% interés!
                   </div>
 
                   <div className="seccion">
                     <strong>Tarjetas de crédito</strong>
                     <div className="iconos">
-                      <img src="" alt="" />
-                      <img src="visa.png" alt="Visa"/>
-                      <img src="mastercard.png" alt="Mastercard"/>
-                      <img src="amex.png" alt="American Express"/>
-                      <img src="codensa.png" alt="Codensa"/>
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" width="50" />
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="MasterCard" width="50" />
+                      <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" width="50" />
+                      {/* Agrega más SVG o íconos personalizados si lo deseas */}
                     </div>
                   </div>
-
-                  <div className="seccion">
-                    <strong>Tarjetas de débito</strong>
-                    <div className="iconos">
-                      <img src="visa.png" alt="Visa Débito"/>
-                      <img src="mastercard.png" alt="Mastercard Débito"/>
-                    </div>
-                  </div>
-
-                  <div className="seccion">
-                    <strong>Efectivo</strong>
-                    <div className="iconos">
-                      <img src="efecty.png" alt="Efecty"/>
-                    </div>
-                  </div>
-
-                  <a href="#" className="enlace">Conoce otros medios de pago</a>
                 </div>
+
               </div>
             </div>
-            
+
             <div className='itemProducRel'>
               <div className='d-flex mb-3'>
                 <h1 className='mb-5 text-gold-600'>Detalles del producto</h1>
@@ -436,51 +414,91 @@ export default function ProductoDetalle({ params }: Props) {
         </div>
 
         {/* Questions section */}
-        <div className='max-w-6xl mx-auto mt-10 content'>
-          <h2 className="text-xl font-bold">Preguntas y respuestas</h2>
+        <div className='max-w-6xl mx-auto mt-10 px-4 '>
           
-          {/* Approved questions from the product */}
-          {approvedQuestions.length > 0 && (
-            <ul className="space-y-4 mb-6">
-              {approvedQuestions.map((item, index) => (
-                <li key={index} className="border p-3 rounded">
-                  <p className="font-semibold">❓ {item.question}</p>
-                  <p className="text-green-700">💬 {item.answer}</p>
-                </li>
-              ))}
-            </ul>
-          )}
-          
-          {/* User questions */}
-          <div className="mb-4">
-            <input
-              type="text"
-              className="border p-2 w-full rounded"
-              placeholder="Escribe tu pregunta aquí..."
-              value={nuevaPregunta}
-              onChange={(e) => setNuevaPregunta(e.target.value)}
-            />
-            <button
-              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-              onClick={enviarPregunta}
-            >
-              Enviar pregunta
-            </button>
-          </div>
 
-          {preguntas.length > 0 ? (
-            <ul className="space-y-4">
-              {preguntas.map((item, index) => (
-                <li key={index} className="border p-3 rounded">
-                  <p className="font-semibold">❓ {item.pregunta}</p>
-                  <p className="text-green-700">💬 {item.respuesta}</p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            approvedQuestions.length === 0 && <p>Aún no hay preguntas sobre este producto.</p>
-          )}
+          {/* Preguntas y respuestas */}
+          <div className='mt-16 bg-gray-900 rounded-lg p-8'>
+            <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas</h2>
+            
+            {/* Preguntas aprobadas */}
+            {approvedQuestions.length > 0 && (
+              <div className="space-y-6 mb-8">
+                {approvedQuestions.map((item, index) => (
+                  <div key={index} className="bg-gray-800 p-5 rounded-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-gold-500 text-black p-2 rounded-full flex-shrink-0">
+                        <span>❓</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-100">{item.question}</p>
+                        <div className="flex items-start mt-4 gap-4">
+                          <div className="bg-gray-700 text-gold-500 p-2 rounded-full flex-shrink-0">
+                            <span>💬</span>
+                          </div>
+                          <p className="text-gray-300">{item.answer}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Formulario de preguntas */}
+            <div className="mb-8">
+              <h3 className="text-lg font-semibold mb-4 text-gold-500">¿Tienes alguna pregunta?</h3>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  className="flex-1 bg-gray-800 border border-gray-700 p-3 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-100"
+                  placeholder="Escribe tu pregunta aquí..."
+                  value={nuevaPregunta}
+                  onChange={(e) => setNuevaPregunta(e.target.value)}
+                />
+                <button
+                  className="px-6 py-3 bg-gold-500 hover:bg-gold-600 text-black rounded-lg transition-colors font-bold"
+                  onClick={enviarPregunta}
+                >
+                  Enviar
+                </button>
+              </div>
+            </div>
+
+            {/* Preguntas del usuario */}
+            {preguntas.length > 0 && (
+              <div className="space-y-6">
+                {preguntas.map((item, index) => (
+                  <div key={index} className="bg-gray-800 p-5 rounded-lg">
+                    <div className="flex items-start gap-4">
+                      <div className="bg-gold-500 text-black p-2 rounded-full flex-shrink-0">
+                        <span>❓</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-100">{item.pregunta}</p>
+                        {item.respuesta && (
+                          <div className="flex items-start mt-4 gap-4">
+                            <div className="bg-gray-700 text-gold-500 p-2 rounded-full flex-shrink-0">
+                              <span>💬</span>
+                            </div>
+                            <p className="text-gray-300">{item.respuesta}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {preguntas.length === 0 && approvedQuestions.length === 0 && (
+              <div className="text-center py-8 bg-gray-800 rounded-lg">
+                <p className="text-gray-400">Aún no hay preguntas sobre este producto.</p>
+              </div>
+            )}
+          </div>
         </div>
+        
       </div>
     </>
   );
