@@ -22,10 +22,10 @@ const productos = [
             "color": "red",
             "size": "Sm",
             "weight": "15kg",
-            "cost_shipping": 100232,
+            "cost_shipping": 10023,
             "dimensions": "4x112",
             "price": 120000,
-            "compare_price": 150000,
+            "compare_price": 15000,
             "stock": 12,
             "images": []
           },

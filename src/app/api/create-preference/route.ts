@@ -1,43 +1,49 @@
-// app/api/create-preference/route.ts
+// src/app/api/create-preference/route.ts
+import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+
+const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
+
+if (!accessToken) {
+  throw new Error('⚠️ MERCADO_PAGO_ACCESS_TOKEN no está definido');
+}
+
+const client = new MercadoPagoConfig({ accessToken });
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { items, back_urls, auto_return } = body;
+    console.log('📦 Datos recibidos:', body);
 
-    // Validación básica
-    if (!items || !Array.isArray(items)) {
-      return NextResponse.json(
-        { error: "Items are required and must be an array" },
-        { status: 400 }
-      );
-    }
-
-    // Crear preferencia en MercadoPago
-    const response = await axios.post(
-      'https://api.mercadopago.com/checkout/preferences',
-      {
-        items,
-        back_urls,
-        auto_return,
-      },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.MERCADO_PAGO_ACCESS_TOKEN}`,
+    const preferenceData = {
+      items: [
+        {
+          id: body.id || 'default-id',
+          title: body.title,
+          quantity: body.quantity,
+          currency_id: 'COP', // o 'USD' si estás en otros países
+          unit_price: body.unit_price,
         },
-      }
-    );
+      ],
+      back_urls: {
+        success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
+        failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
+        pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
+      },
 
-    return NextResponse.json({ id: response.data.id });
+    };
 
-  } catch (error) {
-    console.error("Error en /api/create-preference:", error);
+    const preference = new Preference(client);
+    const response = await preference.create({ body: preferenceData });
+
+    return NextResponse.json({ init_point: response.init_point });
+
+  } catch (error: any) {
+    console.error('❌ Error al crear preferencia:', error?.response?.data || error?.message || error);
     return NextResponse.json(
-      { error: "Failed to create MercadoPago preference" },
+      { error: 'Error al crear preferencia', details: error?.message || 'Desconocido' },
       { status: 500 }
     );
   }
+
 }

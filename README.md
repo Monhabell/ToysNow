@@ -49,7 +49,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
     - `context/`: Manejo global de datos como el carrito.
     - `public/`: Imágenes y recursos estáticos.
 
-
+abrir el puero de forwarded Adres 
 
 👨‍💻 Autor
 Desarrollado por .... Gabriel
