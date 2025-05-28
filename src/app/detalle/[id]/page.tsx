@@ -84,8 +84,8 @@ interface Props {
 }
 
 export default function ProductoDetalle({ params }: Props) {
-  const unwrappedParams = use(params);
-  const { id } = unwrappedParams;
+  const { id } = params;
+
 
   const { agregarProducto } = useCart();
 
@@ -328,7 +328,31 @@ export default function ProductoDetalle({ params }: Props) {
                   </div>
                 )}
 
-                <button className="btnsed">Comprar ahora</button>
+                
+                <button 
+                  className="btnsed"
+                  onClick={() => {
+                    // Crear un pedido con el producto actual
+                    const order = {
+                      items: [{
+                        ...producto,
+                        price: currentPrice,
+                        selectedVariant,
+                        quantity: 1 // Puedes añadir un selector de cantidad si lo necesitas
+                      }],
+                      total: currentPrice,
+                      shipping: selectedVariant?.cost_shipping || producto.shipment || 0
+                    };
+                    
+                    // Guardar el pedido en sessionStorage para el proceso de pago
+                    sessionStorage.setItem('currentOrder', JSON.stringify(order));
+                    
+                    // Redirigir a la página de checkout
+                    window.location.href = '/checkout';
+                  }}
+                >
+                  Comprar ahora
+                </button>
 
                 <button
                   onClick={(e) => {
