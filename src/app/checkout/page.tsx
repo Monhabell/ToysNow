@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar";
+import '../../styles/checkout.css';
 
 
 
@@ -115,7 +116,7 @@ const CheckoutForm = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-gray-900 rounded-lg border border-gold-500 shadow-lg">
+    <div className="content_trasparent">
       <h2 className="text-3xl font-bold mb-6 text-gold-500 text-center font-serif">Finalizar Compra</h2>
 
       <div className="mb-8">
@@ -158,7 +159,7 @@ const CheckoutForm = () => {
         ) : (
           <button
             onClick={handleBuyNow}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-200"
+            className="btn_finalizarCompra"
             disabled={loading}
           >
             Pagar con Mercado Pago
@@ -167,7 +168,7 @@ const CheckoutForm = () => {
       </div>
 
       <button
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded transition duration-200"
+        className="btn_finalizarCompra"
         disabled={loading}
       >
         Pago contra entrega
@@ -185,7 +186,7 @@ export default function CheckoutPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-black pt-32 pb-20 px-4">
+      <div className="min-h-screen  pt-42 pb-20 px-4">
         <div className="container mx-auto">
           <CheckoutForm />
         </div>

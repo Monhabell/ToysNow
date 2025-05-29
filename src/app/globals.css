@@ -310,3 +310,29 @@ scrollbar-width: none;     /* Firefox */
 
 }
 
+
+.btn_finalizarCompra {
+  width: 100%; /* w-full */
+  background-image: linear-gradient(to right, #ca8a04, #a16207); /* bg-gradient-to-r from-yellow-600 to-yellow-700 */
+  color: #000; /* text-black */
+  font-weight: 700; /* font-bold */
+  padding-top: 1rem; /* py-4 */
+  padding-bottom: 1rem;
+  border-radius: 0.75rem; /* rounded-xl */
+  margin-top: 2rem; /* mt-8 (8 * 0.25rem = 2rem) */
+  box-shadow: 0 10px 15px -3px rgba(202, 138, 4, 0.1), 0 4px 6px -2px rgba(202, 138, 4, 0.05); /* shadow-lg shadow-yellow-500/10 */
+  display: flex; /* flex */
+  align-items: center; /* items-center */
+  justify-content: center; /* justify-center */
+  gap: 0.5rem; /* gap-2 */
+  
+  /* Hover effects */
+  transition-property: all; /* transition-all */
+  transition-duration: 300ms; /* duration-300 */
+}
+
+.btn_finalizarCompra:hover {
+  background-image: linear-gradient(to right, #eab308, #ca8a04); /* hover:from-yellow-500 hover:to-yellow-600 */
+  box-shadow: 0 10px 15px -3px rgba(202, 138, 4, 0.2), 0 4px 6px -2px rgba(202, 138, 4, 0.1); /* hover:shadow-yellow-500/20 */
+}
+

@@ -8,60 +8,83 @@ export default function CarritoPage() {
   return (
     <>
       <Navbar />
-      <div className="p-6 bg-gray-100 min-h-screen mt-32">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="p-6  min-h-screen mt-32 text-gray-100">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Columna de Productos */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="bg-white rounded-lg shadow-sm p-4 border">
-              <h2 className="text-lg font-semibold flex items-center gap-2 text-green-600">
-                <span className="text-2xl">⚡</span> Productos
+          <div className="lg:col-span-2 space-y-6">
+            <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 shadow-lg">
+              <h2 className="text-xl font-semibold flex items-center gap-3 text-gold-500">
+                <span className="text-2xl">🛒</span> 
+                <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                  Tu Carrito de Compras
+                </span>
               </h2>
 
-              <div className="divide-y">
+              <div className="divide-y divide-gray-800 mt-4">
                 {carrito.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center py-4">
-                    <div className="flex items-center gap-4">
-                      <img src={item.img[0]} alt={item.name} className="w-16 h-16 object-cover rounded-md border" />
+                  <div key={index} className="flex justify-between items-center py-6 group hover:bg-gray-800/50 transition-all duration-300 px-2 rounded-lg">
+                    <div className="flex items-center gap-5">
+                      <div className="relative">
+                        <img 
+                          src={item.img[0]} 
+                          alt={item.name} 
+                          className="w-20 h-20 object-cover rounded-lg border-2 border-gray-700 group-hover:border-yellow-500 transition-all" 
+                        />
+                        <span className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                          {item.cantidad}
+                        </span>
+                      </div>
                       <div>
-                        <p className="font-medium text-gray-800">{item.name}</p>
-                        {item.color && <p className="text-sm text-gray-500">Color: {item.color}</p>}
-                        <div className="flex gap-3 mt-2 text-sm text-blue-600">
-                          <button onClick={() => eliminarProducto(item.id)}>Eliminar</button>
-                          <span>|</span>
-                          <button>Guardar</button>
-                          <span>|</span>
-                          <button>Modificar</button>
-                          <span>|</span>
-                          <button>Comprar ahora</button>
+                        <p className="font-medium text-gray-100 group-hover:text-yellow-400 transition-colors">{item.name}</p>
+                        {item.color && (
+                          <p className="text-sm text-gray-400 mt-1">
+                            Color: <span className="text-yellow-400">{item.color}</span>
+                          </p>
+                        )}
+                        <div className="flex gap-4 mt-3 text-sm">
+                          <button 
+                            onClick={() => eliminarProducto(item.id)} 
+                            className="text-gray-400 hover:text-yellow-500 transition-colors"
+                          >
+                            Eliminar
+                          </button>
+                          <button className="text-gray-400 hover:text-yellow-500 transition-colors">
+                            Guardar para después
+                          </button>
                         </div>
                       </div>
                     </div>
 
                     <div className="text-right">
-                      <div className="flex items-center justify-end gap-2 mb-2">
+                      <div className="flex items-center justify-end gap-3 mb-3">
                         <button 
                           onClick={() => disminuirCantidad(item.id)} 
-                          className="border px-2 rounded"
+                          className={`border border-gray-700 px-2.5 py-0.5 rounded-lg ${item.cantidad <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-500/10 hover:border-yellow-500/50'}`}
                           disabled={item.cantidad <= 1}
-                        >-</button>
+                        >
+                          <span className="text-gray-300">−</span>
+                        </button>
 
-                        <span className="w-6 text-center">{item.cantidad}</span>
+                        <span className="w-8 text-center text-gray-100">{item.cantidad}</span>
 
                         <button 
                           onClick={() => aumentarCantidad(item.id)} 
-                          className="border px-2 rounded"
+                          className={`border border-gray-700 px-2.5 py-0.5 rounded-lg ${item.cantidad >= item.stock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-500/10 hover:border-yellow-500/50'}`}
                           disabled={item.cantidad >= item.stock}
-                        >+</button>
+                        >
+                          <span className="text-gray-300">+</span>
+                        </button>
                       </div>
 
                       <div>
                         {item.compare_price && (
-                          <div className="text-green-600 text-xs mb-1">
-                            -{(item.price / item.compare_price)*100 }% <span className="line-through text-gray-400">${item.compare_price}</span>
+                          <div className="text-yellow-500 text-xs mb-1">
+                            <span className="line-through text-gray-500 mr-1">${item.compare_price}</span>
+                            <span className="font-bold">-{Math.round((1 - item.price / item.compare_price) * 100)}%</span>
                           </div>
                         )}
-                        <p className="text-lg font-semibold text-gray-800">
+                        <p className="text-xl font-bold text-yellow-400">
                           ${(Number(item.price) * item.cantidad).toLocaleString()}
                         </p>
                       </div>
@@ -70,26 +93,27 @@ export default function CarritoPage() {
                 ))}
               </div>
 
-              {/* Envío Gratis Sección */}
-              <div className="pt-4 mt-4 border-t">
-                <div className="flex justify-between items-center text-green-600 font-medium">
-                  <span>Envío</span>
-      
-                  {calcularEnvioTotal() === 0 && (
-                    <span>Gratis</span>
-                  )}
-
-                  {calcularEnvioTotal() !== 0 && (
-                    <span>${calcularEnvioTotal().toLocaleString()}</span>
-                  )}
+              {/* Sección de Envío */}
+              <div className="pt-6 mt-6 border-t border-gray-800">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-300 font-medium">Envío</span>
+                  
+                  <span className={`text-lg font-medium ${calcularEnvioTotal() === 0 ? 'text-yellow-400' : 'text-gray-300'}`}>
+                    {calcularEnvioTotal() === 0 ? '¡Gratis!' : `$${calcularEnvioTotal().toLocaleString()}`}
+                  </span>
                 </div>
                   
-                <div className="w-full bg-gray-200 h-2 rounded-full mt-2">
-                  <div className="bg-blue-600 h-2 rounded-full" style={{ width: '70%' }}></div>
+                <div className="w-full bg-gray-800 h-2.5 rounded-full mt-3">
+                  <div 
+                    className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-2.5 rounded-full" 
+                    style={{ width: '70%' }}
+                  ></div>
                 </div>
-                <p className="text-sm text-gray-600 mt-2">
-                  Aprovecha tu envío Gratis agregando más productos 
-                  <a href="#" className="text-blue-600 ml-1">Ver más productos Full ›</a>
+                <p className="text-sm text-gray-400 mt-3">
+                  Agrega más productos para obtener envío gratis
+                  <a href="#" className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors">
+                    Ver productos premium ›
+                  </a>
                 </p>
               </div>
             </div>
@@ -97,32 +121,53 @@ export default function CarritoPage() {
 
           {/* Columna Resumen */}
           <div>
-            <div className="bg-white border rounded-lg p-6 shadow-sm">
-              <h3 className="font-semibold text-lg text-gray-800 mb-4">Resumen de compra</h3>
+            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg sticky top-32">
+              <h3 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                Resumen del Pedido
+              </h3>
 
-              <div className="flex justify-between text-gray-700 mb-2">
-                <span>Productos ({carrito.reduce((acc, i) => acc + i.cantidad, 0)})</span>
-                <span>${calcularSubtotal().toLocaleString()}</span>
+              <div className="space-y-4">
+                <div className="flex justify-between text-gray-300">
+                  <span>Productos ({carrito.reduce((acc, i) => acc + i.cantidad, 0)})</span>
+                  <span>${calcularSubtotal().toLocaleString()}</span>
+                </div>
+
+                <div className="flex justify-between text-gray-300">
+                  <span>Envío</span>
+                  <span>${calcularEnvioTotal().toLocaleString()}</span>
+                </div>
+
+                <div className="pt-4 border-t border-gray-800">
+                  <button className="text-yellow-400 hover:text-yellow-300 text-sm underline flex items-center transition-colors">
+                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0"/>
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                    </svg>
+                    Aplicar código de descuento
+                  </button>
+                </div>
               </div>
 
-              <div className="flex justify-between text-gray-700 mb-4">
-                <span>Envío</span>
-                <span>${calcularEnvioTotal().toLocaleString()}</span>
+              <div className="flex justify-between text-2xl font-bold mt-8 pt-6 border-t border-gray-800">
+                <span className="text-gray-300">Total</span>
+                <span className="text-yellow-400">${calcularTotalFinal().toLocaleString()}</span>
               </div>
 
-              <button className="text-blue-600 text-sm underline mb-4">Ingresar código de cupón</button>
-
-              <div className="flex justify-between text-xl font-bold text-gray-800 border-t pt-4">
-                <span>Total</span>
-                <span>${calcularTotalFinal().toLocaleString()}</span>
-              </div>
-
-              <button className="w-full bg-blue-600 text-white py-3 rounded-lg mt-6 hover:bg-blue-700 transition">
-                Continuar compra
+              <button className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-black font-bold py-4 rounded-xl mt-8 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 flex items-center justify-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+                </svg>
+                Finalizar Compra
               </button>
+
+              <div className="mt-6 text-xs text-gray-500 flex items-center">
+                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Compra protegida por nuestra garantía de satisfacción
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     </>
