@@ -1,0 +1,40 @@
+// src/app/api/productos/route.ts
+import { NextResponse } from 'next/server'
+
+
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+  const id = searchParams.get('id');
+
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Se requiere el parámetro ID' },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const API_URL = `http://127.0.0.1:8000/api/tenants/c99a0ed2-b08c-44bf-bef4-bafd96806fa5/v1/products/${id}`
+
+    const res = await fetch(API_URL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        // Agrega aquí headers adicionales si la API lo requiere, como Auth
+      },
+      // Si usas Next.js 13+, puedes deshabilitar la caché:
+      cache: 'no-store'
+    })
+
+    if (!res.ok) {
+      return NextResponse.json({ error: 'No se pudieron obtener los productos' }, { status: res.status })
+    }
+
+    const data = await res.json()
+    return NextResponse.json(data)
+
+  } catch (error) {
+    console.error('Error al obtener productos:', error)
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
+  }
+}

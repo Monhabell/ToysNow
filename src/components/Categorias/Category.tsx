@@ -49,7 +49,7 @@ const CategoryMenu: React.FC = () => {
   return (
     <div >
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl mt-3 font-bold text-gold-500 mb-8 text-center border-b-2 border-gold-500 pb-2">
+        <h1 className="text-1xl mt-3 font-bold text-gold-500 mb-8 text-center border-b-2 border-gold-500 pb-2">
           Nuestras Categorías
         </h1>
         

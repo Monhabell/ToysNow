@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import { useCart } from '@/context/CartContext';
 import { CiHeart, CiShoppingCart } from "react-icons/ci";
 import { FaHeart, FaShoppingCart, FaStar, FaRegStar, FaChevronRight, FaChevronLeft } from "react-icons/fa";
@@ -8,21 +8,53 @@ import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
 import '../../../styles/detalles.css';
 import { Separator } from "@/components/ui/separator"
+import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 
 interface Variant {
-  color?: string;
-  size?: string;
-  weight?: string;
-  cost_shipping?: number;
-  dimensions?: string;
-  price: number;
-  compare_price: number;
+  id: number;
+  sku: string | null;
+  price: string | null;
   stock: number;
-  images: string[];
+  is_available: boolean;
+  compare_price: string | null;
+  shipment: string | null;
+  attributes: {
+    id: number;
+    name: string;
+    value: string;
+  }[];
 }
 
-interface Feature {
+interface Producto {
+  id: number;
+  name: string;
+  slug: string | null;
+  description: string;
+  price: string;
+  compare_price: string;
+  stock: number;
+  is_available: boolean;
+  is_feature: boolean;
+  relevance: number;
+  brand: {
+    id: number;
+    name: string;
+  };
   variants: Variant[];
+  images: {
+    id: number;
+    product_id: number;
+    url: string;
+  }[];
+  categories: {
+    name: string;
+    slug: string;
+    description: string | null;
+    image: string | null;
+    parent_id: number | null;
+  }[];
+  created_at: string;
+  updated_at: string;
 }
 
 interface Qualification {
@@ -43,37 +75,14 @@ interface Question {
   created_at: string;
 }
 
-interface Category {
-  id: number;
-  name: string;
-}
-
 interface SEO {
   meta_title: string;
   meta_description: string;
   keywords: string[];
 }
 
-interface Producto {
-  id: number;
-  name: string;
-  price: number;
-  compare_price: number;
-  slug: string;
-  description: string;
-  brand: string;
-  stock: number;
-  shipment: number;
-  is_available: boolean;
-  is_feature: boolean;
-  features: Feature[];
-  img: string[];
-  categories: Category[];
-  subcategories: Category[];
-  qualification: Qualification;
-  questions: Question[];
-  seo: SEO;
-  created_at: string;
+interface ApiResponse {
+  data: Producto;
 }
 
 interface Props {
@@ -85,8 +94,6 @@ interface Props {
 
 export default function ProductoDetalle({ params }: Props) {
   const { id } = params;
-
-
   const { agregarProducto } = useCart();
 
   const [producto, setProducto] = useState<Producto | null>(null);
@@ -96,22 +103,46 @@ export default function ProductoDetalle({ params }: Props) {
   const [imgSeleccionada, setImgSeleccionada] = useState(0);
   const [preguntas, setPreguntas] = useState<{ pregunta: string; respuesta: string }[]>([]);
   const [nuevaPregunta, setNuevaPregunta] = useState('');
-  const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
+  const [selectedVariant, setSelectedVariant] = useState<{
+    price: number;
+    compare_price: number;
+    stock: number;
+    images: string[];
+    color?: string;
+    size?: string;
+  } | null>(null);
 
   useEffect(() => {
     const obtenerProducto = async () => {
       try {
-        const response = await fetch('/api/productos');
-        const productos: Producto[] = await response.json();
-        const encontrado = productos.find((prod) => prod.id.toString() === id);
-        setProducto(encontrado || null);
+        const response = await fetch(`/api/productoDetalle?id=${id}`);
+        const result: ApiResponse = await response.json();
+        
+        setProducto(result.data || null);
 
         // Set the first variant as default if available
-        if (encontrado?.features?.[0]?.variants?.[0]) {
-          setSelectedVariant(encontrado.features[0].variants[0]);
+        if (result.data?.variants?.[0]) {
+          const variant = result.data.variants[0];
+          setSelectedVariant({
+            price: parseFloat(variant.price || result.data.price),
+            compare_price: parseFloat(variant.compare_price || result.data.compare_price),
+            stock: variant.stock,
+            images: result.data.images.map(img => img.url),
+            // Extraer atributos como color y tamaño si existen
+            color: variant.attributes.find(attr => attr.name.toLowerCase() === 'color')?.value,
+            size: variant.attributes.find(attr => attr.name.toLowerCase() === 'tamaño')?.value
+          });
+        } else {
+          // Si no hay variantes, usar los datos base del producto
+          setSelectedVariant({
+            price: parseFloat(result.data.price),
+            compare_price: parseFloat(result.data.compare_price),
+            stock: result.data.stock,
+            images: result.data.images.map(img => img.url)
+          });
         }
       } catch (error) {
-        console.error('Error al obtener los productos:', error);
+        console.error('Error al obtener el producto:', error);
       }
     };
 
@@ -123,12 +154,14 @@ export default function ProductoDetalle({ params }: Props) {
       if (!producto) return;
       try {
         const res = await fetch('/api/productos');
-        const productos: Producto[] = await res.json();
+        const result: { data: Producto[] } = await res.json();
 
-        const relacionados = productos.filter((p) =>
+        console.log(result)
+
+        const relacionados = result.data.filter((p) =>
           p.id !== producto.id &&
           p.categories.some((cat) =>
-            producto.categories.some(pCat => pCat.id === cat.id)
+            producto.categories.some(pCat => pCat.name === cat.name)
           ));
 
         setRelaciones(relacionados);
@@ -194,38 +227,27 @@ export default function ProductoDetalle({ params }: Props) {
 
   const textoNuevo = (nuevoOk ? 'Nuevo' : '') + ' | +5 vendidos';
 
-  const currentPrice = selectedVariant?.price || producto.price;
-  const currentComparePrice = selectedVariant?.compare_price || producto.compare_price;
+  const currentPrice = selectedVariant?.price || parseFloat(producto.price);
+  const currentComparePrice = selectedVariant?.compare_price || parseFloat(producto.compare_price);
   const valor = currentPrice;
   const descuento = currentComparePrice > currentPrice
     ? Math.round(((currentComparePrice - currentPrice) / currentComparePrice) * 100)
     : 0;
 
-  // Calculate average qualification
-  const qualificationCounts = producto.qualification?.count_users || {};
-  const totalRatings = Object.values(qualificationCounts).reduce((a, b) => a + b, 0);
-  const weightedSum = Object.entries(qualificationCounts).reduce((sum, [stars, count]) => {
-    return sum + (parseInt(stars) * count);
-  }, 0);
-  const averageRating = totalRatings > 0 ? (weightedSum / totalRatings) : 0;
-
-  // Get approved questions from the product
-  const approvedQuestions = producto.questions?.filter(q => q.is_approved) || [];
-
   // Get available colors and sizes from variants
   const colors = Array.from(new Set(
-    producto.features?.flatMap(feature =>
-      feature.variants
-        .filter(v => v.color)
-        .map(v => v.color as string)
+    producto.variants?.flatMap(variant =>
+      variant.attributes
+        .filter(attr => attr.name.toLowerCase() === 'color')
+        .map(attr => attr.value)
     ) || []
   ));
 
   const sizes = Array.from(new Set(
-    producto.features?.flatMap(feature =>
-      feature.variants
-        .filter(v => v.size)
-        .map(v => v.size as string)
+    producto.variants?.flatMap(variant =>
+      variant.attributes
+        .filter(attr => attr.name.toLowerCase() === 'tamaño')
+        .map(attr => attr.value)
     ) || []
   ));
 
@@ -239,10 +261,15 @@ export default function ProductoDetalle({ params }: Props) {
         <div className='max-w-6xl mx-auto content-detalle mt-32'>
           <div className='grid-container'>
             <div className='itemgrupImg'>
-              {producto.img.map((img, index) => (
+              {producto.images.map((img, index) => (
                 <img
-                  key={index}
-                  src={img}
+                  key={img.id}
+                  src={img.url}
+                  onError={(e) => {
+                      const target = e.target as HTMLImageElement;  
+                      target.onerror = null;
+                      target.src = '/images/default.png';
+                  }}
                   alt={producto.name}
                   onClick={() => setImgSeleccionada(index)}
                 />
@@ -251,7 +278,12 @@ export default function ProductoDetalle({ params }: Props) {
 
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
               <img
-                src={producto.img[imgSeleccionada]}
+                src={producto.images[imgSeleccionada]?.url || ''}
+                onError={(e) => {
+                    const target = e.target as HTMLImageElement;  
+                    target.onerror = null;
+                    target.src = '/images/default.png';
+                }}
                 style={{
                   transformOrigin: `${posicion.x}% ${posicion.y}%`
                 }}
@@ -297,8 +329,21 @@ export default function ProductoDetalle({ params }: Props) {
                           className={`w-8 h-8 rounded-full border ${selectedVariant?.color === color ? 'ring-2 ring-blue-500' : ''}`}
                           style={{ backgroundColor: color }}
                           onClick={() => {
-                            const variant = producto.features[0].variants.find(v => v.color === color);
-                            if (variant) setSelectedVariant(variant);
+                            const variant = producto.variants.find(v => 
+                              v.attributes.some(attr => 
+                                attr.name.toLowerCase() === 'color' && attr.value === color
+                              )
+                            );
+                            if (variant) {
+                              setSelectedVariant({
+                                price: parseFloat(variant.price || producto.price),
+                                compare_price: parseFloat(variant.compare_price || producto.compare_price),
+                                stock: variant.stock,
+                                images: producto.images.map(img => img.url),
+                                color,
+                                size: variant.attributes.find(attr => attr.name.toLowerCase() === 'tamaño')?.value
+                              });
+                            }
                           }}
                           title={color}
                         />
@@ -315,10 +360,23 @@ export default function ProductoDetalle({ params }: Props) {
                       {sizes.map((size, index) => (
                         <button
                           key={index}
-                          className={` cursor-pointer px-3 py-1 border rounded ${selectedVariant?.size === size ? 'bg-blue-500 text-white' : 'bg-gray-400'}`}
+                          className={`cursor-pointer px-3 py-1 border rounded ${selectedVariant?.size === size ? 'bg-blue-500 text-white' : 'bg-gray-400'}`}
                           onClick={() => {
-                            const variant = producto.features[0].variants.find(v => v.size === size);
-                            if (variant) setSelectedVariant(variant);
+                            const variant = producto.variants.find(v => 
+                              v.attributes.some(attr => 
+                                attr.name.toLowerCase() === 'tamaño' && attr.value === size
+                              )
+                            );
+                            if (variant) {
+                              setSelectedVariant({
+                                price: parseFloat(variant.price || producto.price),
+                                compare_price: parseFloat(variant.compare_price || producto.compare_price),
+                                stock: variant.stock,
+                                images: producto.images.map(img => img.url),
+                                color: variant.attributes.find(attr => attr.name.toLowerCase() === 'color')?.value,
+                                size
+                              });
+                            }
                           }}
                         >
                           {size}
@@ -328,26 +386,21 @@ export default function ProductoDetalle({ params }: Props) {
                   </div>
                 )}
 
-                
                 <button 
                   className="btnsed"
                   onClick={() => {
-                    // Crear un pedido con el producto actual
                     const order = {
                       items: [{
                         ...producto,
                         price: currentPrice,
                         selectedVariant,
-                        quantity: 1 // Puedes añadir un selector de cantidad si lo necesitas
+                        quantity: 1
                       }],
                       total: currentPrice,
-                      shipping: selectedVariant?.cost_shipping || producto.shipment || 0
+                      shipping: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0
                     };
                     
-                    // Guardar el pedido en sessionStorage para el proceso de pago
                     sessionStorage.setItem('currentOrder', JSON.stringify(order));
-                    
-                    // Redirigir a la página de checkout
                     window.location.href = '/checkout';
                   }}
                 >
@@ -360,7 +413,8 @@ export default function ProductoDetalle({ params }: Props) {
                     agregarProducto({
                       ...producto,
                       price: currentPrice,
-                      selectedVariant
+                      selectedVariant,
+                      images: producto.images.map(img => img.url)
                     });
                   }}
                   className="btnsed"
@@ -368,40 +422,24 @@ export default function ProductoDetalle({ params }: Props) {
                   🛒 Agregar al carrito
                 </button>
 
+                <div className='mt-4'>
+                  <div className="metodos-pago">
+                    <h3>Medios de pago</h3>
 
-
-                {averageRating > 0 && (
-                  <div className='mt-4'>
-                    <div className='flex items-center'>
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i}>{i < Math.round(averageRating) ? '⭐' : '☆'}</span>
-                      ))}
-                      <span className='ml-2'>({averageRating.toFixed(1)})</span>
+                    <div className="promo">
+                      <span role="img" aria-label="tarjeta">💳</span> ¡Paga en hasta 6 cuotas con 0% interés!
                     </div>
-                    <p>{totalRatings} calificaciones</p>
-                  </div>
-                )}
-              </div>
 
-              <div className='border-Black mt-5'>
-                <div className="metodos-pago">
-                  <h3>Medios de pago</h3>
-
-                  <div className="promo">
-                    <span role="img" aria-label="tarjeta">💳</span> ¡Paga en hasta 6 cuotas con 0% interés!
-                  </div>
-
-                  <div className="seccion">
-                    <strong>Tarjetas de crédito</strong>
-                    <div className="iconos">
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" width="50" />
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="MasterCard" width="50" />
-                      <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" width="50" />
-                      {/* Agrega más SVG o íconos personalizados si lo deseas */}
+                    <div className="seccion">
+                      <strong>Tarjetas de crédito</strong>
+                      <div className="iconos">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png" alt="Visa" width="50" />
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png" alt="MasterCard" width="50" />
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg" alt="American Express" width="50" />
+                      </div>
                     </div>
                   </div>
                 </div>
-
               </div>
             </div>
 
@@ -438,30 +476,29 @@ export default function ProductoDetalle({ params }: Props) {
         </div>
 
         {/* Questions section */}
-        <div className='max-w-6xl mx-auto mt-10 px-4 '>
-          
-
-          {/* Preguntas y respuestas */}
+        <div className='max-w-6xl mx-auto mt-10 px-4'>
           <div className='mt-16 bg-gray-900 rounded-lg p-8'>
             <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas</h2>
             
-            {/* Preguntas aprobadas */}
-            {approvedQuestions.length > 0 && (
-              <div className="space-y-6 mb-8">
-                {approvedQuestions.map((item, index) => (
+            {/* Preguntas del usuario */}
+            {preguntas.length > 0 && (
+              <div className="space-y-6">
+                {preguntas.map((item, index) => (
                   <div key={index} className="bg-gray-800 p-5 rounded-lg">
                     <div className="flex items-start gap-4">
                       <div className="bg-gold-500 text-black p-2 rounded-full flex-shrink-0">
                         <span>❓</span>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-100">{item.question}</p>
-                        <div className="flex items-start mt-4 gap-4">
-                          <div className="bg-gray-700 text-gold-500 p-2 rounded-full flex-shrink-0">
-                            <span>💬</span>
+                        <p className="font-medium text-gray-100">{item.pregunta}</p>
+                        {item.respuesta && (
+                          <div className="flex items-start mt-4 gap-4">
+                            <div className="bg-gray-700 text-gold-500 p-2 rounded-full flex-shrink-0">
+                              <span>💬</span>
+                            </div>
+                            <p className="text-gray-300">{item.respuesta}</p>
                           </div>
-                          <p className="text-gray-300">{item.answer}</p>
-                        </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -489,40 +526,13 @@ export default function ProductoDetalle({ params }: Props) {
               </div>
             </div>
 
-            {/* Preguntas del usuario */}
-            {preguntas.length > 0 && (
-              <div className="space-y-6">
-                {preguntas.map((item, index) => (
-                  <div key={index} className="bg-gray-800 p-5 rounded-lg">
-                    <div className="flex items-start gap-4">
-                      <div className="bg-gold-500 text-black p-2 rounded-full flex-shrink-0">
-                        <span>❓</span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-100">{item.pregunta}</p>
-                        {item.respuesta && (
-                          <div className="flex items-start mt-4 gap-4">
-                            <div className="bg-gray-700 text-gold-500 p-2 rounded-full flex-shrink-0">
-                              <span>💬</span>
-                            </div>
-                            <p className="text-gray-300">{item.respuesta}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {preguntas.length === 0 && approvedQuestions.length === 0 && (
+            {preguntas.length === 0 && (
               <div className="text-center py-8 bg-gray-800 rounded-lg">
                 <p className="text-gray-400">Aún no hay preguntas sobre este producto.</p>
               </div>
             )}
           </div>
         </div>
-        
       </div>
     </>
   );

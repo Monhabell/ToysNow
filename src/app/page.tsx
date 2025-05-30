@@ -147,7 +147,7 @@ export default function Home() {
         </div>
 
         <div className='z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 content flex justify-between items-start'>
-          <div className='w-100'>
+          <div className='w-full'>
 
 
             <div className="mt-2 sm:mt-8 content relative">

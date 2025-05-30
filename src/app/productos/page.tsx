@@ -104,22 +104,29 @@ export default function ProductosPage() {
       try {
         setIsLoading(true);
         const res = await fetch('/api/productos');
-        const data = await res.json();
-        setAllProductos(data);
+        const prodcto = await res.json();
+        setAllProductos(prodcto.data);
 
-        // Extraer categorías únicas
-        const cats: Category[] = Array.from(
-          new Set(
-            data.flatMap((p: Producto) => p.categories || [])
-              .filter((cat: Category) => cat?.id && cat?.name)
-              .map((cat: Category) => JSON.stringify(cat))
-          )
-        ).map(str => JSON.parse(str));
+
+        const categoryMap = new Map<string, Category>();
+
+        prodcto.data.forEach((product: any) => {
+          (product.categories || []).forEach((cat: Category) => {
+            const key = `${cat.name}`; // Simplificado, solo usa el nombre
+            if (!categoryMap.has(key)) {
+              categoryMap.set(key, {id: cat.id, name: cat.name});
+            }
+          });
+        });
+
+        const cats: Category[] = Array.from(categoryMap.values());
+
+        console.log(cats)
 
         setCategorias(cats);
 
         // Extraer marcas únicas
-        const marcas = Array.from(new Set(data.map((p: Producto) => p.brand).filter(Boolean))) as string[];
+        const marcas = Array.from(new Set(prodcto.map((p: Producto) => p.brand).filter(Boolean))) as string[];
         setMarcasDisponibles(marcas);
 
       } catch (error) {
@@ -291,7 +298,7 @@ export default function ProductosPage() {
     const counts: Record<string, number> = {};
     categorias.forEach(cat => {
       counts[cat.name] = productosFiltrados.filter(p => 
-        p.categories?.some(c => c.id === cat.id)).length;
+        p.categories?.some(c => normalizarTexto(c.name) === normalizarTexto(cat.name))).length;
     });
     return counts;
   }, [productosFiltrados, categorias]);

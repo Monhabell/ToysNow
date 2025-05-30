@@ -12,7 +12,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price,
   const router = useRouter();
 
   return (
-    <div className="group relative w-110  overflow-hidden rounded-2xl bg-gradient-to-br from-black  to-black p-4 shadow-lg border border-amber-600/30 transition-all hover:shadow-amber-500/30">
+    <div className="group relative   overflow-hidden rounded-2xl bg-gradient-to-br from-black  to-black p-4 shadow-lg border border-amber-600/30 transition-all hover:shadow-amber-500/30">
       
       {/* Borde dorado animado */}
       <div className="absolute inset-0 rounded-2xl border border-amber-500/30 group-hover:border-amber-400/70 transition-all duration-500 pointer-events-none"></div>
