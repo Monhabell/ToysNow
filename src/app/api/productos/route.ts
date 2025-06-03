@@ -1,7 +1,7 @@
 // src/app/api/productos/route.ts
 import { NextResponse } from 'next/server'
 
-const API_URL = 'http://127.0.0.1:8000/api/tenants/c99a0ed2-b08c-44bf-bef4-bafd96806fa5/v1/products'
+const API_URL = 'http://127.0.0.1:8000/api/tenants/6a07fc49-0b34-43be-81f7-1ef1001b118c/v1/products'
 
 export async function GET() {
   try {

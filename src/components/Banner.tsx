@@ -3,8 +3,7 @@ import { useEffect, useState } from 'react'
 import '../styles/banner.css'
 
 const bannerData = [
-  "/images/Banners/7296151.jpg",
-  "/images/Banners/19330956.jpg"
+  "/images/Banners/1000231530.png"
 ]
 
 export default function Banner() {

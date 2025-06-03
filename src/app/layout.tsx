@@ -1,6 +1,7 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
 import { CartProvider } from '@/context/CartContext'
+import SessionProviderWrapper from '@/components/SessionProviderWrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -14,7 +15,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <body className={inter.className}>
         <CartProvider>
-          {children}
+          <SessionProviderWrapper>{children}</SessionProviderWrapper>
         </CartProvider>
       </body>
     </html>
