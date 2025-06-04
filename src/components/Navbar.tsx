@@ -42,17 +42,20 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {session?.user ? (
               <div className="flex items-center space-x-2 text-xs md:text-sm">
-                <Image
-                  src={session.user.image || 'https://img.freepik.com/premium-vector/profile-picture-placeholder-avatar-silhouette-gray-tones-icon-colored-shapes-gradient_1076610-40164.jpg?semt=ais_hybrid&w=740'}
-                  alt={session.user.name || 'Usuario'}
-                  width={24}
-                  height={24}
-                  className="rounded-full"
-                />
-                <span className="text-black font-medium truncate max-w-[100px]">{session.user.name}</span>
+                <button className='perfil' >
+                    <Image
+                    src={session.user.image || 'https://img.freepik.com/premium-vector/profile-picture-placeholder-avatar-silhouette-gray-tones-icon-colored-shapes-gradient_1076610-40164.jpg?semt=ais_hybrid&w=740'}
+                    alt={session.user.name || 'Usuario'}
+                    width={24}
+                    height={24}
+                    className="rounded-full"
+                  />
+                  <span className="font-medium truncate max-w-[100px]">{session.user.name}</span>
+
+                </button>
                 <button
                   onClick={() => signOut()}
-                  className="ml-2 hover:text-magenta-400 transition-colors"
+                  className="ml-2 hover:text-magenta-100 transition-colors cursor-pointer flex items-center"
                 >
                   Salir
                 </button>
@@ -126,8 +129,8 @@ export default function Navbar() {
           {/* Links */}
           <div className={`${isOpen ? 'block' : 'hidden'} md:block mt-4 md:mt-0`}>
             <nav className="flex flex-col mr-5 md:flex-row space-y-3 md:space-y-0 md:space-x-8 font-medium">
-              <Link href="/" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Inicio</Link>
-              <Link href="/productos" className="hover:text-magenta-600 transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Productos</Link>
+              <Link href="/" className="hover:text-white transition-colors border-b-2 border-transparent hover:text-red pb-1">Inicio</Link>
+              <Link href="/productos" className="hover:text-white transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Productos</Link>
               {/* <Link href="/colecciones" ... /> */}
             </nav>
           </div>

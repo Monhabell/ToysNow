@@ -14,7 +14,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const API_URL = `http://127.0.0.1:8000/api/tenants/c99a0ed2-b08c-44bf-bef4-bafd96806fa5/v1/products/${id}`
+    const API_URL = `http://127.0.0.1:8000/api/tenants/f86ca6d4-f2af-4a79-b986-1c8ecf5286d4/v1/products/${id}`
 
     const res = await fetch(API_URL, {
       method: 'GET',

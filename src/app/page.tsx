@@ -15,7 +15,7 @@ type Producto = {
   price: number | string
   compare_price?: number | string
   stock?: number
-  images?: { id: number, product_id: number, url: string }[]  // Cambiado de img a images
+  images?: { id: number, product_id: number, url: string }[]
   created_at?: string | Date
   qualification?: number
   relevance?: number
@@ -30,10 +30,8 @@ type ProductoDestacadoType = {
   name: string
   price: number | string
   description?: string
-  images: { url: string }[]  // Cambiado para coincidir con la estructura del JSON
+  images: { url: string }[]
 } | null
-
-
 
 export default function Home() {
   const [promociones, setPromociones] = useState<Producto[]>([])
@@ -42,36 +40,28 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const obtenerProductos = async () => {
-      try {
-        const res = await fetch('/api/productos')
-        const productos = await res.json()
-        const filtrados = productos.data.filter((p: any) => p.compare_price > 0)
-        setPromociones(filtrados)
-      } catch (error) {
-        console.error('Error al cargar productos:', error)
-      }
-    }
-    obtenerProductos()
-  }, [])
-
-  // Actualiza el tipo ProductoDestacadoType
-
-  // Luego en el useEffect donde obtienes el destacado:
-  useEffect(() => {
-    const obtenerDestacado = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true)
-        const res = await fetch('/api/productos')
-        if (!res.ok) throw new Error('Error al cargar producto destacado')
+        const [productosRes, destacadoRes] = await Promise.all([
+          fetch('/api/productos'),
+          fetch('/api/productos')
+        ])
+        
+        if (!productosRes.ok || !destacadoRes.ok) {
+          throw new Error('Error al cargar datos')
+        }
 
-        const { data: productos } = await res.json()
+        const productosData = await productosRes.json()
+        const destacadoData = await destacadoRes.json()
 
-        // Producto con relevance = 1 o el primer producto como fallback
-        let destacado = productos.find((p: Producto) => p.relevance === 1) || productos[0]
+        // Procesar promociones
+        const filtrados = productosData.data.filter((p: any) => p.compare_price >= 0)
+        setPromociones(filtrados)
 
+        // Procesar producto destacado
+        let destacado = destacadoData.data.find((p: Producto) => p.relevance === 1) || destacadoData.data[0]
         if (!destacado) {
-          // Si no hay productos, crear uno por defecto
           destacado = {
             id: 0,
             name: 'Producto destacado',
@@ -80,27 +70,25 @@ export default function Home() {
             description: 'Producto de ejemplo'
           }
         } else {
-          // Asegurar que tenga imágenes
           if (!destacado.images || destacado.images.length === 0) {
             destacado.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
           } else {
-            // Construir la URL completa si es necesario
             destacado.images = destacado.images.map(img => ({
               url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
             }))
           }
         }
-
         setProductoDestacado(destacado)
 
       } catch (err) {
-        console.error('Error al cargar producto destacado:', err)
-        setError('Error al cargar el producto destacado.')
+        console.error('Error:', err)
+        setError('Error al cargar los datos. Por favor intenta nuevamente.')
       } finally {
         setLoading(false)
       }
     }
-    obtenerDestacado()
+    
+    fetchData()
   }, [])
 
   const scrollLeft = () => {
@@ -114,17 +102,75 @@ export default function Home() {
   }
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p>Cargando...</p>
-      </div>
-    )
-  }
+      return (
+        <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center space-y-6">
+          {/* Logo animado (puedes reemplazar con tu propio logo) */}
+          <div className="relative w-24 h-24 mb-6">
+            <div className="absolute inset-0 border-4 border-gold-600 rounded-full animate-ping opacity-75"></div>
+            <div className="absolute inset-2 border-2 border-gold-400 rounded-full flex items-center justify-center">
+              <span className="text-gold-400 font-bold text-xl">NOIR</span>
+            </div>
+          </div>
+          
+          {/* Barra de progreso animada */}
+          <div className="w-64 md:w-80 h-2 bg-gray-800 rounded-full overflow-hidden">
+            <div 
+              className="h-full bg-gradient-to-r from-gold-500 to-gold-300 rounded-full animate-progress"
+              style={{
+                animation: 'progress 2.5s ease-in-out infinite',
+                backgroundSize: '200% 100%',
+                backgroundPosition: '100% 0%'
+              }}
+            ></div>
+          </div>
+          
+          {/* Texto con animación */}
+          <div className="text-center space-y-2">
+            <h2 className="text-2xl font-bold text-gold-400 animate-pulse text-center">
+               <span className="text-white">Experiencia ToysNow</span>
+            </h2>
+            <p className="text-gray-400 max-w-md px-4">
+              <span className="inline-block animate-typing overflow-hidden whitespace-nowrap border-r-2 border-gold-500 pr-1">
+                Preparando los productos más exclusivos para ti...
+              </span>
+            </p>
+          </div>
+          
+          {/* Efecto de partículas decorativas */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(15)].map((_, i) => (
+              <div 
+                key={i}
+                className="absolute bg-gold-400 rounded-full animate-float"
+                style={{
+                  width: `${Math.random() * 6 + 2}px`,
+                  height: `${Math.random() * 6 + 2}px`,
+                  left: `${Math.random() * 100}%`,
+                  top: `${Math.random() * 100}%`,
+                  animationDuration: `${Math.random() * 10 + 10}s`,
+                  animationDelay: `${Math.random() * 5}s`,
+                  opacity: Math.random() * 0.5 + 0.3
+                }}
+              ></div>
+            ))}
+          </div>
+        </div>
+      )
+    }
 
   if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <p className="text-red-500">{error}</p>
+      <div className="flex justify-center items-center min-h-screen bg-black text-white">
+        <div className="text-center p-6 max-w-md">
+          <h2 className="text-2xl font-bold text-red-500 mb-4">Error</h2>
+          <p className="mb-6">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-gold-600 hover:bg-gold-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
       </div>
     )
   }
@@ -147,10 +193,10 @@ export default function Home() {
         </div>
 
         <div className='z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 content flex justify-between items-start'>
-          <div className='w-full'>
+          
 
 
-            <div className="mt-2 sm:mt-8 content relative">
+            <div className="sm:mt-8 content w-210 relative">
               <button
                 onClick={scrollLeft}
                 className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
@@ -179,7 +225,7 @@ export default function Home() {
               </button>
             </div>
 
-          </div>
+         
           {/* Producto destacado con comprobación adicional */}
           <div>
             {productoDestacado && (

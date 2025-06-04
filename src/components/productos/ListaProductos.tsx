@@ -104,7 +104,6 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
             cantUs = count;
           }
 
-          const img =  p.img || ['https://www.jcprola.com/data/sinfoto.png']
           return (
             <motion.div
               key={p.id}
@@ -112,7 +111,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
               whileHover={{ scale: 1.05 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
-              <div className="relative h-52">
+              <div key={p.id} className="relative h-52">
                 <Image
                   src={p.img?.[0] || 'https://www.jcprola.com/data/sinfoto.png'} // Usa '#' como fallback
                   alt={p.name}

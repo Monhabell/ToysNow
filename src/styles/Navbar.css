@@ -28,6 +28,25 @@
   input:focus, button:focus {
     outline: none;
   }
+
+  .perfil{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--gold-600);
+    text-decoration: none;
+    cursor: pointer;
+    padding: 5px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    color: black;
+  }
+
+  .perfil:hover {
+
+    background-color: rgb(58, 0, 0);
+    color: white !important;
+  }
   
   /* Responsive tweaks */
   @media (max-width: 768px) {

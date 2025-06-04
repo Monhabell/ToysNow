@@ -48,11 +48,11 @@ const CheckoutForm = () => {
 
   const handleBuyNow = async () => {
 
-    // si no ha iniciado sesion redirigir a la pagina de login
-    // if (!sessionStorage.getItem('user')) {
-    //   router.push('/login');
-    //   return;
-    // }
+    
+    if (!sessionStorage.getItem('user')) {
+      router.push('/login');
+      return;
+    }
 
     console.log("pago con mercado pago")
     setLoading(true)

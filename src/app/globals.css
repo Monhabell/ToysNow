@@ -10,7 +10,7 @@
   --magenta-400: #FF66FF;
   --magenta-500: #FF00FF;
   --magenta-600: #CC00CC;
-  --magenta-100: #850133;
+  --magenta-100: #530000;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
@@ -336,3 +336,45 @@ scrollbar-width: none;     /* Firefox */
   box-shadow: 0 10px 15px -3px rgba(202, 138, 4, 0.2), 0 4px 6px -2px rgba(202, 138, 4, 0.1); /* hover:shadow-yellow-500/20 */
 }
 
+@keyframes progress {
+  0% {
+    width: 0%;
+    background-position: 100% 0%;
+  }
+  50% {
+    width: 70%;
+    background-position: 0% 0%;
+  }
+  100% {
+    width: 100%;
+    background-position: 0% 0%;
+  }
+}
+
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100vh) translateX(20px);
+    opacity: 0;
+  }
+}
+
+.animate-progress {
+  animation: progress 2.5s ease-in-out infinite;
+}
+
+.animate-typing {
+  animation: typing 3.5s steps(40, end) infinite;
+}
+
+.animate-float {
+  animation: float linear infinite;
+}
