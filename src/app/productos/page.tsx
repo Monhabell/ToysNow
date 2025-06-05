@@ -106,7 +106,7 @@ export default function ProductosPage() {
         const res = await fetch('/api/productos');
         const prodcto = await res.json();
         setAllProductos(prodcto.data);
-
+        
 
         const categoryMap = new Map<string, Category>();
 

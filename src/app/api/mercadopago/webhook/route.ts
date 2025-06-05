@@ -13,6 +13,7 @@ export async function POST(req: Request) {
 
     // Crear el directorio si no existe
     await mkdir(dir, { recursive: true });
+    
 
     // Guardar los datos en un archivo con marca de tiempo
     await writeFile(filePath, JSON.stringify(body, null, 2), 'utf-8');

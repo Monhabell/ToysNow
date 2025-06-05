@@ -49,10 +49,10 @@ const CheckoutForm = () => {
   const handleBuyNow = async () => {
 
     
-    if (!sessionStorage.getItem('user')) {
-      router.push('/login');
-      return;
-    }
+    // if (!sessionStorage.getItem('user')) {
+    //   router.push('/login');
+    //   return;
+    // }
 
     console.log("pago con mercado pago")
     setLoading(true)
@@ -61,6 +61,8 @@ const CheckoutForm = () => {
       if (!order || order.items.length === 0) {
         throw new Error('No hay items en el pedido');
       }
+
+      
 
       // Preparar los items para Mercado Pago
       const items = order.items.map(item => ({

@@ -14,13 +14,14 @@ export async function GET(request: Request) {
   }
 
   try {
-    const API_URL = `http://127.0.0.1:8000/api/tenants/f86ca6d4-f2af-4a79-b986-1c8ecf5286d4/v1/products/${id}`
+    const API_URL = `${process.env.API_TENANT_BASE_URL_V1}/products/${id}`;
 
     const res = await fetch(API_URL, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // Agrega aquí headers adicionales si la API lo requiere, como Auth
+        'authorization': `Bearer ${process.env.BEARER_TOKEN_SECRET}`,
+
       },
       // Si usas Next.js 13+, puedes deshabilitar la caché:
       cache: 'no-store'
