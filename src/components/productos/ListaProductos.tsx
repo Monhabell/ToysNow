@@ -16,7 +16,7 @@ type Producto = {
   price: number;
   compare_price: number;
   stock: number;
-  img: string[];
+  images: string[];
   created_at: string | Date;
   qualification?: {
     count_users: {
@@ -113,7 +113,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
             >
               <div key={p.id} className="relative h-52">
                 <Image
-                  src={p.img?.[0] || 'https://www.jcprola.com/data/sinfoto.png'} // Usa '#' como fallback
+                  src={p.images?.[0] || 'https://www.jcprola.com/data/sinfoto.png'} // Usa '#' como fallback
                   alt={p.name}
                   fill
                   className="object-cover"

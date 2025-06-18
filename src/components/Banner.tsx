@@ -1,14 +1,32 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import Router from 'next/router'
 import '../styles/banner.css'
 
-const bannerData = [
-  "/images/Banners/1000231530.png"
-]
+type BannerItem = {
+  image: string;
+  type: 'alert' | 'internal' | 'external' | 'whatsapp';
+  payload: string;
+};
 
 export default function Banner() {
-  const extendedData = [bannerData[bannerData.length - 1], ...bannerData, bannerData[0]] // [last, real images..., first]
-  const [currentIndex, setCurrentIndex] = useState(1) // Arrancamos en la posición 1
+  const router = useRouter()
+  const [bannerData, setBannerData] = useState<BannerItem[]>([])
+
+  useEffect(() => {
+    fetch('/api/banner') // tu endpoint real aquí
+      .then(res => res.json())
+      .then(data => setBannerData(data))
+      .catch(err => console.error('Error al cargar banners:', err))
+  }, [])
+
+  const extendedData = bannerData.length
+    ? [bannerData[bannerData.length - 1], ...bannerData, bannerData[0]]
+    : []
+
+  const [currentIndex, setCurrentIndex] = useState(1)
   const [isTransitioning, setIsTransitioning] = useState(true)
 
   const goToPrevious = () => {
@@ -23,29 +41,47 @@ export default function Banner() {
 
   useEffect(() => {
     if (bannerData.length > 1) {
-      const interval = setInterval(() => {
-        goToNext()
-      }, 7000)
+      const interval = setInterval(goToNext, 5000)
       return () => clearInterval(interval)
     }
-  }, []) // solo una vez al montar
+  }, [bannerData])
 
-  // Esto detecta cuando llegas a clones
   const handleTransitionEnd = () => {
     if (currentIndex === extendedData.length - 1) {
-      // Si es el clon de la primera imagen, salta al real
       setIsTransitioning(false)
       setCurrentIndex(1)
-    }
-    if (currentIndex === 0) {
-      // Si es el clon de la última imagen, salta al real
+    } else if (currentIndex === 0) {
       setIsTransitioning(false)
       setCurrentIndex(extendedData.length - 2)
     }
   }
 
+  const realIndex = (currentIndex - 1 + bannerData.length) % bannerData.length
+
+  const handleClick = () => {
+    const item = bannerData[realIndex]
+    if (!item) return
+
+    switch (item.type) {
+      case 'alert':
+        alert(item.payload)
+        break
+      case 'internal':
+        router.push(`/productos?buscar=${encodeURIComponent(item.payload)}`)
+        break
+      case 'external':
+        window.open(item.payload, '_blank')
+        break
+      case 'whatsapp':
+        window.open(`https://wa.me/${item.payload}`, '_blank')
+        break
+      default:
+        console.warn('Tipo de acción desconocido:', item.type)
+    }
+  }
+
   return (
-    <div className="banner_publicitario overflow-hidden">
+    <div className="banner_publicitario overflow-hidden cursor-pointer">
       <div
         className="banner_slider"
         style={{
@@ -53,9 +89,19 @@ export default function Banner() {
           transition: isTransitioning ? 'transform 0.5s ease' : 'none'
         }}
         onTransitionEnd={handleTransitionEnd}
+        onClick={handleClick}
       >
-        {extendedData.map((image, index) => (
-          <img key={index} src={image} alt={`Banner ${index}`} className="banner_image" />
+        {extendedData.map((item, index) => (
+         <Image 
+            key={`${item.image}-${index}-${Date.now()}`}
+            src={item.image} 
+            alt={`Banner ${index}`} 
+            className="banner_image" 
+            width={2200}
+            height={700}
+            priority
+            unoptimized={process.env.NODE_ENV === 'development'} 
+          />
         ))}
       </div>
 

@@ -6,8 +6,8 @@ import SessionProviderWrapper from '@/components/SessionProviderWrapper'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  title: 'Softgenix Ecommerce',
-  description: 'Tienda virtual desarrollada con Next.js',
+  title: 'ToysNow',
+  description: 'Tienda erotica descubre una amplia selección de productos a precios inugualables. ¡déjate llevar por la imaginación y rompe con la monotonía!  ',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

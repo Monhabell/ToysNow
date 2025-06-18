@@ -131,7 +131,6 @@ export default function Navbar() {
             <nav className="flex flex-col mr-5 md:flex-row space-y-3 md:space-y-0 md:space-x-8 font-medium">
               <Link href="/" className="hover:text-white transition-colors border-b-2 border-transparent hover:text-red pb-1">Inicio</Link>
               <Link href="/productos" className="hover:text-white transition-colors border-b-2 border-transparent hover:border-magenta-600 pb-1">Productos</Link>
-              {/* <Link href="/colecciones" ... /> */}
             </nav>
           </div>
 

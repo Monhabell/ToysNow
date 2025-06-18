@@ -6,6 +6,7 @@
 :root {
   --gold-500: #FFD700;
   --gold-600: #D4AF37;
+  --red-600: #a00000;
   --black: #000000;
   --magenta-400: #FF66FF;
   --magenta-500: #FF00FF;
@@ -43,6 +44,7 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
 
   --sidebar-ring: oklch(0.708 0 0);
+  --border-redBlack: #740036;
 
 }
 
