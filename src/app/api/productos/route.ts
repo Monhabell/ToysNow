@@ -9,8 +9,8 @@ export async function GET() {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        // Agrega aquí headers adicionales si la API lo requiere, como Auth
-        'authorization': `Bearer ${process.env.BEARER_TOKEN_SECRET}`,
+        'X-API-Key': process.env.API_KEY || ''
+
       },
       // Si usas Next.js 13+, puedes deshabilitar la caché:
       cache: 'no-store'

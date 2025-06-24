@@ -16,14 +16,7 @@ type UserData = {
     email: string;
     password: string;
     name: string;
-    phone: string;
-    address: {
-        street: string;
-        city: string;
-        state: string;
-        postalCode: string;
-        country: string;
-    };
+    password_confirmation?: string;
 };
 
 export default function AuthPage() {
@@ -33,20 +26,28 @@ export default function AuthPage() {
         email: '',
         password: '',
         name: '',
-        phone: '',
-        address: {
-            street: '',
-            city: '',
-            state: '',
-            postalCode: '',
-            country: 'Colombia'
-        }
+        password_confirmation: ''
     })
 
     const { data: session, status } = useSession()
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
+
+
+    const handleConfirmation = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target
+        if (name === 'password_confirmation') {
+            if (value !== userData.password) {
+                setError('Las contraseñas no coinciden')
+            } else {
+                setError('')
+            }
+
+        }
+
+        handleChange(e)
+    }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
@@ -70,8 +71,7 @@ export default function AuthPage() {
             return false
         }
 
-        if (!isLogin && (!userData.name || !userData.phone || !userData.address.street ||
-            !userData.address.city || !userData.address.postalCode)) {
+        if (!isLogin && (!userData.name)) {
             setError('Por favor completa todos los campos de dirección')
             return false
         }
@@ -98,18 +98,23 @@ export default function AuthPage() {
             setLoading(false)
             return
         }
-
+        //Obtener device name
+        const deviceName = navigator.userAgent || 'Desconocido'
         try {
-            const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
+            const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
             const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData)
-            })
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({...userData, device_name: deviceName}),
+            });
 
             const data = await response.json()
+
+            console.log('Respuesta del servidor:', data)
+
+            
 
             if (!response.ok) {
                 throw new Error(data.message || 'Error en la autenticación')
@@ -190,120 +195,6 @@ export default function AuthPage() {
                                             />
                                         </div>
                                     </div>
-
-                                    <div>
-                                        <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-1">
-                                            Teléfono
-                                        </label>
-                                        <div className="relative rounded-md shadow-sm">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <Phone className="h-5 w-5 text-gold-500" />
-                                            </div>
-                                            <input
-                                                id="phone"
-                                                name="phone"
-                                                type="tel"
-                                                autoComplete="tel"
-                                                required
-                                                value={userData.phone}
-                                                onChange={handleChange}
-                                                className="input-gold"
-                                                placeholder="Número de teléfono"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div>
-                                        <label htmlFor="address.street" className="block text-sm font-medium text-gray-300 mb-1">
-                                            Dirección
-                                        </label>
-                                        <div className="relative rounded-md shadow-sm">
-                                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <MapPin className="h-5 w-5 text-gold-500" />
-                                            </div>
-                                            <input
-                                                id="address.street"
-                                                name="address.street"
-                                                type="text"
-                                                autoComplete="street-address"
-                                                required
-                                                value={userData.address.street}
-                                                onChange={handleChange}
-                                                className="input-gold"
-                                                placeholder="Calle y número"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label htmlFor="address.city" className="block text-sm font-medium text-gray-300 mb-1">
-                                                Ciudad
-                                            </label>
-                                            <input
-                                                id="address.city"
-                                                name="address.city"
-                                                type="text"
-                                                autoComplete="address-level2"
-                                                required
-                                                value={userData.address.city}
-                                                onChange={handleChange}
-                                                className="input-gold"
-                                                placeholder="Ciudad"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="address.state" className="block text-sm font-medium text-gray-300 mb-1">
-                                                Estado
-                                            </label>
-                                            <input
-                                                id="address.state"
-                                                name="address.state"
-                                                type="text"
-                                                autoComplete="address-level1"
-                                                required
-                                                value={userData.address.state}
-                                                onChange={handleChange}
-                                                className="input-gold"
-                                                placeholder="Estado"
-                                            />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label htmlFor="address.postalCode" className="block text-sm font-medium text-gray-300 mb-1">
-                                                Código Postal
-                                            </label>
-                                            <input
-                                                id="address.postalCode"
-                                                name="address.postalCode"
-                                                type="text"
-                                                autoComplete="postal-code"
-                                                required
-                                                value={userData.address.postalCode}
-                                                onChange={handleChange}
-                                                className="input-gold"
-                                                placeholder="C.P."
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="address.country" className="block text-sm font-medium text-gray-300 mb-1">
-                                                País
-                                            </label>
-                                            <input
-                                                id="address.country"
-                                                name="address.country"
-                                                type="text"
-                                                autoComplete="country"
-                                                required
-                                                value={userData.address.country}
-                                                onChange={handleChange}
-                                                className="input-gold"
-                                                disabled
-                                            />
-                                        </div>
-                                    </div>
                                 </>
                             )}
 
@@ -358,12 +249,47 @@ export default function AuthPage() {
                                         </button>
                                     </div>
                                 </div>
-                                {!isLogin && (
-                                    <p className="mt-2 text-xs text-gray-400">
-                                        La contraseña debe tener al menos 8 caracteres.
-                                    </p>
-                                )}
+                                
                             </div>
+                            {!isLogin && (
+                                <div>
+
+                                    <label htmlFor="password" className="block text-sm font-medium text-gray-300 mb-1">
+                                        Confirmar contraseña
+                                    </label>
+                                    <div className="relative rounded-md shadow-sm">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <Lock className="h-5 w-5 text-gold-500" />
+                                        </div>
+                                        <input
+                                            id="password_confirmation"
+                                            name="password_confirmation"
+                                            type={showPassword ? 'text' : 'password'}
+                                            autoComplete={isLogin ? 'current-password' : 'new-password'}
+                                            required
+                                            value={userData.password_confirmation}
+                                            onChange={handleConfirmation}
+                                            className="input-gold"
+                                            placeholder={isLogin ? 'Ingresa tu contraseña' : 'Crea una contraseña segura'}
+                                        />
+                                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="text-gold-500 hover:text-gold-400"
+                                            >
+                                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {!isLogin && (
+                                        <p className="mt-2 text-xs text-gray-400">
+                                            La contraseña debe tener al menos 8 caracteres.
+                                        </p>
+                                    )}
+                                    
+                                </div>
+                            )}
 
                             {isLogin && (
                                 <div className="flex items-center justify-between pt-2">

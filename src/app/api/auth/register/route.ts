@@ -1,11 +1,9 @@
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
-  const API_URL = `${process.env.API_TENANT_BASE_URL_V1}/auth/google/callback`;
-
-
+  
+  const API_URL = `${process.env.API_TENANT_BASE_URL_V1}/register`;
   const body = await request.json();
-
   const res = await fetch(API_URL, {
       method: 'POST',
       body: JSON.stringify(body),

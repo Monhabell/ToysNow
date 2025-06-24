@@ -9,7 +9,7 @@ const handler = NextAuth({
     }),
   ],
   callbacks: {
-    async signIn({ user }) {
+    async signIn({ user, account }) {
       try {
         const res = await fetch(`${process.env.API_BASE_URL}/api/google`, {
           method: 'POST',
@@ -18,24 +18,42 @@ const handler = NextAuth({
             email: user.email,
             name: user.name,
             image: user.image,
-            // provieder: 'google' usar en la api para ofrecerle al cliente agregar contraseña
           }),
         });
 
         if (!res.ok) throw new Error('Fallo en API');
 
+        const data = await res.json();
+        
+        // Guardamos el token en el objeto account
+        if (account) {
+          account.apiToken = data.token;
+        }
+        
         return true;
       } catch (err) {
         console.error('Error:', err);
         return false;
       }
     },
-    async session({ session }) {
+    async jwt({ token, account }) {
+      // Pasamos el token de account al JWT
+      if (account?.apiToken) {
+        token.apiToken = account.apiToken;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      // Pasamos el token del JWT a la sesión
+      session.apiToken = token.apiToken;
       return session;
     },
   },
   pages: {
-    signIn: '/',  // Página custom para login
+    signIn: '/',
+  },
+  session: {
+    strategy: "jwt",
   },
 });
 

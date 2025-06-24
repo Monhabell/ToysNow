@@ -9,10 +9,10 @@ const UserProfile = () => {
     const { data: session, status } = useSession()
 
     console.log(session?.user?.name)
-    // consultar a una api los datos del usuario
-    // const user = await fetchUserData(session?.user?.email);
 
     const nombre = session?.user?.name || 'Usuario';
+
+    const token = session?.apiToken|| '';
 
     const [userData, setUserData] = useState({
         name: nombre,
@@ -61,6 +61,8 @@ const UserProfile = () => {
                             </div>
                             <h2 className="text-xl font-semibold">{userData.name}</h2>
                             <p className="text-gray-400">{userData.email}</p>
+                            <p className="text-gray-400">{token}</p>
+
                         </div>
 
                         <nav className="mt-6">

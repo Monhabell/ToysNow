@@ -14,7 +14,7 @@ import { NextResponse } from 'next/server'
         {
             "image": "/images/Banners/3.webp",
             "type": "internal",
-            "payload": "nuevos"
+            "payload": "plug"
         },
         {
             "image": "/images/Banners/4.webp",
