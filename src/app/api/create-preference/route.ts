@@ -36,6 +36,8 @@ export async function POST(request: Request) {
     const preference = new Preference(client);
     const response = await preference.create({ body: preferenceData });
 
+    console.log('✅ Preferencia creada:', response);
+
     return NextResponse.json({ init_point: response.init_point });
 
   } catch (error: any) {

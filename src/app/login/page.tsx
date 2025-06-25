@@ -90,47 +90,30 @@ export default function AuthPage() {
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setLoading(true)
-        setError('')
+        e.preventDefault();
+        setLoading(true);
+        setError("");
 
         if (!validateForm()) {
-            setLoading(false)
-            return
+            setLoading(false);
+            return;
         }
-        //Obtener device name
-        const deviceName = navigator.userAgent || 'Desconocido'
-        try {
-            const endpoint = isLogin ? "/api/auth/login" : "/api/auth/register";
-            const response = await fetch(endpoint, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({...userData, device_name: deviceName}),
-            });
 
-            const data = await response.json()
+        const result = await signIn("credentials", {
+            redirect: false,
+            email: userData.email,
+            password: userData.password,
+            callbackUrl: "/", // o donde quieras redirigir
+        });
 
-            console.log('Respuesta del servidor:', data)
+        setLoading(false);
 
-            
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Error en la autenticación')
-            }
-
-            // Guardar token y redirigir
-            localStorage.setItem('token', data.token)
-            localStorage.setItem('user', JSON.stringify(data.user))
-
-            router.push('/')
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado')
-        } finally {
-            setLoading(false)
+        if (result?.error) {
+            setError(result.error);
+        } else {
+            router.push(result?.url || "/");
         }
-    }
+        };
 
     return (
         <div className="min-h-screen flex flex-col">

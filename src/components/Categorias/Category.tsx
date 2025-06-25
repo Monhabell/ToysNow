@@ -81,18 +81,6 @@ const CategoryMenu: React.FC = () => {
     router.push(`/productos?buscar=${encodeURIComponent(subcategory.name)}&categoria=${encodeURIComponent(category.slug)}&subcategoria=${encodeURIComponent(subcategory.slug)}`);
   };
 
-  // Default icons mapping for categories without images
-  const getCategoryIcon = (categoryName: string) => {
-    const iconMap: Record<string, string> = {
-      'Plug': '/images/icons/plug.png',
-      'Retardantes': '/images/icons/retardantes.png',
-      'Aceites': '/images/icons/aceite.png',
-      // Add more mappings as needed
-    };
-    
-    return iconMap[categoryName] || '/images/icons/default.png';
-  };
-
   if (loading) {
     return (
       <div className="bg-black text-white py-8 px-4">
@@ -124,15 +112,9 @@ const CategoryMenu: React.FC = () => {
   }
 
   return (
-    <div className="bg-black text-white py-8 px-4">
+    <div className="bg-black text-white py-2 px-4 mt-2">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold text-gold-600 mb-2 border-b-2 border-redBlack pb-2 inline-block">
-            Nuestras Categorías
-          </h2>
-        </div>
-
-        <div className="category-menu flex flex-wrap justify-center gap-6 mb-2 pt-2">
+        <div className="category-menu flex flex-wrap justify-center gap-6 mb-1 pt-1">
           {categories.map((category) => (
             <button
               key={category.slug}

@@ -20,7 +20,7 @@ export async function GET(request: Request) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'authorization': `Bearer ${process.env.BEARER_TOKEN_SECRET}`,
+        'X-API-Key': process.env.API_KEY || ''
 
       },
       // Si usas Next.js 13+, puedes deshabilitar la caché:

@@ -34,6 +34,9 @@ type ProductoDestacadoType = {
   images: { url: string }[]
 } | null
 
+// Tiempo de vida del cache en milisegundos (5 minutos)
+const CACHE_LIFETIME = 5 * 60 * 1000;
+
 export default function Home() {
   const [promociones, setPromociones] = useState<Producto[]>([])
   const [productoDestacado, setProductoDestacado] = useState<ProductoDestacadoType>(null)
@@ -44,6 +47,26 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoading(true)
+        
+        // Verificar si hay datos en cache y si aún son válidos
+        const cachedData = localStorage.getItem('productosCache');
+        const cacheTimestamp = localStorage.getItem('productosCacheTimestamp');
+        
+        if (cachedData && cacheTimestamp) {
+          const now = new Date().getTime();
+          const cachedTime = parseInt(cacheTimestamp, 10);
+          
+          if (now - cachedTime < CACHE_LIFETIME) {
+            // Usar datos del cache
+            const { promociones: cachedPromociones, destacado: cachedDestacado } = JSON.parse(cachedData);
+            setPromociones(cachedPromociones);
+            setProductoDestacado(cachedDestacado);
+            setLoading(false);
+            return;
+          }
+        }
+
+        // Si no hay cache válido, hacer la petición
         const [productosRes, destacadoRes] = await Promise.all([
           fetch('/api/productos'),
           fetch('/api/productos')
@@ -80,6 +103,15 @@ export default function Home() {
           }
         }
         setProductoDestacado(destacado)
+
+        // Guardar en cache
+        const cacheData = {
+          promociones: filtrados,
+          destacado: destacado
+        };
+        
+        localStorage.setItem('productosCache', JSON.stringify(cacheData));
+        localStorage.setItem('productosCacheTimestamp', new Date().getTime().toString());
 
       } catch (err) {
         console.error('Error:', err)
@@ -137,24 +169,7 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Efecto de partículas decorativas */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(15)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute bg-gold-400 rounded-full animate-float"
-              style={{
-                width: `${Math.random() * 6 + 2}px`,
-                height: `${Math.random() * 6 + 2}px`,
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDuration: `${Math.random() * 10 + 10}s`,
-                animationDelay: `${Math.random() * 5}s`,
-                opacity: Math.random() * 0.5 + 0.3
-              }}
-            ></div>
-          ))}
-        </div>
+        
       </div>
     )
   }
@@ -195,7 +210,7 @@ export default function Home() {
         </div>
 
         <div className='z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 content '>
-          <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex flex-col lg:flex-row gap-1">
             {/* Carrusel de productos - ocupa 2/3 del espacio en pantallas grandes */}
             <div className="lg:w-2/3 relative">
               <button
