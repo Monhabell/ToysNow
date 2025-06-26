@@ -65,6 +65,10 @@ export async function POST(req: Request) {
       pagosConMetadata,
     };
 
+    // guardar en base de datos el proceso de pago
+    // Aquí deberías implementar la lógica para guardar en tu base de datos
+
+    // primer de dato craate segundo close y confirmar status de la orden
 
     const dir = path.resolve(process.cwd(), 'webhook_logs');
     await mkdir(dir, { recursive: true });

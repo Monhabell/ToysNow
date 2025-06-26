@@ -7,6 +7,8 @@ export async function POST(req: NextRequest) {
 
   console.log('🔍 Buscando orden localmente por preference_id:', orderId);
 
+  // consultar a la base de datos si el pago esta realizado
+
   try {
     const dir = path.resolve(process.cwd(), 'webhook_logs');
     const files = await readdir(dir);
