@@ -103,7 +103,7 @@ export default function AuthPage() {
             redirect: false,
             email: userData.email,
             password: userData.password,
-            callbackUrl: "/", // o donde quieras redirigir
+            callbackUrl: sessionStorage.getItem('currentPage') || '/', // o donde quieras redirigir
         });
 
         setLoading(false);
@@ -111,9 +111,10 @@ export default function AuthPage() {
         if (result?.error) {
             setError(result.error);
         } else {
-            router.push(result?.url || "/");
+            router.push(result?.url || '/');
         }
         };
+  
 
     return (
         <div className="min-h-screen flex flex-col">

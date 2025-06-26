@@ -2,6 +2,19 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+// Extiende el tipo User para incluir apiToken
+declare module "next-auth" {
+  interface Session {
+    apiToken?: string;
+    userId?: string | number; // Asegúrate que coincida con el tipo de ID
+  }
+
+  interface User {
+    apiToken?: string;
+  }
+}
+
+
 const handler = NextAuth({
   providers: [
     GoogleProvider({
@@ -34,6 +47,8 @@ const handler = NextAuth({
           if (!res.ok || !data.user) {
             throw new Error(data.message || "Credenciales inválidas");
           }
+
+          
 
           return {
             id: data.user.id,
@@ -86,6 +101,7 @@ const handler = NextAuth({
     },
 
     async jwt({ token, user, account }) {
+
       // Google o Credentials
       if (account?.apiToken) {
         token.apiToken = account.apiToken;
@@ -93,11 +109,17 @@ const handler = NextAuth({
       if (user?.apiToken) {
         token.apiToken = user.apiToken;
       }
+
+      // Guardar ID del usuario
+      if (user?.id) {
+        token.userId = user.id;
+      }
       return token;
     },
 
     async session({ session, token }) {
       session.apiToken = token.apiToken;
+      session.userId = typeof token.userId === "string" || typeof token.userId === "number" ? token.userId : undefined; // 👈 Añadimos esto
       return session;
     },
   },

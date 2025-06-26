@@ -18,18 +18,29 @@ export async function POST(request: Request) {
     const preferenceData = {
       items: [
         {
-          id: body.id || 'default-id',
+          id: body.id_user || 'default-id',
           title: body.title,
           quantity: body.quantity,
           currency_id: 'COP', // o 'USD' si estás en otros países
           unit_price: body.unit_price,
         },
       ],
+
+      metadata: 
+        {
+        id_user: body.id_user,
+        email: body.email,
+        descripcion_envio: body.descripcion_envio,
+        delivery_info: body.delivery_info,
+        }
+      ,
+      
       back_urls: {
         success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
         failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
         pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
       },
+      
 
     };
 
@@ -38,7 +49,7 @@ export async function POST(request: Request) {
 
     console.log('✅ Preferencia creada:', response);
 
-    return NextResponse.json({ init_point: response.init_point });
+    return NextResponse.json({ init_point: response.init_point,  orderId: response.id });
 
   } catch (error: any) {
     console.error('❌ Error al crear preferencia:', error?.response?.data || error?.message || error);

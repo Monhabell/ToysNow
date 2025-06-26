@@ -9,6 +9,9 @@ import Navbar from "@/components/Navbar";
 import '../../../styles/detalles.css';
 import { Separator } from "@/components/ui/separator"
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation';
+
 
 interface Variant {
   id: number;
@@ -96,6 +99,10 @@ export default function ProductoDetalle({ params }: Props) {
   const [nuevaPregunta, setNuevaPregunta] = useState('');
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession()
+    const router = useRouter();
+  
+
 
   useEffect(() => {
     const obtenerProducto = async () => {
@@ -349,6 +356,7 @@ export default function ProductoDetalle({ params }: Props) {
             </div>
 
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
+             
               <img
                 src={producto.images[imgSeleccionada] ? getImageUrl(producto.images[imgSeleccionada].url) : '/images/default.png'}
                 onError={(e) => {
@@ -465,6 +473,18 @@ export default function ProductoDetalle({ params }: Props) {
                         shipping: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0
                       };
 
+                      // guardar en local storage la pagina actual
+                      console.log(window.location.href);
+                      sessionStorage.setItem('currentPage', window.location.href);
+
+                     
+
+                      if (!session ) {
+                        router.push('/login');
+                        return;
+                      }
+
+                      
                       sessionStorage.setItem('currentOrder', JSON.stringify(order));
                       window.location.href = '/checkout';
                     }}

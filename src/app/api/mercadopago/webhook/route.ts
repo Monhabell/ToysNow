@@ -7,38 +7,78 @@ export async function POST(req: Request) {
 
     console.log('📩 Webhook recibido:', body);
 
-    const paymentId = body.id;
+    console.log(body)
+
+    const orderId = body.data?.id || body.id;
     const topic = body.type;
 
-    console.log('ID del pago:', paymentId);
+    console.log('ID de la orden:', orderId);
+    console.log('Tipo:', topic);
 
-    if (!paymentId || !topic) {
-      console.warn('⚠️ Webhook incompleto:', body);
-      return new Response('Webhook incompleto', { status: 400 });
+    if (!orderId ) {
+      console.warn('⚠️ Webhook no válido:', body);
+      return new Response('Webhook no válido', { status: 400 });
     }
 
     const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
-    const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+
+    // 1. Obtener la orden de compra
+    const orderRes = await fetch(`https://api.mercadopago.com/merchant_orders/${orderId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
         'Content-Type': 'application/json',
       },
     });
 
-    // Ruta absoluta para guardar los datos
+    const orderData = await orderRes.json();
+    console.log("📦 Orden completa:", orderData);
+
+    const pagos = orderData.payments || [];
+
+    // 2. Si hay pagos, obtener metadata desde cada pago
+    const pagosConMetadata = [];
+
+    for (const pago of pagos) {
+      const paymentId = pago.id;
+
+      const paymentRes = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const paymentData = await paymentRes.json();
+
+      pagosConMetadata.push({
+        paymentId,
+        metadata: paymentData.metadata,
+        status: paymentData.status,
+        amount: paymentData.transaction_amount,
+      });
+    }
+
+    // 3. Guardar todo en el archivo
+    const output = {
+      orderId,
+      orderData,
+      pagosConMetadata,
+    };
+
+
     const dir = path.resolve(process.cwd(), 'webhook_logs');
-    const filePath = path.resolve(dir, `log-${Date.now()}.json`);
-
-    // Crear el directorio si no existe
     await mkdir(dir, { recursive: true });
-    
 
-    // Guardar los datos en un archivo con marca de tiempo
-    await writeFile(filePath, JSON.stringify(body, null, 2), 'utf-8');
+    const filePath = path.resolve(dir, `log-order-${Date.now()}.json`);
+    await writeFile(filePath, JSON.stringify(output, null, 2), 'utf-8');
 
-    return new Response('Datos guardados', { status: 200 });
+    return new Response('Orden + metadata guardada', { 
+      status: 200 ,
+      headers: { 'Content-Type': 'application/json' },
+    });
+
   } catch (error) {
-    console.error('❌ Error al guardar webhook:', error);
+    console.error('❌ Error al procesar webhook:', error);
     return new Response('Error', { status: 500 });
   }
 }

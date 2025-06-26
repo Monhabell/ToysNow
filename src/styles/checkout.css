@@ -1,11 +1,27 @@
-.content_trasparent {
-  max-width: 42rem; /* 672px - equivalent to max-w-2xl */
-  margin-left: auto;
-  margin-right: auto;
-  padding: 1.5rem; /* 24px - equivalent to p-6 */
-  background-color: #111827b4; /* equivalent to bg-gray-900 */
-  border-radius: 0.5rem; /* 8px - equivalent to rounded-lg */
-  border: 0.3px solid #d4af37; /* gold color - equivalent to border-gold-500 (note: gold-500 isn't a standard Tailwind color) */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* equivalent to shadow-lg */
+
+:root {
+  --black: #000000;
+  --gold: #D4AF37;
+  --gold-dark: #B7950B;
+  --vinotinto: #722F37;
+  --gray-dark: #1A1A1A;
+  --gray-medium: #333333;
+  --gray-light: #CCCCCC;
+}
+
+.bg-gold-500 {
+  background-color: var(--gold);
+}
+
+.hover\:bg-gold-600:hover {
+  background-color: var(--gold-dark);
+}
+
+.text-gold-500 {
+  color: var(--gold);
+}
+
+.border-vinotinto {
+  border-color: var(--vinotinto);
 }
 
