@@ -5,13 +5,15 @@ import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 import '../../styles/checkout.css';
 import { useSession, signOut } from 'next-auth/react'
+import StarRating from '@/components/StarRating'
+
 
 interface OrderItem {
   id: number;
   name: string;
   price: number;
   quantity: number;
-  selectedVariant?: any;
+  variant?: any;
 }
 
 interface Order {
@@ -50,8 +52,11 @@ const CheckoutForm = () => {
   const [editAddress, setEditAddress] = useState(false);
   const { data: session, status } = useSession();
 
+  const token = session?.apiToken|| '';
+
   useEffect(() => {
     const orderData = sessionStorage.getItem('currentOrder');
+    console.log(orderData)
     if (!orderData) {
       router.push('/');
       return;
@@ -84,9 +89,14 @@ const CheckoutForm = () => {
     setEditAddress(false);
   };
 
+  
+
   const handleBuyNow = async () => {
     setLoading(true);
     try {
+
+      console.log(order?.items.map(item => item.variant))
+
       if (!order || order.items.length === 0) {
         throw new Error('No hay items en el pedido');
       }
@@ -97,13 +107,17 @@ const CheckoutForm = () => {
       }
 
       const items = order.items.map(item => ({
-        title: `${item.name}${item.selectedVariant?.color ? ` - Color: ${item.selectedVariant.color}` : ''}${item.selectedVariant?.size ? ` - Tamaño: ${item.selectedVariant.size}` : ''}`,
+        title: `${item.name}${item.variant?.color ? ` - Color: ${item.selectedVariant.color}` : ''}${item.selectedVariant?.size ? ` - Tamaño: ${item.selectedVariant.size}` : ''}`,
         unit_price: item.price,
         quantity: item.quantity,
+        id: item.id,
         description: `este producto es malo no retarda`,
         id_user: session?.userId,
         email: session?.user?.email,
-        delivery_info: deliveryInfo
+        delivery_info: deliveryInfo,
+        variants_id: item.variant?.id ,
+        user_token: token
+
       }));
 
       const res = await fetch('/api/create-preference', {
@@ -117,7 +131,10 @@ const CheckoutForm = () => {
           quantity: items[0].quantity,
           id_user: session?.userId,
           email: session?.user?.email,
-          delivery_info: deliveryInfo
+          delivery_info: deliveryInfo,
+          id_product: items[0].id,// Asegúrate de que este campo sea correcto
+          variants: items[0].variants_id,
+          user_token: token
         }),
       });
 
@@ -221,7 +238,7 @@ const CheckoutForm = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Departamento/Piso</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Departamento</label>
                       <input
                         type="text"
                         name="apartment"
@@ -245,7 +262,7 @@ const CheckoutForm = () => {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-300 mb-1">Provincia</label>
+                      <label className="block text-sm font-medium text-gray-300 mb-1">Barrio</label>
                       <input
                         type="text"
                         name="province"
@@ -370,14 +387,18 @@ const CheckoutForm = () => {
             <div className="bg-gray-900 rounded-lg p-6 border border-vinotinto sticky top-4">
               <h2 className="text-xl font-bold text-gold-500 mb-4">Resumen de tu compra</h2>
 
+
               <div className="space-y-3 mb-6">
                 {order.items.map((item, index) => (
                   <div key={index} className="flex justify-between py-2 border-b border-gray-700">
                     <div className="flex items-center">
                       <span className="text-gray-300">
                         {item.name}
+   
                         {item.selectedVariant?.color && <span className="text-gold-300"> - {item.selectedVariant.color}</span>}
                         {item.selectedVariant?.size && <span className="text-gold-600"> - {item.selectedVariant.size}</span>}
+                        {item.selectedVariant?.talla && <span className="text-gold-600"> - {item.selectedVariant.talla}</span>}
+
                       </span>
                       <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
                     </div>

@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator"
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
+import StarRating from '@/components/StarRating'
 
 
 interface Variant {
@@ -100,9 +101,7 @@ export default function ProductoDetalle({ params }: Props) {
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [loading, setLoading] = useState(true);
   const { data: session, status } = useSession()
-    const router = useRouter();
-  
-
+  const router = useRouter();
 
   useEffect(() => {
     const obtenerProducto = async () => {
@@ -122,11 +121,14 @@ export default function ProductoDetalle({ params }: Props) {
 
         setProducto(result.data);
 
-        // Set the first variant as default if available
-        if (result.data.variants?.length > 0) {
-          setSelectedVariant(result.data.variants[0]);
+        // Filtrar variantes válidas (con precio) y establecer la primera como seleccionada
+        const validVariants = result.data.variants.filter(v => v.price !== null);
+        if (validVariants.length > 0) {
+          setSelectedVariant(validVariants[0]);
+        } else {
+          // Si no hay variantes con precio, usar el precio base del producto
+          setSelectedVariant(null);
         }
-
         
       } catch (error) {
         console.error('Error al obtener el producto:', error);
@@ -182,8 +184,6 @@ export default function ProductoDetalle({ params }: Props) {
     setPosicion({ x, y });
   };
 
-
-
   const scrollLeft = () => {
     const slider = document.getElementById('slider');
     slider?.scrollBy({ left: -300, behavior: 'smooth' });
@@ -211,32 +211,171 @@ export default function ProductoDetalle({ params }: Props) {
     return `${process.env.NEXT_PUBLIC_BACKEND_URL || ''}/${url}`;
   };
 
-  // Group attributes by name
-  const groupedAttributes: Record<string, string[]> = {};
-  producto?.variants.forEach(variant => {
-    variant.attributes.forEach(attr => {
-      if (!groupedAttributes[attr.name]) {
-        groupedAttributes[attr.name] = [];
-      }
-      if (!groupedAttributes[attr.name].includes(attr.value)) {
-        groupedAttributes[attr.name].push(attr.value);
+  const handleRating = (value: number) => {
+   
+    console.log('Usuario calificó con:', value)
+  }
+
+  const separarAtributos = () => {
+    if (!producto) return { generales: {}, variantes: {} };
+
+    const generales: Record<string, string[]> = {};
+    const variantes: Record<string, string[]> = {};
+
+    // Primero identificamos qué atributos varían entre las variantes CON PRECIO
+    const atributosQueVarían = new Set<string>();
+    const variantesConPrecio = producto.variants.filter(v => v.price !== null);
+
+    if (variantesConPrecio.length > 1) {
+      // Comparar la primera variante con precio con las demás para ver qué atributos cambian
+      const primeraVariant = variantesConPrecio[0];
+
+      variantesConPrecio.forEach(variant => {
+        variant.attributes.forEach(attr => {
+          const primeraAttrValue = primeraVariant.attributes.find(a => a.name === attr.name)?.value;
+          if (primeraAttrValue !== attr.value) {
+            atributosQueVarían.add(attr.name);
+          }
+        });
+      });
+    }
+
+    // Atributos de todas las variantes (incluyendo las sin precio)
+    const allAttributes = new Set<string>();
+    producto.variants.forEach(v => {
+      v.attributes.forEach(attr => {
+        allAttributes.add(attr.name);
+      });
+    });
+
+    // Separamos los atributos
+    Array.from(allAttributes).forEach(attrName => {
+      if (atributosQueVarían.has(attrName)) {
+        // Es un atributo de variante (seleccionable)
+        variantes[attrName] = [];
+        variantesConPrecio.forEach(v => {
+          const attrValue = v.attributes.find(a => a.name === attrName)?.value;
+          if (attrValue && !variantes[attrName].includes(attrValue)) {
+            variantes[attrName].push(attrValue);
+          }
+        });
+      } else {
+        // Es un atributo general (característica del producto)
+        generales[attrName] = [];
+        producto.variants.forEach(v => {
+          const attrValue = v.attributes.find(a => a.name === attrName)?.value;
+          if (attrValue && !generales[attrName].includes(attrValue)) {
+            generales[attrName].push(attrValue);
+          }
+        });
       }
     });
-  });
+
+    return { generales, variantes };
+  };
 
   const handleVariantSelect = (attributeName: string, value: string) => {
     if (!producto) return;
 
-    // Find variant that matches the selected attribute
-    const matchingVariant = producto.variants.find(variant =>
-      variant.attributes.some(attr =>
-        attr.name === attributeName && attr.value === value
-      )
-    );
+    // Solo buscar entre variantes con precio
+    const validVariants = producto.variants.filter(v => v.price !== null);
+
+    // Encontrar la variante que coincide con todos los atributos seleccionados
+    let matchingVariant = validVariants.find(variant => {
+      // Verificar que todos los atributos de variante coincidan con los seleccionados
+      return Object.entries(variantes).every(([name, _]) => {
+        // Si este es el atributo que estamos cambiando, verificar el nuevo valor
+        if (name === attributeName) {
+          return variant.attributes.some(attr => attr.name === name && attr.value === value);
+        }
+        // Para otros atributos, verificar que coincidan con la selección actual
+        if (selectedVariant) {
+          const currentValue = selectedVariant.attributes.find(attr => attr.name === name)?.value;
+          return variant.attributes.some(attr => attr.name === name && attr.value === currentValue);
+        }
+        return true;
+      });
+    });
+
+    // Si no encontramos una variante que coincida con todos los atributos,
+    // buscar una que al menos coincida con el atributo que estamos cambiando
+    if (!matchingVariant) {
+      matchingVariant = validVariants.find(variant =>
+        variant.attributes.some(attr =>
+          attr.name === attributeName && attr.value === value
+        )
+      );
+    }
 
     if (matchingVariant) {
       setSelectedVariant(matchingVariant);
     }
+  };
+
+  const handleComprarAhora = () => {
+    if (!producto) return;
+
+    // Crear objeto de producto para el checkout
+    const productToCheckout = {
+      id: producto.id,
+      name: producto.name,
+      price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
+      compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) : 
+                   producto.compare_price ? parseFloat(producto.compare_price) : null,
+      quantity: 1,
+      image: producto.images[0] ? getImageUrl(producto.images[0].url) : '/images/default.png',
+      variant: selectedVariant ? {
+        id: selectedVariant.id,
+        attributes: selectedVariant.attributes.map(attr => ({
+          name: attr.name,
+          value: attr.value
+        }))
+      } : null,
+      stock: selectedVariant?.stock || producto.stock,
+      shipment: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0
+    };
+
+    // Guardar en sessionStorage para el checkout
+    sessionStorage.setItem('currentOrder', JSON.stringify({
+      items: [productToCheckout],
+      total: productToCheckout.price,
+      shipping: productToCheckout.shipment
+    }));
+
+    // Guardar la página actual para posible redirección después del login
+    sessionStorage.setItem('currentPage', window.location.href);
+
+    // Redirigir al checkout
+    if (!session) {
+      router.push('/login');
+      return;
+    }
+
+    router.push('/checkout');
+  };
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!producto) return;
+
+    agregarProducto({
+      id: producto.id,
+      name: producto.name,
+      price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
+      compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) : 
+                   producto.compare_price ? parseFloat(producto.compare_price) : null,
+      quantity: 1,
+      images: producto.images.map(img => getImageUrl(img.url)),
+      variant: selectedVariant ? {
+        id: selectedVariant.id,
+        attributes: selectedVariant.attributes.map(attr => ({
+          name: attr.name,
+          value: attr.value
+        }))
+      } : null,
+      stock: selectedVariant?.stock || producto.stock,
+      shipment: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0
+    });
   };
 
   if (loading) {
@@ -255,13 +394,10 @@ export default function ProductoDetalle({ params }: Props) {
     );
   }
 
-  const fechaCreacion = new Date(producto.created_at);
-  const hoy = new Date();
-  const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
-  const nuevoOk = diffDias <= 30;
-  const textoNuevo = (nuevoOk ? 'Nuevo' : '') + ' | +5 vendidos';
+  const { generales, variantes } = separarAtributos();
+  const variantesConPrecio = producto.variants.filter(v => v.price !== null);
 
-  // Determine current price and compare price
+  // Determinar precio actual
   const currentPrice = selectedVariant?.price
     ? parseFloat(selectedVariant.price)
     : parseFloat(producto.price);
@@ -278,56 +414,11 @@ export default function ProductoDetalle({ params }: Props) {
 
   const currentStock = selectedVariant?.stock || producto.stock;
 
-  const separarAtributos = () => {
-    const generales: Record<string, string[]> = {};
-    const variantes: Record<string, string[]> = {};
-
-    // Primero identificamos qué atributos varían entre variantes
-    const atributosQueVarían = new Set<string>();
-
-    if (producto.variants.length > 1) {
-      // Comparar la primera variante con las demás para ver qué atributos cambian
-      const primeraVariant = producto.variants[0];
-
-      producto.variants.forEach(variant => {
-        variant.attributes.forEach(attr => {
-          const primeraAttrValue = primeraVariant.attributes.find(a => a.name === attr.name)?.value;
-          if (primeraAttrValue !== attr.value) {
-            atributosQueVarían.add(attr.name);
-          }
-        });
-      });
-    }
-
-    // Ahora separamos los atributos
-    producto.variants[0].attributes.forEach(attr => {
-      if (atributosQueVarían.has(attr.name)) {
-        // Es un atributo de variante
-        if (!variantes[attr.name]) {
-          variantes[attr.name] = [];
-        }
-        // Agregamos todos los valores posibles de todas las variantes
-        producto.variants.forEach(v => {
-          const attrValue = v.attributes.find(a => a.name === attr.name)?.value;
-          if (attrValue && !variantes[attr.name].includes(attrValue)) {
-            variantes[attr.name].push(attrValue);
-          }
-        });
-      } else {
-        // Es un atributo general
-        if (!generales[attr.name]) {
-          generales[attr.name] = [];
-        }
-        if (!generales[attr.name].includes(attr.value)) {
-          generales[attr.name].push(attr.value);
-        }
-      }
-    });
-
-    return { generales, variantes };
-  };
-
-  const { generales, variantes } = separarAtributos();
+  const fechaCreacion = new Date(producto.created_at);
+  const hoy = new Date();
+  const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
+  const nuevoOk = diffDias <= 30;
+  const textoNuevo = (nuevoOk ? 'Nuevo' : '') + ' | +5 vendidos';
 
   return (
     <>
@@ -356,7 +447,6 @@ export default function ProductoDetalle({ params }: Props) {
             </div>
 
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
-             
               <img
                 src={producto.images[imgSeleccionada] ? getImageUrl(producto.images[imgSeleccionada].url) : '/images/default.png'}
                 onError={(e) => {
@@ -385,6 +475,13 @@ export default function ProductoDetalle({ params }: Props) {
 
                 <h1 className='detail_text text-gold-600'>{producto.name}</h1>
 
+                { producto.qualification >= 0 && (
+                  <div className='star_qualifications'>
+                    <StarRating rating={producto.qualification} onRate={handleRating} />
+                    <p className='ml-2 '>({producto.reviews_count})</p>
+                  </div>
+                )}
+
                 {descuento > 0 ? (
                   <div className='flex items-center gap-2'>
                     <p className='valorPresio'>${currentPrice.toLocaleString('en-CO')}</p>
@@ -399,8 +496,7 @@ export default function ProductoDetalle({ params }: Props) {
                   {currentStock > 0 ? `Disponible (${currentStock} unidades)` : 'Agotado'}
                 </p>
 
-
-                {/* Atributos generales */}
+                {/* Atributos generales (características del producto) */}
                 {Object.entries(generales).length > 0 && (
                   <div className="mt-4">
                     <h3 className="font-medium mb-2">Características:</h3>
@@ -415,8 +511,8 @@ export default function ProductoDetalle({ params }: Props) {
                   </div>
                 )}
 
-                {/* Atributos de variante */}
-                {Object.entries(variantes).length > 0 && (
+                {/* Opciones seleccionables (solo para variantes con precio) */}
+                {variantesConPrecio.length > 0 && Object.entries(variantes).length > 0 && (
                   <div className="mt-6">
                     <h3 className="font-medium mb-2">Opciones:</h3>
                     {Object.entries(variantes).map(([name, values]) => (
@@ -427,7 +523,9 @@ export default function ProductoDetalle({ params }: Props) {
                             const isSelected = selectedVariant?.attributes.some(
                               attr => attr.name === name && attr.value === value
                             );
-                            const isAvailable = producto.variants.some(v =>
+                            
+                            // Verificar disponibilidad
+                            const isAvailable = variantesConPrecio.some(v =>
                               v.attributes.some(a =>
                                 a.name === name &&
                                 a.value === value &&
@@ -438,12 +536,13 @@ export default function ProductoDetalle({ params }: Props) {
                             return (
                               <button
                                 key={idx}
-                                className={`px-3 py-1 border rounded text-sm ${isSelected
+                                className={`px-3 py-1 border rounded text-sm ${
+                                  isSelected
                                     ? 'bg-gold-500 text-white border-gold-500'
                                     : isAvailable
                                       ? 'bg-white border-gray-300 hover:bg-gray-100'
                                       : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-                                  }`}
+                                }`}
                                 onClick={() => handleVariantSelect(name, value)}
                                 disabled={!isAvailable}
                                 title={!isAvailable ? 'No disponible' : ''}
@@ -461,63 +560,27 @@ export default function ProductoDetalle({ params }: Props) {
                 <div className="flex flex-col gap-3 mt-6">
                   <button
                     className="btnsed bg-gold-500 hover:bg-gold-600 text-white"
-                    onClick={() => {
-                      const order = {
-                        items: [{
-                          ...producto,
-                          price: currentPrice,
-                          selectedVariant,
-                          quantity: 1
-                        }],
-                        total: currentPrice,
-                        shipping: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0
-                      };
-
-                      // guardar en local storage la pagina actual
-                      console.log(window.location.href);
-                      sessionStorage.setItem('currentPage', window.location.href);
-
-                     
-
-                      if (!session ) {
-                        router.push('/login');
-                        return;
-                      }
-
-                      
-                      sessionStorage.setItem('currentOrder', JSON.stringify(order));
-                      window.location.href = '/checkout';
-                    }}
+                    onClick={handleComprarAhora}
                     disabled={currentStock <= 0}
                   >
                     Comprar ahora
                   </button>
 
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      agregarProducto({
-                        ...producto,
-                        price: currentPrice,
-                        selectedVariant,
-                        images: producto.images.map(img => getImageUrl(img.url))
-                      });
-                    }}
+                  {/* <button
+                    onClick={handleAddToCart}
                     className="btnsed border border-gold-500 text-gold-500 hover:bg-gold-50"
                     disabled={currentStock <= 0}
                   >
                     🛒 Agregar al carrito
-                  </button>
+                  </button> */}
                 </div>
 
                 <div className='mt-6'>
                   <div className="metodos-pago">
                     <h3 className="font-medium mb-3">Medios de pago</h3>
-
                     <div className="promo bg-blue-50 text-blue-700 p-3 rounded-lg mb-4">
                       <span role="img" aria-label="tarjeta">💳</span> ¡Paga en hasta 6 cuotas con 0% interés!
                     </div>
-
                     <div className="seccion mb-4">
                       <strong className="block mb-2">Tarjetas de crédito</strong>
                       <div className="iconos flex gap-3">
@@ -582,12 +645,10 @@ export default function ProductoDetalle({ params }: Props) {
           </div>
         </div>
 
-        {/* Questions section */}
         <div className='max-w-6xl mx-auto mt-10 px-4'>
           <div className='mt-16 bg-gray-50 rounded-lg p-8 shadow-sm'>
             <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas</h2>
 
-            {/* User questions */}
             {preguntas.length > 0 && (
               <div className="space-y-6">
                 {preguntas.map((item, index) => (
@@ -613,7 +674,6 @@ export default function ProductoDetalle({ params }: Props) {
               </div>
             )}
 
-            {/* Question form */}
             <div className="mt-8">
               <h3 className="text-lg font-semibold mb-4 text-gold-500">¿Tienes alguna pregunta?</h3>
               <div className="flex gap-3">
