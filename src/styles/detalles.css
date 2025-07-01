@@ -185,3 +185,45 @@
   align-items: center;
   margin-top: 10px;
 }
+
+.cuestions {
+  flex: 1;
+  background-color: white;
+  border: 1px solid #D1D5DB; /* gray-300 */
+  padding: 0.75rem; /* 12px */
+  border-radius: 0.5rem; /* rounded-lg */
+  color: #1F2937; /* text-gray-800 */
+  outline: none;
+}
+
+.cuestions:focus {
+  box-shadow: 0 0 0 2px #FFD700; /* focus:ring-2 + gold-500 */
+  border-color: transparent; /* focus:border-transparent */
+}
+
+.send_cuestions {
+  padding-left: 1.5rem;   /* px-6 */
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;   /* py-3 */
+  padding-bottom: 0.75rem;
+  background-color: #FFD700;  /* gold-500 (asumido como dorado clásico) */
+  color: black;
+  border-radius: 0.5rem;   /* rounded-lg */
+  transition: background-color 0.2s ease-in-out;  /* transition-colors */
+  font-weight: 500;  /* font-medium */
+  cursor: pointer;
+}
+
+.bsend_cuestions:hover {
+  background-color: #E6BE00;  /* gold-600 (más oscuro que gold-500) */
+}
+
+.productos-relacionados{
+  background-color: rgb(36, 36, 36);
+  color: rgb(255, 255, 255);
+  margin-top: 20px;
+  height: 90%;
+  padding: 15px;
+  border-radius: 15px;
+}
+

@@ -129,7 +129,7 @@ export default function ProductoDetalle({ params }: Props) {
           // Si no hay variantes con precio, usar el precio base del producto
           setSelectedVariant(null);
         }
-        
+
       } catch (error) {
         console.error('Error al obtener el producto:', error);
         setProducto(null);
@@ -212,7 +212,7 @@ export default function ProductoDetalle({ params }: Props) {
   };
 
   const handleRating = (value: number) => {
-   
+
     console.log('Usuario calificó con:', value)
   }
 
@@ -320,8 +320,8 @@ export default function ProductoDetalle({ params }: Props) {
       id: producto.id,
       name: producto.name,
       price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
-      compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) : 
-                   producto.compare_price ? parseFloat(producto.compare_price) : null,
+      compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) :
+        producto.compare_price ? parseFloat(producto.compare_price) : null,
       quantity: 1,
       image: producto.images[0] ? getImageUrl(producto.images[0].url) : '/images/default.png',
       variant: selectedVariant ? {
@@ -362,8 +362,8 @@ export default function ProductoDetalle({ params }: Props) {
       id: producto.id,
       name: producto.name,
       price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
-      compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) : 
-                   producto.compare_price ? parseFloat(producto.compare_price) : null,
+      compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) :
+        producto.compare_price ? parseFloat(producto.compare_price) : null,
       quantity: 1,
       images: producto.images.map(img => getImageUrl(img.url)),
       variant: selectedVariant ? {
@@ -475,7 +475,7 @@ export default function ProductoDetalle({ params }: Props) {
 
                 <h1 className='detail_text text-gold-600'>{producto.name}</h1>
 
-                { producto.qualification >= 0 && (
+                {producto.qualification >= 0 && (
                   <div className='star_qualifications'>
                     <StarRating rating={producto.qualification} onRate={handleRating} />
                     <p className='ml-2 '>({producto.reviews_count})</p>
@@ -499,12 +499,11 @@ export default function ProductoDetalle({ params }: Props) {
                 {/* Atributos generales (características del producto) */}
                 {Object.entries(generales).length > 0 && (
                   <div className="mt-4">
-                    <h3 className="font-medium mb-2">Características:</h3>
                     <div className="space-y-2">
                       {Object.entries(generales).map(([name, values]) => (
                         <div key={name} className="flex flex-wrap gap-1">
-                          <span className="font-medium text-gray-700">{name}:</span>
-                          <span className="text-gray-600">{values.join(', ')}</span>
+                          <span className="font-medium text-gold-600">{name}:</span>
+                          <span className="text-white-600">{values.join(', ')}</span>
                         </div>
                       ))}
                     </div>
@@ -514,16 +513,15 @@ export default function ProductoDetalle({ params }: Props) {
                 {/* Opciones seleccionables (solo para variantes con precio) */}
                 {variantesConPrecio.length > 0 && Object.entries(variantes).length > 0 && (
                   <div className="mt-6">
-                    <h3 className="font-medium mb-2">Opciones:</h3>
                     {Object.entries(variantes).map(([name, values]) => (
                       <div key={name} className="mt-3">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">{name}:</h4>
+                        <h4 className="text-sm font-medium text-gold-600 mb-2">{name}:</h4>
                         <div className="flex gap-2 flex-wrap">
                           {values.map((value, idx) => {
                             const isSelected = selectedVariant?.attributes.some(
                               attr => attr.name === name && attr.value === value
                             );
-                            
+
                             // Verificar disponibilidad
                             const isAvailable = variantesConPrecio.some(v =>
                               v.attributes.some(a =>
@@ -536,13 +534,12 @@ export default function ProductoDetalle({ params }: Props) {
                             return (
                               <button
                                 key={idx}
-                                className={`px-3 py-1 border rounded text-sm ${
-                                  isSelected
-                                    ? 'bg-gold-500 text-white border-gold-500'
+                                className={`cursor-pointer px-3 py-1 border rounded text-sm ${isSelected
+                                    ? 'bg-black text-gold-600 border-gold-500'
                                     : isAvailable
-                                      ? 'bg-white border-gray-300 hover:bg-gray-100'
-                                      : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-                                }`}
+                                      ? 'bg-gray border-gray-600 hover:text-gold-600 hover:bg-gold-50'
+                                      : 'bg-gold-600 border-gray-200 text-gray-400 cursor-not-allowed'
+                                  }`}
                                 onClick={() => handleVariantSelect(name, value)}
                                 disabled={!isAvailable}
                                 title={!isAvailable ? 'No disponible' : ''}
@@ -604,55 +601,61 @@ export default function ProductoDetalle({ params }: Props) {
               <div className='mb-3'>
                 <h1 className='mb-5 text-gold-600 text-2xl font-bold'>Detalles del producto</h1>
                 {producto.description && (
-                  <div className='text-sm text-gray-700'>
+                  <div className='text-sm text-white-700'>
                     <p>{producto.description}</p>
                   </div>
                 )}
-              </div>
-
-              <Separator className="my-6" />
-
-              <div className='mt-5'>
-                <h1 className='text-gold-600 text-2xl font-bold mb-4'>Productos relacionados</h1>
-                <div className="relative">
-                  {mostrarBotones && (
-                    <button
-                      className="slider-btn left absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                      onClick={scrollLeft}
-                    >
-                      <GoChevronLeft className="text-gray-700" size={24} />
-                    </button>
-                  )}
-
-                  <div
-                    id='slider'
-                    className='overflow-x-auto p-2 scroll-smooth scrollbar-hide whitespace-nowrap'
-                  >
-                    <ListaProductos productos={relacionados} isSlider />
-                  </div>
-
-                  {mostrarBotones && (
-                    <button
-                      className="slider-btn right absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
-                      onClick={scrollRight}
-                    >
-                      <GoChevronRight className="text-gray-700" size={24} />
-                    </button>
-                  )}
-                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div className='max-w-6xl mx-auto mt-10 px-4'>
-          <div className='mt-16 bg-gray-50 rounded-lg p-8 shadow-sm'>
+
+
+
+        {relacionados.length > 0 && (
+          <div className='productos-relacionados max-w-6xl mx-auto mt-32'>
+            <div className='mt-5'>
+              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Productos relacionados</h1>
+              <div className="relative">
+                {mostrarBotones && (
+                  <button
+                    className="slider-btn left absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                    onClick={scrollLeft}
+                  >
+                    <GoChevronLeft className="text-gray-700" size={24} />
+                  </button>
+                )}
+
+                <div
+                  id='slider'
+                  className='overflow-x-auto p-2 scroll-smooth scrollbar-hide whitespace-nowrap'
+                >
+                  <ListaProductos productos={relacionados} isSlider />
+                </div>
+
+                {mostrarBotones && (
+                  <button
+                    className="slider-btn right absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100"
+                    onClick={scrollRight}
+                  >
+                    <GoChevronRight className="text-gray-700" size={24} />
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+
+        <div className='max-w-6xl mx-auto mt-10 px-4 bg-black '>
+          <div className='mt-16 bg-black rounded-lg p-8 shadow-sm'>
             <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas</h2>
 
             {preguntas.length > 0 && (
               <div className="space-y-6">
                 {preguntas.map((item, index) => (
-                  <div key={index} className="bg-white p-5 rounded-lg shadow-sm">
+                  <div key={index} className="bg-gray-50 p-5 rounded-lg shadow-sm">
                     <div className="flex items-start gap-4">
                       <div className="bg-gold-500 text-white p-2 rounded-full flex-shrink-0">
                         <span>❓</span>
@@ -679,14 +682,14 @@ export default function ProductoDetalle({ params }: Props) {
               <div className="flex gap-3">
                 <input
                   type="text"
-                  className="flex-1 bg-white border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-gold-500 focus:border-transparent text-gray-800"
+                  className="cuestions"
                   placeholder="Escribe tu pregunta aquí..."
                   value={nuevaPregunta}
                   onChange={(e) => setNuevaPregunta(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && enviarPregunta()}
                 />
                 <button
-                  className="px-6 py-3 bg-gold-500 hover:bg-gold-600 text-white rounded-lg transition-colors font-medium"
+                  className="send_cuestions"
                   onClick={enviarPregunta}
                 >
                   Enviar

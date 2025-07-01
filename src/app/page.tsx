@@ -39,7 +39,11 @@ const CACHE_LIFETIME = 5 * 60 * 1000;
 
 export default function Home() {
   const [promociones, setPromociones] = useState<Producto[]>([])
+  const [promocionesCant, setProductCant] = useState<Producto[]>([])
+
   const [productoDestacado, setProductoDestacado] = useState<ProductoDestacadoType>(null)
+  const [productoDestacado2, setProductoDestacado2] = useState<ProductoDestacadoType>(null)
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -79,9 +83,17 @@ export default function Home() {
         const productosData = await productosRes.json()
         const destacadoData = await destacadoRes.json()
 
+
         // Procesar promociones
         const filtrados = productosData.data.filter((p: any) => p.compare_price >= 0)
         setPromociones(filtrados)
+
+        // mostrar 10 productos al azar
+        const shuffled = productosData.data
+          .filter((p: any) => p.compare_price >= 0) // Filtramos promociones
+          .sort(() => 0.5 - Math.random()) // Mezclamos
+          .slice(0, 5); // Tomamos 5
+        setProductCant(shuffled);
 
         // Procesar producto destacado
         let destacado = destacadoData.data.find((p: Producto) => p.relevance === 1) || destacadoData.data[0]
@@ -104,10 +116,26 @@ export default function Home() {
         }
         setProductoDestacado(destacado)
 
+        const productoDestacado2 = destacadoData.data.find((p: Producto) => p.relevance === 2) || destacadoData.data[1] || destacadoData.data[0]; // Usamos el segundo o el primero si no hay con relevance=2
+
+        if (productoDestacado2) {
+          if (!productoDestacado2.images || productoDestacado2.images.length === 0) {
+            productoDestacado2.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }];
+          } else {
+            productoDestacado2.images = productoDestacado2.images.map(img => ({
+              url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
+            }));
+          }
+        }
+        setProductoDestacado2(productoDestacado2);
+
+
         // Guardar en cache
         const cacheData = {
           promociones: filtrados,
-          destacado: destacado
+          destacado: destacado,
+          destacado2: productoDestacado2,
+          shuffled: shuffled,
         };
         
         localStorage.setItem('productosCache', JSON.stringify(cacheData));
@@ -124,13 +152,16 @@ export default function Home() {
     fetchData()
   }, [])
 
-  const scrollLeft = () => {
-    const slider = document.getElementById('slider')
+  
+
+
+  const scrollLeft = (deslizar: string) => {
+    const slider = document.getElementById(deslizar)
     slider?.scrollBy({ left: -300, behavior: 'smooth' })
   }
 
-  const scrollRight = () => {
-    const slider = document.getElementById('slider')
+  const scrollRight = (deslizar: string) => {
+    const slider = document.getElementById(deslizar)
     slider?.scrollBy({ left: 500, behavior: 'smooth' })
   }
 
@@ -210,11 +241,12 @@ export default function Home() {
         </div>
 
         <div className='z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 content '>
-          <div className="flex flex-col lg:flex-row gap-1">
+          <div className="card-destacado">
             {/* Carrusel de productos - ocupa 2/3 del espacio en pantallas grandes */}
-            <div className="lg:w-2/3 relative">
+            <div className="carrusel_productos">
+              
               <button
-                onClick={scrollLeft}
+                onClick={() => scrollLeft('slider')}
                 className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronLeft size={20} className="sm:w-6 sm:h-6" />
@@ -225,7 +257,7 @@ export default function Home() {
                 className="overflow-x-auto py-4 sm:py-6 scroll-smooth scrollbar-hide space-x-4 sm:space-x-6"
               >
                 <ListaProductos
-                  productos={promociones.map(p => ({
+                  productos={promocionesCant.map(p => ({
                     ...p,
                     images: p.images || ['https://www.jcprola.com/data/sinfoto.png']
                   }))}
@@ -234,7 +266,7 @@ export default function Home() {
               </div>
 
               <button
-                onClick={scrollRight}
+                onClick={() => scrollRight('slider')}
                 className="absolute right-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
@@ -242,7 +274,7 @@ export default function Home() {
             </div>
 
             {/* Producto destacado - ocupa 1/3 del espacio en pantallas grandes */}
-            <div className="lg:w-1/3">
+            <div className="producto_destacado">
               {productoDestacado && (
                 <ProductoDestacado
                   img={productoDestacado.images[0].url}
@@ -264,7 +296,7 @@ export default function Home() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gold-600 mb-1 sm:mb-2">OFERTAS CALIENTES</h2>
                 <p className="text-sm sm:text-base text-gold-500">Productos que despertarán tus sentidos</p>
               </div>
-              <a href="#" className="self-end sm:self-auto flex items-center text-sm sm:text-base text-gold-600 hover:text-gold-300 group transition-colors">
+              <a href="/productos" className="self-end sm:self-auto flex items-center text-sm sm:text-base text-gold-600 hover:text-gold-300 group transition-colors">
                 Ver todas
                 <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </a>
@@ -273,14 +305,14 @@ export default function Home() {
             {/* Slider  productos mas vendidos*/}
             <div className="mt-2 sm:mt-8 content relative">
               <button
-                onClick={scrollLeft}
+                onClick={() => scrollLeft('slider2')}
                 className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronLeft size={20} className="sm:w-6 sm:h-6" />
               </button>
 
               <div
-                id="slider"
+                id="slider2"
                 className="overflow-x-auto py-4 sm:py-6 scroll-smooth scrollbar-hide space-x-4 sm:space-x-6"
               >
                 <ListaProductos
@@ -293,7 +325,7 @@ export default function Home() {
               </div>
 
               <button
-                onClick={scrollRight}
+                onClick={() => scrollRight('slider2')}
                 className="absolute right-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
@@ -302,23 +334,37 @@ export default function Home() {
           </section>
 
           {/* Destacado del mes */}
-          <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
-            <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
-            <img
-              src="/images/productos/producto2.1.jpg"
-              alt="Producto destacado"
-              className="w-full h-full object-cover"
-            />
-            <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">
-              <span className="text-sm sm:text-base text-white font-semibold">DESTACADO DEL MES</span>
-              <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">Colección Éxtasis Noir</h2>
-              <p className="text-xs sm:text-base text-white mb-4 sm:mb-6">Descubre la elegancia de lo prohibido...</p>
-              <button className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group">
-                DESCUBRIR
-                <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </button>
-            </div>
-          </section>
+          {productoDestacado2 && (
+            <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
+              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
+              <img
+                src={productoDestacado2.images[0].url}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;  
+                  target.onerror = null;
+                  target.src = '/images/default.png';
+                }}
+                alt={productoDestacado2.name}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">
+                <span className="text-sm sm:text-base text-white font-semibold">DESTACADO DEL MES</span>
+                <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">{productoDestacado2.name}</h2>
+                
+                <a 
+                  href={`/productos/${productoDestacado2.id}`}
+                  className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group"
+                >
+                  DESCUBRIR
+                  <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
+            </section>
+          )}
+
+          
+       
+          
         </main>
 
         {/* Newsletter */}

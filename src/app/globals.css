@@ -351,3 +351,44 @@ scrollbar-width: none;     /* Firefox */
 .animate-float {
   animation: float linear infinite;
 }
+
+
+.card-destacado {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr; /* Sin comas */
+  gap: 1rem;
+}
+
+.carrusel_productos {
+  grid-column-start: 1;
+  grid-column-end: 3; /* Ocupa columnas 1 y 2 */
+  position: relative;
+}
+
+.producto_destacado {
+  grid-column-start: 3;
+  grid-column-end: 4; /* Ocupa solo la columna 3 */
+}
+
+.carrusel_productos button {
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+.carrusel_productos button:hover {
+  background-color: var(--magenta-100);
+}
+
+
+
+
+
+
+@media (min-width: 1024px) {
+  .card-destacado {
+    flex-direction: row;
+  }
+}
+
+

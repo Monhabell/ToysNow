@@ -34,6 +34,7 @@ export async function POST(request: Request) {
           quantity: Number(quantity),
           currency_id: 'COP',
           unit_price: Number(unit_price),
+          varaintes: body.variantes_producto || [],
         },
       ],
       metadata: {

@@ -104,6 +104,29 @@ const CheckoutForm = () => {
       // Validar información de envío
       if (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.phone) {
         throw new Error('Por favor complete toda la información de envío');
+        
+      }
+
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.id;
+
+      if (paymentMethod === 'cashOnDelivery') {
+        // Lógica para pago contra entrega
+        console.log('Datos del pedido para entrega:', {
+          items: order.items,
+          total: order.total + order.shipping,
+          deliveryInfo,
+          user: {
+            email: session?.user?.email,
+            userId: session?.userId
+          }
+        });
+        
+        // Aquí podrías hacer una llamada a tu API para registrar el pedido
+        // await fetch('/api/create-cash-order', { ... });
+        
+        alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
+        //router.push('/order-confirmation');
+        return;
       }
 
       const items = order.items.map(item => ({
@@ -116,7 +139,11 @@ const CheckoutForm = () => {
         email: session?.user?.email,
         delivery_info: deliveryInfo,
         variants_id: item.variant?.id ,
-        user_token: token
+        user_token: token,
+        variantes: item.variant?.attributes?.map((attr: any) => ({
+          name: attr.name,
+          value: attr.value
+        }))
 
       }));
 
@@ -134,7 +161,8 @@ const CheckoutForm = () => {
           delivery_info: deliveryInfo,
           id_product: items[0].id,// Asegúrate de que este campo sea correcto
           variants: items[0].variants_id,
-          user_token: token
+          user_token: token,
+          variantes_producto: items[0].variantes,
         }),
       });
 
@@ -393,14 +421,17 @@ const CheckoutForm = () => {
                   <div key={index} className="flex justify-between py-2 border-b border-gray-700">
                     <div className="flex items-center">
                       <span className="text-gray-300">
-                        {item.name}
-   
-                        {item.selectedVariant?.color && <span className="text-gold-300"> - {item.selectedVariant.color}</span>}
-                        {item.selectedVariant?.size && <span className="text-gold-600"> - {item.selectedVariant.size}</span>}
-                        {item.selectedVariant?.talla && <span className="text-gold-600"> - {item.selectedVariant.talla}</span>}
+                        {item.name} <br />
+                        {item.variant?.attributes?.map((attr: any, idx: number) => (
+                          
+                          <span key={idx} className="text-gray-400 ml-1">
+                            {attr.name}: {attr.value}       
+                          </span>
+                        ))}
 
                       </span>
-                      <span className="text-gray-500 text-sm ml-2">x{item.quantity}</span>
+                      <br />
+                      <span className="text-gray-500 text-sm ml-10">Cant {item.quantity}</span>
                     </div>
                     <span className="text-white">
                       ${(item.price * item.quantity).toLocaleString()}
