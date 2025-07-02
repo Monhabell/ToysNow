@@ -50,13 +50,59 @@ const CheckoutForm = () => {
     deliveryNotes: ''
   });
   const [editAddress, setEditAddress] = useState(false);
+  const [mensajellegadaPedido, setMensajellegadaPedido] = useState('');
+  const [valueEnvio, setvalorEnvio] = useState('');
+
   const { data: session, status } = useSession();
+  const token = session?.apiToken || '';
 
-  const token = session?.apiToken|| '';
+  const handleLlegadaPedido = () => {
+    const currentTime = new Date();
+    const horas = currentTime.getHours().toString().padStart(2, '0');
+    const minutos = currentTime.getMinutes().toString().padStart(2, '0');
+    const actualTime = `${horas}:${minutos}`;
 
+    const limitTime = '11:00'; // Hora límite para entrega al día siguiente
+
+    let mensaje = 'Tu pedido llega hoy';
+    if (actualTime > limitTime) {
+      mensaje = 'Tu pedido llega mañana';
+    }
+
+    setMensajellegadaPedido(mensaje);
+  };
+
+  interface DeliveryInfoData {
+    address: string;
+    apartment: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    phone: string;
+    deliveryType: 'casa' | 'oficina' | 'otro';
+    deliveryNotes: string;
+  }
+
+  const handleValueEnvio = (dataEnvio: DeliveryInfoData): void => {
+    const cityvalueEnvio: string = dataEnvio.city;
+    let valueEnvio = 0
+    console.log(cityvalueEnvio)
+
+    if (cityvalueEnvio == 'Bogota'){
+        valueEnvio = 15500        
+        console.log(valueEnvio);
+    }
+
+    setvalorEnvio(valueEnvio.toString())
+  }
+
+  
   useEffect(() => {
     const orderData = sessionStorage.getItem('currentOrder');
     console.log(orderData)
+    handleLlegadaPedido();
+    
+
     if (!orderData) {
       router.push('/');
       return;
@@ -67,6 +113,7 @@ const CheckoutForm = () => {
     const savedDeliveryInfo = localStorage.getItem('deliveryInfo');
     if (savedDeliveryInfo) {
       setDeliveryInfo(JSON.parse(savedDeliveryInfo));
+      handleValueEnvio(JSON.parse(savedDeliveryInfo));
     }
   }, [router]);
 
@@ -74,6 +121,7 @@ const CheckoutForm = () => {
     if (preferenceId) {
       window.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${preferenceId}`;
     }
+    
   }, [preferenceId]);
 
   const handleDeliveryInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -107,30 +155,8 @@ const CheckoutForm = () => {
         
       }
 
-      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.id;
-
-      if (paymentMethod === 'cashOnDelivery') {
-        // Lógica para pago contra entrega
-        console.log('Datos del pedido para entrega:', {
-          items: order.items,
-          total: order.total + order.shipping,
-          deliveryInfo,
-          user: {
-            email: session?.user?.email,
-            userId: session?.userId
-          }
-        });
-        
-        // Aquí podrías hacer una llamada a tu API para registrar el pedido
-        // await fetch('/api/create-cash-order', { ... });
-        
-        alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
-        //router.push('/order-confirmation');
-        return;
-      }
-
       const items = order.items.map(item => ({
-        title: `${item.name}${item.variant?.color ? ` - Color: ${item.selectedVariant.color}` : ''}${item.selectedVariant?.size ? ` - Tamaño: ${item.selectedVariant.size}` : ''}`,
+        title: `${item.name}${item.variant?.color ? ` - Color: ${item.variant?.color}` : ''}${item.variant?.size ? ` - Tamaño: ${item.variant?.size}` : ''}`,
         unit_price: item.price,
         quantity: item.quantity,
         id: item.id,
@@ -146,6 +172,44 @@ const CheckoutForm = () => {
         }))
 
       }));
+
+       // validar cupon de descuento
+      const cuponInput = document.getElementById('cuponInput') as HTMLInputElement;
+      const cupon = cuponInput.value.trim();  
+      if (cupon) {
+
+        const idCuponProducto = items[0].id; 
+        console.log('Cupón ingresado:', cupon);
+        console.log('ID del producto:', idCuponProducto);
+
+        // enviamnos a la api 
+        // responde la api con % de descuento y true o false si es valido o no
+
+      }
+
+
+      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.id;
+
+      if (paymentMethod === 'cashOnDelivery') {
+        // Lógica para pago contra entrega
+        console.log('Datos del pedido para contra entrega:', {
+          items: order.items,
+          total: order.total + order.shipping,
+          deliveryInfo,
+          user: {
+            email: session?.user?.email,
+            userId: session?.userId
+          }
+        });
+        
+        
+        
+        alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
+        //router.push('/order-confirmation');
+        return;
+      }
+
+      
 
       const res = await fetch('/api/create-preference', {
         method: 'POST',
@@ -258,6 +322,7 @@ const CheckoutForm = () => {
                       <label className="block text-sm font-medium text-gray-300 mb-1">Dirección</label>
                       <input
                         type="text"
+                        id="address"
                         name="address"
                         value={deliveryInfo.address}
                         onChange={handleDeliveryInfoChange}
@@ -283,6 +348,7 @@ const CheckoutForm = () => {
                       <label className="block text-sm font-medium text-gray-300 mb-1">Ciudad</label>
                       <input
                         type="text"
+                        id='city'
                         name="city"
                         value={deliveryInfo.city}
                         onChange={handleDeliveryInfoChange}
@@ -362,12 +428,61 @@ const CheckoutForm = () => {
                 <div className="text-gray-300">
                   <p className="font-medium">{deliveryInfo.address || 'No especificada'}</p>
                   {deliveryInfo.apartment && <p>Departamento: {deliveryInfo.apartment}</p>}
-                  <p>{deliveryInfo.city}, {deliveryInfo.province} {deliveryInfo.postalCode}</p>
+                  <p id="cityAddres">{deliveryInfo.city}, {deliveryInfo.province} {deliveryInfo.postalCode}</p>
                   <p>Teléfono: {deliveryInfo.phone || 'No especificado'}</p>
                   <p>Recibir en: {deliveryInfo.deliveryType === 'casa' ? 'Casa' : deliveryInfo.deliveryType === 'oficina' ? 'Oficina' : 'Otro'}</p>
                   {deliveryInfo.deliveryNotes && <p className="mt-2 italic">Notas: {deliveryInfo.deliveryNotes}</p>}
                 </div>
               )}
+            </div>
+
+            <div>
+
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Columna izquierda - Detalle del pedido */}
+                <div className="flex-1 bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
+                  <h2 className="text-xl font-bold text-white mb-4">Tu pedido</h2>
+
+                  {mensajellegadaPedido && (
+                    <div className="mt-4 p-4 rounded-lg border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-900 via-yellow-800 to-yellow-700 shadow-lg animate-fade-in">
+                      <div className="flex items-center space-x-3">
+                        <svg
+                          className="w-6 h-6 text-yellow-300"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth={2}
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M8 7V3M16 7V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                          />
+                        </svg>
+                        <p className="text-yellow-100 font-semibold text-sm md:text-base">
+                          {mensajellegadaPedido}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+
+                {/* Columna derecha - Cupón */}
+                <div className="w-full md:w-1/3 bg-gray-900 rounded-lg p-6 mb-6 border border-vinotinto">
+                  <h2 className="text-xl font-bold text-gold-500 mb-4">Cupón de descuento</h2>
+                  <div className="flex items-center space-x-3">
+                    <input
+                      type="text"
+                      id="cuponInput"
+                      name="cupon"
+                      placeholder="Ingresa tu cupón"
+                      className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                    />
+                  </div>
+                </div>
+              </div>
+
             </div>
 
             <div className="bg-gray-900 rounded-lg p-6 border border-vinotinto">
@@ -447,11 +562,14 @@ const CheckoutForm = () => {
                 </div>
                 <div className="flex justify-between text-gray-300">
                   <span>Envío</span>
-                  <span>${order.shipping.toLocaleString()}</span>
+                  <span>${valueEnvio}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold text-gold-500 pt-2 mt-2 border-t border-gray-700">
                   <span>Total</span>
-                  <span>${(order.total + order.shipping).toLocaleString()}</span>
+                  <span>
+                    {(parseFloat(order.total) + parseFloat(valueEnvio)).toLocaleString('en-CO')}
+                  </span>
+
                 </div>
               </div>
 

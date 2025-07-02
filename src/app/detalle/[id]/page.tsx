@@ -531,6 +531,26 @@ export default function ProductoDetalle({ params }: Props) {
                               )
                             );
 
+                            if (name === 'color') {
+                              return (
+                                <button
+                                  key={idx}
+                                  className={`w-8 h-8 rounded-full border-2 m-1 transition-all duration-200
+                                    ${isSelected ? 'ring-2 ring-gold-600' : ''}
+                                    ${!isAvailable ? 'opacity-40 cursor-not-allowed' : 'hover:scale-110'}
+                                  `}
+                                  style={{
+                                    backgroundColor: value,  // 👈 Establece el color desde el value
+                                    borderColor: isSelected ? '#FFD700' : '#ccc',
+                                  }}
+                                  onClick={() => handleVariantSelect(name, value)}
+                                  disabled={!isAvailable}
+                                  title={!isAvailable ? 'No disponible' : value}
+                                ></button>
+                              );
+                            }
+
+
                             return (
                               <button
                                 key={idx}

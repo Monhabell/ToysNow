@@ -131,7 +131,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;  
                   target.onerror = null;
-                  target.src = '/images/default.png';
+                  target.src = '/images/default.webp';
                 }}
                 alt={p.name}
                 fill

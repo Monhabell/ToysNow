@@ -62,9 +62,11 @@ export default function Home() {
           
           if (now - cachedTime < CACHE_LIFETIME) {
             // Usar datos del cache
-            const { promociones: cachedPromociones, destacado: cachedDestacado } = JSON.parse(cachedData);
+            const { promociones: cachedPromociones, destacado: cachedDestacado, productoDestacado2:productoDestacado2, shuffled: shuffled  } = JSON.parse(cachedData);
             setPromociones(cachedPromociones);
             setProductoDestacado(cachedDestacado);
+            setProductoDestacado2(productoDestacado2);
+            setProductCant(shuffled)
             setLoading(false);
             return;
           }
@@ -85,7 +87,7 @@ export default function Home() {
 
 
         // Procesar promociones
-        const filtrados = productosData.data.filter((p: any) => p.compare_price >= 0)
+        const filtrados = productosData.data.filter((p: any) => p.compare_price > 0)
         setPromociones(filtrados)
 
         // mostrar 10 productos al azar
@@ -134,7 +136,7 @@ export default function Home() {
         const cacheData = {
           promociones: filtrados,
           destacado: destacado,
-          destacado2: productoDestacado2,
+          productoDestacado2: productoDestacado2,
           shuffled: shuffled,
         };
         
@@ -342,7 +344,7 @@ export default function Home() {
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;  
                   target.onerror = null;
-                  target.src = '/images/default.png';
+                  target.src = '/images/default.webp';
                 }}
                 alt={productoDestacado2.name}
                 className="w-full h-full object-cover"
@@ -352,7 +354,7 @@ export default function Home() {
                 <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">{productoDestacado2.name}</h2>
                 
                 <a 
-                  href={`/productos/${productoDestacado2.id}`}
+                  href={`/detalle/${productoDestacado2.id}`}
                   className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group"
                 >
                   DESCUBRIR
