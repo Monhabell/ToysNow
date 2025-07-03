@@ -4,16 +4,26 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 import '../../styles/checkout.css';
-import { useSession, signOut } from 'next-auth/react'
-import StarRating from '@/components/StarRating'
+import { useSession } from 'next-auth/react';
+import { FaCheckDouble } from "react-icons/fa";
 
+
+interface ProductVariant {
+  id?: number;
+  color?: string;
+  size?: string;
+  attributes?: Array<{
+    name: string;
+    value: string;
+  }>;
+}
 
 interface OrderItem {
   id: number;
   name: string;
   price: number;
   quantity: number;
-  variant?: any;
+  variant?: ProductVariant;
 }
 
 interface Order {
@@ -35,6 +45,10 @@ interface DeliveryInfo {
 
 const CheckoutForm = () => {
   const router = useRouter();
+  const { data: session } = useSession();
+  const token = session?.apiToken || '';
+
+  // State management
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -50,240 +64,273 @@ const CheckoutForm = () => {
     deliveryNotes: ''
   });
   const [editAddress, setEditAddress] = useState(false);
-  const [mensajellegadaPedido, setMensajellegadaPedido] = useState('');
-  const [valueEnvio, setvalorEnvio] = useState('');
+  const [deliveryMessage, setDeliveryMessage] = useState('');
+  const [shippingCost, setShippingCost] = useState(0);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
 
-  const { data: session, status } = useSession();
-  const token = session?.apiToken || '';
+  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'success' | 'failed'>('pending');
+  const [paymentMessage, setPaymentMessage] = useState('');
 
-  const handleLlegadaPedido = () => {
-    const currentTime = new Date();
-    const horas = currentTime.getHours().toString().padStart(2, '0');
-    const minutos = currentTime.getMinutes().toString().padStart(2, '0');
-    const actualTime = `${horas}:${minutos}`;
-
-    const limitTime = '11:00'; // Hora límite para entrega al día siguiente
-
-    let mensaje = 'Tu pedido llega hoy';
-    if (actualTime > limitTime) {
-      mensaje = 'Tu pedido llega mañana';
-    }
-
-    setMensajellegadaPedido(mensaje);
+  const colombiaData: Record<string, string[]> = {
+    "Bogota": ["Bogotá"],
+    "Antioquia": ["Medellín", "Envigado", "Bello", "Itagüí"],
+    "Cundinamarca": ["Bogotá", "Soacha", "Zipaquirá", "Chía"],
+    "Valle del Cauca": ["Cali", "Palmira", "Tuluá", "Buenaventura"],
+    "Atlántico": ["Barranquilla", "Soledad", "Malambo"],
+    "Bolívar": ["Cartagena", "Magangué", "Turbaco"],
+    
+    // Agrega más departamentos y ciudades según necesites
   };
 
-  interface DeliveryInfoData {
-    address: string;
-    apartment: string;
-    city: string;
-    province: string;
-    postalCode: string;
-    phone: string;
-    deliveryType: 'casa' | 'oficina' | 'otro';
-    deliveryNotes: string;
-  }
-
-  const handleValueEnvio = (dataEnvio: DeliveryInfoData): void => {
-    const cityvalueEnvio: string = dataEnvio.city;
-    let valueEnvio = 0
-    console.log(cityvalueEnvio)
-
-    if (cityvalueEnvio == 'Bogota'){
-        valueEnvio = 15500        
-        console.log(valueEnvio);
-    }
-
-    setvalorEnvio(valueEnvio.toString())
-  }
-
-  
+  // Load order and delivery info from storage
   useEffect(() => {
     const orderData = sessionStorage.getItem('currentOrder');
-    console.log(orderData)
-    handleLlegadaPedido();
-    
-
     if (!orderData) {
       router.push('/');
       return;
     }
-    setOrder(JSON.parse(orderData));
 
-    // Cargar datos de envío si existen
+    const parsedOrder = JSON.parse(orderData);
+    setOrder(parsedOrder);
+    calculateDeliveryTime();
+
     const savedDeliveryInfo = localStorage.getItem('deliveryInfo');
     if (savedDeliveryInfo) {
-      setDeliveryInfo(JSON.parse(savedDeliveryInfo));
-      handleValueEnvio(JSON.parse(savedDeliveryInfo));
+      const parsedDeliveryInfo = JSON.parse(savedDeliveryInfo);
+      setDeliveryInfo(parsedDeliveryInfo);
+      calculateShippingCost(parsedDeliveryInfo.city);
     }
   }, [router]);
 
+  // Redirect to MercadoPago if preferenceId is set
   useEffect(() => {
     if (preferenceId) {
-      window.location.href = `https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=${preferenceId}`;
+      console.log("Preference Object:", preferenceId);
+      console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
+
+      const popup = window.open(
+        preferenceId.init_point, // ✅ Aquí debe ir la URL, no el objeto completo
+        'PagoMercadoPago',
+        'width=1000,height=600,scrollbars=yes,resizable=yes'
+      );
+
+      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
+        setError("Bloqueado por el navegador: habilita los pop-ups");
+        return;
+      }
     }
-    
   }, [preferenceId]);
 
-  const handleDeliveryInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setDeliveryInfo(prev => ({
-      ...prev,
-      [name]: value
-    }));
+
+  // Calculate estimated delivery time
+  const calculateDeliveryTime = () => {
+    const currentTime = new Date();
+    const hours = currentTime.getHours().toString().padStart(2, '0');
+    const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+    const currentTimeString = `${hours}:${minutes}`;
+    const cutoffTime = '11:00';
+
+    setDeliveryMessage(
+      currentTimeString > cutoffTime
+        ? 'Tu pedido llega mañana'
+        : 'Tu pedido llega hoy'
+    );
   };
 
+  // Calculate shipping cost based on city
+  const calculateShippingCost = (city: string) => {
+    const shippingRates: Record<string, number> = {
+      'Bogotá': 15500,
+      'Soacha': 20000, 
+      'Medellín': 25000,
+      'Cali': 25000,
+      // Add more cities as needed
+    };
+
+    setShippingCost(shippingRates[city] || 20000); // Default shipping cost
+  };
+
+  // Handle delivery info changes
+  const handleDeliveryInfoChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setDeliveryInfo(prev => ({ ...prev, [name]: value }));
+
+    if (name === 'city') {
+      calculateShippingCost(value);
+    }
+  };
+
+  // Save delivery info to local storage
   const saveDeliveryInfo = () => {
     localStorage.setItem('deliveryInfo', JSON.stringify(deliveryInfo));
     setEditAddress(false);
   };
 
-  
+  // Update item quantity
+  const updateQuantity = (index: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
 
-  const handleBuyNow = async () => {
-    setLoading(true);
+    setOrder(prev => {
+      if (!prev) return null;
+
+      const updatedItems = [...prev.items];
+      updatedItems[index] = {
+        ...updatedItems[index],
+        quantity: newQuantity
+      };
+
+      const newTotal = updatedItems.reduce(
+        (sum, item) => sum + (item.price * item.quantity), 0
+      );
+
+      // Update session storage
+      const updatedOrder = {
+        ...prev,
+        items: updatedItems,
+        total: newTotal
+      };
+      sessionStorage.setItem('currentOrder', JSON.stringify(updatedOrder));
+
+      return updatedOrder;
+    });
+  };
+
+  // Apply coupon code
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+
     try {
 
-      console.log(order?.items.map(item => item.variant))
+      const discount = couponCode.toUpperCase() === 'DESCUENTO10' ? 0.50 : 0;
+      setCouponDiscount(discount);
 
+      if (discount === 0) {
+        setError('Cupón no válido o expirado');
+      }
+    } catch (err) {
+      setError('Error al validar el cupón');
+    }
+  };
+
+  // Process payment
+  const handlePayment = async () => {
+    setLoading(true);
+    setError('');
+    setPaymentStatus('pending');
+
+    try {
+      // Validate order exists
       if (!order || order.items.length === 0) {
         throw new Error('No hay items en el pedido');
       }
 
-      // Validar información de envío
+      // Validate delivery info
       if (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.phone) {
         throw new Error('Por favor complete toda la información de envío');
-        
       }
 
+      // Get selected payment method
+      const paymentMethod = document.querySelector<HTMLInputElement>(
+        'input[name="paymentMethod"]:checked'
+      )?.id;
+
+      // Prepare items for API
       const items = order.items.map(item => ({
-        title: `${item.name}${item.variant?.color ? ` - Color: ${item.variant?.color}` : ''}${item.variant?.size ? ` - Tamaño: ${item.variant?.size}` : ''}`,
+        title: `${item.name}${item.variant?.color ? ` - Color: ${item.variant.color}` : ''
+          }${item.variant?.size ? ` - Tamaño: ${item.variant.size}` : ''
+          }`,
         unit_price: item.price,
         quantity: item.quantity,
         id: item.id,
-        description: `este producto es malo no retarda`,
+        description: 'Producto de alta calidad',
         id_user: session?.userId,
         email: session?.user?.email,
         delivery_info: deliveryInfo,
-        variants_id: item.variant?.id ,
+        variants_id: item.variant?.id,
         user_token: token,
-        variantes: item.variant?.attributes?.map((attr: any) => ({
+        variantes: item.variant?.attributes?.map(attr => ({
           name: attr.name,
           value: attr.value
         }))
-
       }));
 
-       // validar cupon de descuento
-      const cuponInput = document.getElementById('cuponInput') as HTMLInputElement;
-      const cupon = cuponInput.value.trim();  
-      if (cupon) {
-
-        const idCuponProducto = items[0].id; 
-        console.log('Cupón ingresado:', cupon);
-        console.log('ID del producto:', idCuponProducto);
-
-        // enviamnos a la api 
-        // responde la api con % de descuento y true o false si es valido o no
-
-      }
-
-
-      const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.id;
-
+      // Cash on delivery logic
       if (paymentMethod === 'cashOnDelivery') {
-        // Lógica para pago contra entrega
-        console.log('Datos del pedido para contra entrega:', {
+        console.log('Pedido para contra entrega:', {
           items: order.items,
-          total: order.total + order.shipping,
+          total: calculateTotal(),
           deliveryInfo,
           user: {
             email: session?.user?.email,
             userId: session?.userId
           }
         });
-        
-        
-        
+
         alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
-        //router.push('/order-confirmation');
         return;
       }
 
-      
-
+      // Process payment with MercadoPago
       const res = await fetch('/api/create-preference', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: items[0].title + " " + items[0].description,
-          unit_price: items[0].unit_price,
+          title: items[0].title,
+          unit_price: +items[0].unit_price,
+          totalCompra: calculateTotal(),
           quantity: items[0].quantity,
           id_user: session?.userId,
           email: session?.user?.email,
           delivery_info: deliveryInfo,
-          id_product: items[0].id,// Asegúrate de que este campo sea correcto
+          id_product: items[0].id,
           variants: items[0].variants_id,
           user_token: token,
           variantes_producto: items[0].variantes,
+          coupon: couponDiscount > 0 ? couponCode : null,
+          discount: +items[0].unit_price * couponDiscount,
+          shipping_cost: shippingCost,
         }),
       });
 
       const data = await res.json();
-      console.log("datos")
       console.log(data)
-      console.log("...")
-
-
-      if (res.ok) {
-        window.open(data.init_point, '_blank');
-        console.log(data.orderId)
-
-        let tries = 0;
-        const maxTries = 10; // hasta 10 veces (5 minutos si el intervalo es de 30s)
-
-        const interval = setInterval(async () => {
-          tries++;
-
-          const resStatus = await fetch('/api/get-order-status', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ orderId: data.orderId }) // asegúrate de retornar `orderId` desde create-preference
-          });
-
-          const statusData = await resStatus.json();
-          console.log('🔄 Estado de la orden:', statusData.status);
-
-          if (statusData.status === 'approved') {
-            clearInterval(interval);
-            alert('✅ ¡Pago realizado con éxito!');
-            // puedes redirigir a otra página o mostrar un mensaje
-          }
-
-          if (tries >= maxTries) {
-            clearInterval(interval);
-            console.warn('⏱ Tiempo de espera agotado');
-          }
-        }, 30000); 
+      if (data.init_point) {
+        setPreferenceId(data);
+        // El estado de éxito se manejará en el efecto que redirige a MercadoPago
       } else {
-        console.error('Error al crear la preferencia de pago:', data);
-        setError('Error al crear la preferencia de pago. Inténtalo de nuevo más tarde.');
+        throw new Error('No se pudo crear la preferencia de pago');
       }
+
     } catch (error) {
-      console.error('Error al crear la preferencia de pago:', error);
+      console.error('Payment error:', error);
       setError(
         error instanceof Error
           ? error.message
-          : 'Error al crear la preferencia de pago. Inténtalo de nuevo más tarde.'
+          : 'Error al procesar el pago. Inténtalo de nuevo.'
       );
     } finally {
       setLoading(false);
     }
   };
 
+  // Calculate total with shipping and discounts
+  const calculateTotal = () => {
+    if (!order) return 0;
+
+    console.log(order)
+
+    const subtotal = order.items.reduce(
+      (sum, item) => sum + (item.price * item.quantity), 0
+    );
+
+    const discountedSubtotal = subtotal * (1 - couponDiscount);
+    return discountedSubtotal + shippingCost;
+  };
+
+  // Loading state
   if (!order) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -297,22 +344,22 @@ const CheckoutForm = () => {
       <Navbar />
 
       <div className="container mx-auto py-8 px-4 mt-32">
-        <h1 className="text-3xl font-bold mb-8 text-gold-500 text-center ">Finalizar compra</h1>
+        <h1 className="text-3xl font-bold mb-8 text-gold-500 text-center">Finalizar compra</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Sección izquierda - Información de envío */}
+          {/* Left section - Delivery info */}
           <div className="lg:w-2/3">
             <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-vinotinto">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-gold-500">1. Dirección de entrega</h2>
-                {!editAddress ? (
+                {!editAddress && (
                   <button
                     onClick={() => setEditAddress(true)}
                     className="text-gold-500 hover:text-gold-300 text-sm font-medium"
                   >
                     Modificar
                   </button>
-                ) : null}
+                )}
               </div>
 
               {editAddress ? (
@@ -322,39 +369,53 @@ const CheckoutForm = () => {
                       <label className="block text-sm font-medium text-gray-300 mb-1">Dirección</label>
                       <input
                         type="text"
-                        id="address"
                         name="address"
                         value={deliveryInfo.address}
                         onChange={handleDeliveryInfoChange}
                         className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
                         placeholder="Calle y número"
+                        required
                       />
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-1">Departamento</label>
-                      <input
-                        type="text"
-                        name="apartment"
-                        value={deliveryInfo.apartment}
+                      <select
+                        name="department"
+                        value={deliveryInfo.department}
                         onChange={handleDeliveryInfoChange}
                         className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
-                        placeholder="Opcional"
-                      />
+                        required
+                      >
+                        <option value="">Selecciona un departamento</option>
+                        {Object.keys(colombiaData).map(dep => (
+                          <option key={dep} value={dep}>{dep}</option>
+                        ))}
+                      </select>
                     </div>
+
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    
+
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-1">Ciudad</label>
-                      <input
-                        type="text"
-                        id='city'
+                      <select
                         name="city"
                         value={deliveryInfo.city}
                         onChange={handleDeliveryInfoChange}
                         className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
-                      />
+                        required
+                        disabled={!deliveryInfo.department}
+                      >
+                        <option value="">Selecciona una ciudad</option>
+                        {deliveryInfo.department &&
+                          colombiaData[deliveryInfo.department].map(city => (
+                            <option key={city} value={city}>{city}</option>
+                          ))}
+                      </select>
                     </div>
+
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-1">Barrio</label>
                       <input
@@ -365,7 +426,8 @@ const CheckoutForm = () => {
                         className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
                       />
                     </div>
-                    <div>
+
+                    <div >
                       <label className="block text-sm font-medium text-gray-300 mb-1">Código Postal</label>
                       <input
                         type="text"
@@ -377,6 +439,9 @@ const CheckoutForm = () => {
                     </div>
                   </div>
 
+                  
+
+
                   <div>
                     <label className="block text-sm font-medium text-gray-300 mb-1">Teléfono</label>
                     <input
@@ -386,6 +451,7 @@ const CheckoutForm = () => {
                       onChange={handleDeliveryInfoChange}
                       className="w-full bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
                       placeholder="Ej: 11 1234-5678"
+                      required
                     />
                   </div>
 
@@ -428,63 +494,76 @@ const CheckoutForm = () => {
                 <div className="text-gray-300">
                   <p className="font-medium">{deliveryInfo.address || 'No especificada'}</p>
                   {deliveryInfo.apartment && <p>Departamento: {deliveryInfo.apartment}</p>}
-                  <p id="cityAddres">{deliveryInfo.city}, {deliveryInfo.province} {deliveryInfo.postalCode}</p>
+                  <p>{deliveryInfo.city}, {deliveryInfo.province} {deliveryInfo.postalCode}</p>
                   <p>Teléfono: {deliveryInfo.phone || 'No especificado'}</p>
-                  <p>Recibir en: {deliveryInfo.deliveryType === 'casa' ? 'Casa' : deliveryInfo.deliveryType === 'oficina' ? 'Oficina' : 'Otro'}</p>
-                  {deliveryInfo.deliveryNotes && <p className="mt-2 italic">Notas: {deliveryInfo.deliveryNotes}</p>}
+                  <p>Recibir en: {{
+                    'casa': 'Casa',
+                    'oficina': 'Oficina',
+                    'otro': 'Otro'
+                  }[deliveryInfo.deliveryType]}</p>
+                  {deliveryInfo.deliveryNotes && (
+                    <p className="mt-2 italic">Notas: {deliveryInfo.deliveryNotes}</p>
+                  )}
                 </div>
               )}
             </div>
 
-            <div>
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Order details */}
+              <div className="flex-1 bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
+                <h2 className="text-xl font-bold text-white mb-4">Tu pedido</h2>
 
-              <div className="flex flex-col md:flex-row gap-6">
-                {/* Columna izquierda - Detalle del pedido */}
-                <div className="flex-1 bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
-                  <h2 className="text-xl font-bold text-white mb-4">Tu pedido</h2>
-
-                  {mensajellegadaPedido && (
-                    <div className="mt-4 p-4 rounded-lg border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-900 via-yellow-800 to-yellow-700 shadow-lg animate-fade-in">
-                      <div className="flex items-center space-x-3">
-                        <svg
-                          className="w-6 h-6 text-yellow-300"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M8 7V3M16 7V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                          />
-                        </svg>
-                        <p className="text-yellow-100 font-semibold text-sm md:text-base">
-                          {mensajellegadaPedido}
-                        </p>
-                      </div>
+                {deliveryMessage && (
+                  <div className="mt-4 p-4 rounded-lg border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-900 via-yellow-800 to-yellow-700 shadow-lg animate-fade-in">
+                    <div className="flex items-center space-x-3">
+                      <svg
+                        className="w-6 h-6 text-yellow-300"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M8 7V3M16 7V3M3 11h18M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      <p className="text-yellow-100 font-semibold text-sm md:text-base">
+                        {deliveryMessage}
+                      </p>
                     </div>
-                  )}
-
-                </div>
-
-                {/* Columna derecha - Cupón */}
-                <div className="w-full md:w-1/3 bg-gray-900 rounded-lg p-6 mb-6 border border-vinotinto">
-                  <h2 className="text-xl font-bold text-gold-500 mb-4">Cupón de descuento</h2>
-                  <div className="flex items-center space-x-3">
-                    <input
-                      type="text"
-                      id="cuponInput"
-                      name="cupon"
-                      placeholder="Ingresa tu cupón"
-                      className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
-                    />
                   </div>
-                </div>
+                )}
               </div>
 
+              {/* Coupon section */}
+              <div className="w-full md:w-1/2 bg-gray-900 rounded-lg p-6 mb-6 border border-vinotinto">
+                <h2 className="text-xl font-bold text-gold-500 mb-4">Cupón de descuento</h2>
+                <div className="flex items-center space-x-3">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Ingresa tu cupón"
+                    className="flex-1 bg-gray-800 border border-gray-700 rounded px-3 py-2 text-white"
+                  />
+                  <button
+                    onClick={applyCoupon}
+                    className="bg-gold-500 hover:bg-gold-600 text-black font-bold py-2 px-4 rounded"
+                  >
+                    <FaCheckDouble />
+                  </button>
+                </div>
+                {couponDiscount > 0 && (
+                  <p className="text-green-500 mt-2 text-sm">
+                    Cupón aplicado: {couponDiscount * 100}% de descuento
+                  </p>
+                )}
+              </div>
             </div>
 
+            {/* Payment method */}
             <div className="bg-gray-900 rounded-lg p-6 border border-vinotinto">
               <h2 className="text-xl font-bold text-gold-500 mb-4">2. Método de pago</h2>
 
@@ -525,28 +604,41 @@ const CheckoutForm = () => {
             </div>
           </div>
 
-          {/* Sección derecha - Resumen de compra */}
+          {/* Right section - Order summary */}
           <div className="lg:w-1/3">
             <div className="bg-gray-900 rounded-lg p-6 border border-vinotinto sticky top-4">
               <h2 className="text-xl font-bold text-gold-500 mb-4">Resumen de tu compra</h2>
 
-
               <div className="space-y-3 mb-6">
                 {order.items.map((item, index) => (
                   <div key={index} className="flex justify-between py-2 border-b border-gray-700">
-                    <div className="flex items-center">
+                    <div>
                       <span className="text-gray-300">
-                        {item.name} <br />
-                        {item.variant?.attributes?.map((attr: any, idx: number) => (
-                          
+                        {item.name}
+                        {item.variant?.attributes?.map((attr, idx) => (
                           <span key={idx} className="text-gray-400 ml-1">
-                            {attr.name}: {attr.value}       
+                            {attr.name}: {attr.value}
                           </span>
                         ))}
-
                       </span>
-                      <br />
-                      <span className="text-gray-500 text-sm ml-10">Cant {item.quantity}</span>
+                      <div className="flex items-center mt-2">
+                        <button
+                          onClick={() => updateQuantity(index, item.quantity - 1)}
+                          className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded-l flex items-center justify-center"
+                          disabled={item.quantity <= 1}
+                        >
+                          -
+                        </button>
+                        <span className="bg-gray-800 text-white w-10 h-8 flex items-center justify-center">
+                          {item.quantity}
+                        </span>
+                        <button
+                          onClick={() => updateQuantity(index, item.quantity + 1)}
+                          className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded-r flex items-center justify-center"
+                        >
+                          +
+                        </button>
+                      </div>
                     </div>
                     <span className="text-white">
                       ${(item.price * item.quantity).toLocaleString()}
@@ -560,16 +652,22 @@ const CheckoutForm = () => {
                   <span>Subtotal</span>
                   <span>${order.total.toLocaleString()}</span>
                 </div>
+
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-green-500">
+                    <span>Descuento ({couponDiscount * 100}%)</span>
+                    <span>-${(order.total * couponDiscount).toLocaleString()}</span>
+                  </div>
+                )}
+
                 <div className="flex justify-between text-gray-300">
                   <span>Envío</span>
-                  <span>${valueEnvio}</span>
+                  <span>${shippingCost.toLocaleString()}</span>
                 </div>
+
                 <div className="flex justify-between text-lg font-bold text-gold-500 pt-2 mt-2 border-t border-gray-700">
                   <span>Total</span>
-                  <span>
-                    {(parseFloat(order.total) + parseFloat(valueEnvio)).toLocaleString('en-CO')}
-                  </span>
-
+                  <span>${calculateTotal().toLocaleString('en-CO')}</span>
                 </div>
               </div>
 
@@ -580,16 +678,16 @@ const CheckoutForm = () => {
               )}
 
               <button
-                onClick={handleBuyNow}
+                onClick={handlePayment}
                 disabled={loading}
-                className="w-full bg-gold-500 hover:bg-gold-600 text-black font-bold py-3 px-4 rounded-lg flex justify-center items-center cursor-pointer"
+                className="w-full bg-gold-500 hover:bg-gold-600 text-black font-bold py-3 px-4 rounded-lg flex justify-center items-center cursor-pointer disabled:opacity-70"
               >
-                {loading ? (
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/20000/svg" fill="none" viewBox="0 0 24 24">
+                {loading && (
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                ) : null}
+                )}
                 {loading ? 'Procesando...' : 'Finalizar compra'}
               </button>
 

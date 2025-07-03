@@ -365,7 +365,7 @@ export default function ProductoDetalle({ params }: Props) {
       compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) :
         producto.compare_price ? parseFloat(producto.compare_price) : null,
       quantity: 1,
-      images: producto.images.map(img => getImageUrl(img.url)),
+      image: producto.images[0] ? getImageUrl(producto.images[0].url) : '/images/default.png',
       variant: selectedVariant ? {
         id: selectedVariant.id,
         attributes: selectedVariant.attributes.map(attr => ({
@@ -583,13 +583,13 @@ export default function ProductoDetalle({ params }: Props) {
                     Comprar ahora
                   </button>
 
-                  {/* <button
+                  <button
                     onClick={handleAddToCart}
                     className="btnsed border border-gold-500 text-gold-500 hover:bg-gold-50"
                     disabled={currentStock <= 0}
                   >
                     🛒 Agregar al carrito
-                  </button> */}
+                  </button>
                 </div>
 
                 <div className='mt-6'>

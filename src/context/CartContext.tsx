@@ -75,18 +75,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const calcularEnvioTotal = () => {
     const subtotal = calcularSubtotal()
-    if (subtotal > 500000) {
+    console.log(subtotal)
+    if (subtotal > 150000) {
       return 0
     } else {
-      return carrito.reduce(
-        (total, producto) => total + (producto.shipment > 0 ? producto.shipment * producto.cantidad : 0),
-        0
-      )
+      let subtotalEnvio = carrito.reduce((total, producto) => total + producto.price * producto.cantidad, 0)
+       let total = 150000 - subtotalEnvio
+      return total
     }
   }
 
   const calcularTotalFinal = () => {
-    return calcularSubtotal() + calcularEnvioTotal()
+    return calcularSubtotal()
   }
 
   return (

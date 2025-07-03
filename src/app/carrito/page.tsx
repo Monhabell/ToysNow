@@ -1,9 +1,65 @@
 'use client'
 import { useCart } from '@/context/CartContext'
 import Navbar from '@/components/Navbar'
+import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation';
+
 
 export default function CarritoPage() {
-  const { carrito, eliminarProducto, aumentarCantidad, disminuirCantidad, calcularSubtotal, calcularEnvioTotal, calcularTotalFinal } = useCart()
+  const { data: session, status } = useSession()
+    const router = useRouter();
+
+  const { carrito, eliminarProducto, aumentarCantidad, disminuirCantidad, calcularSubtotal, calcularEnvioTotal, calcularTotalFinal} = useCart()
+
+  console.log(carrito)
+
+  const handleComprarAhora = () => {
+    if (carrito.length === 0) return;
+
+    // Crear array de productos para el checkout
+    const productsToCheckout = carrito.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      compare_price: item.compare_price || null,
+      quantity: item.cantidad,
+      image: item.image[0] || '/images/default.png',
+      variant: item.variant?.id ? {
+        id: item.variant.id,
+        attributes: item.variant.attributes?.map(attr => ({
+          name: attr.name,
+          value: attr.value
+        })) || []
+      } : null,
+      stock: item.stock,
+      shipment: item.shipment || 0
+    }));
+
+    // Calcular totales
+    const subtotal = calcularSubtotal();
+    const shipping = calcularEnvioTotal();
+    const total = calcularTotalFinal();
+
+    // Guardar en sessionStorage para el checkout
+    sessionStorage.setItem('currentOrder', JSON.stringify({
+      items: productsToCheckout,
+      subtotal,
+      shipping,
+      total
+    }));
+
+    // Guardar la página actual para posible redirección después del login
+    sessionStorage.setItem('currentPage', window.location.href);
+
+    // Redirigir al checkout
+    if (!session) {
+      router.push('/login');
+      return;
+    }
+
+    router.push('/checkout');
+  };
+
 
   return (
     <>
@@ -22,12 +78,17 @@ export default function CarritoPage() {
               </h2>
 
               <div className="divide-y divide-gray-800 mt-4">
-                {carrito.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center py-6 group hover:bg-gray-800/50 transition-all duration-300 px-2 rounded-lg">
+                {carrito.map((item) => (
+                  <div key={`${item.id}-${item.variant?.id || '0'}`} className="flex justify-between items-center py-6 group hover:bg-gray-800/50 transition-all duration-300 px-2 rounded-lg">
                     <div className="flex items-center gap-5">
                       <div className="relative">
                         <img 
-                          src={item.img[0]} 
+                          src={item.image[0]} 
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;  
+                            target.onerror = null;
+                            target.src = '/images/default.webp';
+                          }}
                           alt={item.name} 
                           className="w-20 h-20 object-cover rounded-lg border-2 border-gray-700 group-hover:border-yellow-500 transition-all" 
                         />
@@ -37,6 +98,11 @@ export default function CarritoPage() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-100 group-hover:text-yellow-400 transition-colors">{item.name}</p>
+                        {item.variant.id &&(
+                          <p className="text-sm text-gray-400 mt-1">
+                            Detalle: <span className="text-yellow-400">{item.variant.attributes[0].name}  {item.variant.attributes[0].value}</span>
+                          </p>
+                        )}
                         {item.color && (
                           <p className="text-sm text-gray-400 mt-1">
                             Color: <span className="text-yellow-400">{item.color}</span>
@@ -132,10 +198,6 @@ export default function CarritoPage() {
                   <span>${calcularSubtotal().toLocaleString()}</span>
                 </div>
 
-                <div className="flex justify-between text-gray-300">
-                  <span>Envío</span>
-                  <span>${calcularEnvioTotal().toLocaleString()}</span>
-                </div>
 
                 <div className="pt-4 border-t border-gray-800">
                   <button className="text-yellow-400 hover:text-yellow-300 text-sm underline flex items-center transition-colors">
@@ -153,19 +215,16 @@ export default function CarritoPage() {
                 <span className="text-yellow-400">${calcularTotalFinal().toLocaleString()}</span>
               </div>
 
-              <button className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-black font-bold py-4 rounded-xl mt-8 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 flex items-center justify-center gap-2">
+              <button
+                onClick={handleComprarAhora}
+               className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-black font-bold py-4 rounded-xl mt-8 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
                 Finalizar Compra
               </button>
 
-              <div className="mt-6 text-xs text-gray-500 flex items-center">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Compra protegida por nuestra garantía de satisfacción
-              </div>
+              
             </div>
           </div>
         </div>

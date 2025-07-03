@@ -13,11 +13,11 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     console.log('📦 Datos recibidos:', body);
-    const token = body.user_token || '';
+
 
 
     // ✅ Validación básica de datos requeridos
-    const { title, quantity, unit_price, id_user, email, descripcion_envio, delivery_info, variants, id_product, user_token } = body;
+    const { shipping_cost, variantes_producto, discount, totalCompra, title, quantity, unit_price, id_user, email, descripcion_envio, delivery_info, variants, id_product, user_token } = body;
 
     if (!title || !quantity || !unit_price || !id_user || !email) {
       return NextResponse.json(
@@ -26,6 +26,8 @@ export async function POST(request: Request) {
       );
     }
 
+    
+
     const preferenceData = {
       items: [
         {
@@ -33,22 +35,30 @@ export async function POST(request: Request) {
           title,
           quantity: Number(quantity),
           currency_id: 'COP',
-          unit_price: Number(unit_price),
-          varaintes: body.variantes_producto || [],
+          unit_price: Number(unit_price - discount),
         },
       ],
+      
+      shipments: {
+        cost: Number(shipping_cost) || 0, // 👈 Aquí va el costo del envío
+        mode: 'not_specified', // Puedes poner 'custom' si usas tu propio método
+      },
+      
       metadata: {
         id_user,
         email,
         descripcion_envio,
         delivery_info,
-        token_id_user: token
+        token_id_user: user_token,
+        varaintes_id: variants,
+        variantesProducto: JSON.stringify(variantes_producto || []),
       },
       back_urls: {
         success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
         failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
         pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
       },
+      
     };
 
     const preference = new Preference(client);
@@ -63,7 +73,8 @@ export async function POST(request: Request) {
       unite_price: item.unit_price,
       quantity: item.quantity,
       currency: item.currency_id,
-      variant_id: body.variants || [],
+      variante_id: variants,
+      variantesProducto: JSON.stringify(variantes_producto || []),
     })) || [];
 
     const status = 'pending';
@@ -75,7 +86,7 @@ export async function POST(request: Request) {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${user_token}`,
           'X-API-Key': process.env.API_KEY || '',
         },
         body: JSON.stringify({
@@ -84,6 +95,7 @@ export async function POST(request: Request) {
           status,
           delivery_info: delivery_notes,
         }),
+        
       });
 
       const orderData = await orderRes.json();
@@ -95,7 +107,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       init_point: response.init_point,
       orderId: preference_id,
-      token_id : token    
+      token_id : user_token    
     });
 
   } catch (error: any) {
