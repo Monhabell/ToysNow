@@ -1,10 +1,11 @@
 'use client'
 import { useEffect, useState, useMemo } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ListaProductos from '@/components/productos/ListaProductos'
 import '../../styles/productos.css';
 import { Skeleton } from "@/components/ui/skeleton"
+import Head from 'next/head'
 import {
   Select,
   SelectContent,
@@ -15,6 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
+import { generateProductListSchema, generateBreadcrumbsSchema } from '../../utils/schemaUtils';
 
 interface Variant {
   color?: string;
@@ -79,6 +81,7 @@ interface Producto {
 export default function ProductosPage() {
   const [allProductos, setAllProductos] = useState<Producto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+   const router = useRouter();
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get('buscar')?.toLowerCase() || '';
   const categoriaParam = searchParams.get('categoria') || '';
@@ -106,7 +109,7 @@ export default function ProductosPage() {
         const res = await fetch('/api/productos');
         const prodcto = await res.json();
         setAllProductos(prodcto.data);
-        
+
 
         const categoryMap = new Map<string, Category>();
 
@@ -114,7 +117,7 @@ export default function ProductosPage() {
           (product.categories || []).forEach((cat: Category) => {
             const key = `${cat.name}`; // Simplificado, solo usa el nombre
             if (!categoryMap.has(key)) {
-              categoryMap.set(key, {id: cat.id, name: cat.name});
+              categoryMap.set(key, { id: cat.id, name: cat.name });
             }
           });
         });
@@ -153,11 +156,11 @@ export default function ProductosPage() {
     const qualificationCounts = producto.qualification?.count_users || {};
     const totalRatings = Object.values(qualificationCounts).reduce((a, b) => a + b, 0);
     if (totalRatings === 0) return 0;
-    
+
     const weightedSum = Object.entries(qualificationCounts).reduce((sum, [stars, count]) => {
       return sum + (parseInt(stars) * count);
     }, 0);
-    
+
     return weightedSum / totalRatings;
   };
 
@@ -175,24 +178,24 @@ export default function ProductosPage() {
         const brand = normalizarTexto(producto.brand || '');
 
         // Buscar en variantes de color
-        const colores = producto.features?.flatMap(f => 
+        const colores = producto.features?.flatMap(f =>
           f.variants.filter(v => v.color).map(v => v.color)
-          .join(' ') || '');
+            .join(' ') || '');
 
-        return normalizarTexto(categoriasStr).includes(termino) || 
-               nombre.includes(termino) ||
-               description.includes(termino) ||
-               brand.includes(termino) ||
-               normalizarTexto(colores).includes(termino);
+        return normalizarTexto(categoriasStr).includes(termino) ||
+          nombre.includes(termino) ||
+          description.includes(termino) ||
+          brand.includes(termino) ||
+          normalizarTexto(colores).includes(termino);
       });
     }
 
     // Filtro por categoría
     if (categoriaSeleccionada) {
       filtrados = filtrados.filter(producto =>
-        producto.categories?.some(cat => 
+        producto.categories?.some(cat =>
           normalizarTexto(cat.name) === normalizarTexto(categoriaSeleccionada)
-      ));
+        ));
     }
 
     // Filtro por precio (usando el precio base o el primer variant)
@@ -239,8 +242,8 @@ export default function ProductosPage() {
 
     // Filtro por envío gratis
     if (envioGratis) {
-      filtrados = filtrados.filter(producto => 
-        producto.features?.some(f => 
+      filtrados = filtrados.filter(producto =>
+        producto.features?.some(f =>
           f.variants.some(v => v.cost_shipping === 0)
         ) || producto.shipment === 0
       );
@@ -248,7 +251,7 @@ export default function ProductosPage() {
 
     // Filtro por rating mínimo
     if (ratingMinimo !== '') {
-      filtrados = filtrados.filter(producto => 
+      filtrados = filtrados.filter(producto =>
         calcularRatingPromedio(producto) >= ratingMinimo
       );
     }
@@ -297,7 +300,7 @@ export default function ProductosPage() {
   const contadorPorCategoria = useMemo(() => {
     const counts: Record<string, number> = {};
     categorias.forEach(cat => {
-      counts[cat.name] = productosFiltrados.filter(p => 
+      counts[cat.name] = productosFiltrados.filter(p =>
         p.categories?.some(c => normalizarTexto(c.name) === normalizarTexto(cat.name))).length;
     });
     return counts;
@@ -324,8 +327,8 @@ export default function ProductosPage() {
   // Función para ordenar productos
   const ordenarProductos = (criterio: string) => {
     const productosOrdenados = [...allProductos];
-    
-    switch(criterio) {
+
+    switch (criterio) {
       case 'precio':
         productosOrdenados.sort((a, b) => {
           const precioA = a.features?.[0]?.variants?.[0]?.price || a.price;
@@ -333,7 +336,7 @@ export default function ProductosPage() {
           return precioA - precioB;
         });
         break;
-        
+
       case 'calificacion':
         productosOrdenados.sort((a, b) => {
           const ratingA = calcularRatingPromedio(a);
@@ -341,22 +344,56 @@ export default function ProductosPage() {
           return ratingB - ratingA;
         });
         break;
-        
+
       default:
         // Mantener orden original
         break;
     }
-    
+
     setAllProductos(productosOrdenados);
   };
 
+  const metaTitle = categoriaSeleccionada
+    ? `${categoriaSeleccionada} | Tu E-commerce - Los mejores productos`
+    : "Explora nuestros productos | Tu E-commerce";
+
+  const metaDescription = categoriaSeleccionada
+    ? `Encuentra los mejores ${categoriaSeleccionada.toLowerCase()} al mejor precio. Envío gratis en compras mayores a $50.`
+    : "Catálogo completo de productos. Ofertas especiales, envíos rápidos y garantía de satisfacción.";
+
+  const canonicalUrl = `https://tuecomerce.com/productos${categoriaSeleccionada ? `?categoria=${encodeURIComponent(categoriaSeleccionada)}` : ''}`;
+
+  // Dentro del componente:
+  const productListSchema = generateProductListSchema(metaTitle, metaDescription, canonicalUrl, productosPaginados);
+  const breadcrumbsSchema = generateBreadcrumbsSchema(canonicalUrl, categoriaSeleccionada);
+  
   return (
     <>
+      <Head>
+        <title>{metaTitle}</title>
+        <meta name="description" content={metaDescription} />
+        <meta property="og:title" content={metaTitle} />
+        <meta property="og:description" content={metaDescription} />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={`https://tuecomerce.com/productos${categoriaSeleccionada ? `?categoria=${encodeURIComponent(categoriaSeleccionada)}` : ''}`} />
+        <link rel="canonical" href={`https://tuecomerce.com/productos${categoriaSeleccionada ? `?categoria=${encodeURIComponent(categoriaSeleccionada)}` : ''}`} />
+      </Head>
+
+      {/* Scripts de esquema */}
+      <script type="application/ld+json">
+        {JSON.stringify(productListSchema)}
+      </script>
+      <script type="application/ld+json">
+        {JSON.stringify(breadcrumbsSchema)}
+      </script>
+
+
+
       <Navbar />
       <div className='max-w-7xl mx-auto mt-32 px-4 content-producto'>
         <div className='flex flex-col md:flex-row gap-6'>
           {/* Panel de Filtros */}
-          <button 
+          <button
             className="btn-toggle-filter"
             onClick={toggleFilter}
           >
@@ -581,7 +618,7 @@ export default function ProductosPage() {
                             onClick={() => paginate(currentPage - 1)}
                             className="btn-paginacion-back"
                           >
-                            &laquo; 
+                            &laquo;
                           </button>
                         )}
 
