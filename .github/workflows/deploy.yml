@@ -1,0 +1,34 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches: ["main"]  # Cambia a "master" si es tu rama principal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"  # Usa la versión de Node.js de tu proyecto
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build  # Asegúrate de que este comando esté en tu package.json
+
+      - name: Deploy to VPS via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}  # IP del VPS
+          username: ${{ secrets.SSH_USERNAME }}  # Usuario (ej: root o ubuntu)
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/www.toysnow.com.co/public
+            git pull origin main
+            npm install --production
+            pm2 restart next-app
