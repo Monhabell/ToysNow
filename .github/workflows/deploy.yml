@@ -28,7 +28,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}  # Usuario (ej: root o ubuntu)
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/www.toysnow.com.co/public
+            cd /home/toysnow/htdocs/www.toysnow.com.co
             git pull origin main
             npm install --production
             pm2 restart next-app
