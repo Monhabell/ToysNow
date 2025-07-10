@@ -1,3 +1,7 @@
+
+// Agregar en la primera línea de cada archivo:
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { MercadoPagoConfig, Preference } from 'mercadopago';
 import { NextResponse } from 'next/server';
 
