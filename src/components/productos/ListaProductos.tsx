@@ -54,7 +54,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
 
   const calculateIsNew = (createdAt: string | Date | undefined) => {
     if (!isClient || !createdAt) return false
-  
+
     const fechaCreacion = createdAt instanceof Date ? createdAt : new Date(createdAt)
     const hoy = new Date()
     const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24))
@@ -83,7 +83,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
 
         const tieneDescuento = finalComparePrice > 0 && finalComparePrice > finalPrice
         const stockBajo = finalStock <= 5
-        const EnvioGratis = finalShipment === 0
+        const EnvioGratis = Number(finalShipment) === 0
         const nuevoOk = isClient && calculateIsNew(p.created_at)
 
         const TotalCalifi = p.qualification || 0
@@ -147,7 +147,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                 )}
               </div>
 
-              {TotalCalifi >= 0 && (
+              {Number(TotalCalifi) >= 0 && (
                 <div className='star_qualifications'>
                   <StarRating rating={TotalCalifi} onRate={handleRating} />
                   <p className='ml-2 mt-1'>({cantUs})</p>
