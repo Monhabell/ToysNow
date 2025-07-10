@@ -2,7 +2,7 @@ name: Deploy to VPS
 
 on:
   push:
-    branches: ["main"]  # Cambia a "master" si es tu rama principal
+    branches: ["main"]
 
 jobs:
   deploy:
@@ -13,10 +13,11 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "20"  # Usa la versión de Node.js de tu proyecto
+          node-version: "20"
+          cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci # Usa npm ci para instalación limpia y consistente
 
       - name: Build project
         run: |
@@ -34,14 +35,22 @@ jobs:
           EOF
           npm run build
 
+      - name: Install PM2 globally (locally for the workflow)
+        run: npm install -g pm2
+
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@master
         with:
-          host: ${{ secrets.SSH_HOST }}  # IP del VPS
-          username: ${{ secrets.SSH_USERNAME }}  # Usuario (ej: root o ubuntu)
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
+            # Verificar y configurar el entorno en el VPS
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # Cargar nvm si existe
+            
             cd /home/toysnow/htdocs/www.toysnow.com.co
-            git pull origin main
-            npm install --production
-            pm2 restart next-app
+            git fetch origin
+            git reset --hard origin/main
+            npm ci --production
+            pm2 restart next-app || pm2 start npm --name "next-app" -- start
