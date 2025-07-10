@@ -36,7 +36,7 @@ interface Order {
 
 interface DeliveryInfo {
   address: string;
-  apartment: string;
+  department: string;
   city: string;
   province: string;
   postalCode: string;
@@ -57,7 +57,7 @@ const CheckoutForm = () => {
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo>({
     address: '',
-    apartment: '',
+    department: '',
     city: '',
     province: '',
     postalCode: '',
@@ -79,7 +79,7 @@ const CheckoutForm = () => {
     "Valle del Cauca": ["Cali", "Palmira", "Tuluá", "Buenaventura"],
     "Atlántico": ["Barranquilla", "Soledad", "Malambo"],
     "Bolívar": ["Cartagena", "Magangué", "Turbaco"],
-    
+
     // Agrega más departamentos y ciudades según necesites
   };
 
@@ -107,10 +107,10 @@ const CheckoutForm = () => {
   useEffect(() => {
     if (preferenceId) {
       console.log("Preference Object:", preferenceId);
-      // console.log("Order ID:", preferenceId.orderId); // Eliminado porque preferenceId es string
+      //console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
 
       const popup = window.open(
-        preferenceId, // Usar preferenceId como string URL
+        preferenceId, // ✅ Aquí debe ir la URL, no el objeto completo
         'PagoMercadoPago',
         'width=1000,height=600,scrollbars=yes,resizable=yes'
       );
@@ -142,7 +142,7 @@ const CheckoutForm = () => {
   const calculateShippingCost = (city: string) => {
     const shippingRates: Record<string, number> = {
       'Bogotá': 15500,
-      'Soacha': 20000, 
+      'Soacha': 20000,
       'Medellín': 25000,
       'Cali': 25000,
       // Add more cities as needed
@@ -396,7 +396,7 @@ const CheckoutForm = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    
+
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-1">Ciudad</label>
@@ -439,7 +439,7 @@ const CheckoutForm = () => {
                     </div>
                   </div>
 
-                  
+
 
 
                   <div>
@@ -493,7 +493,7 @@ const CheckoutForm = () => {
               ) : (
                 <div className="text-gray-300">
                   <p className="font-medium">{deliveryInfo.address || 'No especificada'}</p>
-                  {deliveryInfo.apartment && <p>Departamento: {deliveryInfo.apartment}</p>}
+                  {deliveryInfo.department && <p>Departamento: {deliveryInfo.department}</p>}
                   <p>{deliveryInfo.city}, {deliveryInfo.province} {deliveryInfo.postalCode}</p>
                   <p>Teléfono: {deliveryInfo.phone || 'No especificado'}</p>
                   <p>Recibir en: {{
