@@ -19,8 +19,9 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Next.js application
+      - name: Build Next.js application (optional)
         run: |
+          echo "✅ Build local (opcional, para probar errores antes del deploy)"
           cat <<EOF > .env.local
           MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
           MERCADO_PAGO_PUBLIC_KEY=${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
@@ -35,33 +36,46 @@ jobs:
           EOF
           npm run build
 
-      - name: Deploy to VPS
+      - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Configurar Node.js y NPM
+            # Cargar nvm (si aplica)
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-            
-            # Ir al directorio de la aplicación
+
+            echo "📁 Entrando al proyecto"
             cd /home/toysnow/htdocs/www.toysnow.com.co
-            
-            # Detener PM2 si está corriendo
-            pm2 delete next-app || true
-            
-            # Actualizar código
-            git pull origin
+
+            echo "🔐 Configurando variables de entorno"
+            cat <<EOF > .env.local
+            MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
+            MERCADO_PAGO_PUBLIC_KEY=${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
+            NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY }}
+            NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            API_BASE_URL=${{ secrets.API_BASE_URL }}
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
+            API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
+            API_KEY=${{ secrets.API_KEY }}
+            EOF
+
+            echo "📦 Obteniendo últimos cambios"
             git fetch origin
             git reset --hard origin/main
-            
-            # Instalar dependencias y construir
+
+            echo "📦 Instalando dependencias"
             npm install --production
+
+            echo "⚙️ Compilando aplicación"
             npm run build
-            
-            # Iniciar la aplicación con PM2
-            pm2 start npm --name "next-app" -- start
+
+            echo "🚀 Reiniciando aplicación con PM2"
+            pm2 delete toysnow || true
+            pm2 start npm --name "toysnow" -- start
             pm2 save
             pm2 startup
