@@ -14,6 +14,7 @@ import Link from 'next/link';
 import type { Producto } from '@/types/productos'
 
 
+
 type ProductoDestacadoType = {
   id: string | number
   name: string
@@ -99,7 +100,7 @@ export default function Home() {
           if (!destacado.images || destacado.images.length === 0) {
             destacado.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
           } else {
-            destacado.images = destacado.images.map(img => ({
+            destacado.images = destacado.images.map((img: Image) => ({
               url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
             }))
           }
@@ -112,7 +113,7 @@ export default function Home() {
           if (!productoDestacado2.images || productoDestacado2.images.length === 0) {
             productoDestacado2.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }];
           } else {
-            productoDestacado2.images = productoDestacado2.images.map(img => ({
+            productoDestacado2.images = productoDestacado2.images.map((img: Image) => ({
               url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
             }));
           }
