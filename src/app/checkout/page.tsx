@@ -107,10 +107,10 @@ const CheckoutForm = () => {
   useEffect(() => {
     if (preferenceId) {
       console.log("Preference Object:", preferenceId);
-      console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
+      // console.log("Order ID:", preferenceId.orderId); // Eliminado porque preferenceId es string
 
       const popup = window.open(
-        preferenceId.init_point, // ✅ Aquí debe ir la URL, no el objeto completo
+        preferenceId, // Usar preferenceId como string URL
         'PagoMercadoPago',
         'width=1000,height=600,scrollbars=yes,resizable=yes'
       );
