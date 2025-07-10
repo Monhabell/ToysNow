@@ -1,6 +1,6 @@
 'use client'
 import { useEffect, useState, useMemo } from 'react'
-import { useSearchParams, useRouter } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ListaProductos from '@/components/productos/ListaProductos'
 import '../../styles/productos.css';

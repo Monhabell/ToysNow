@@ -103,7 +103,7 @@ export default function ProductoDetalle({ params }: Props) {
   const [nuevaPregunta, setNuevaPregunta] = useState('');
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [loading, setLoading] = useState(true);
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const router = useRouter();
 
   useEffect(() => {

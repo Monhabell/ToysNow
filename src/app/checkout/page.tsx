@@ -692,7 +692,7 @@ const CheckoutForm = () => {
               </button>
 
               <div className="mt-4 text-center text-xs text-gray-500">
-                <p>Al hacer clic en "Finalizar compra", aceptas nuestros Términos y Condiciones</p>
+                <p>Al hacer clic en Finalizar compra, aceptas nuestros Términos y Condiciones</p>
               </div>
             </div>
           </div>

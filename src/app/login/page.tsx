@@ -27,7 +27,7 @@ export default function AuthPage() {
         password_confirmation: ''
     })
 
-    const { data: session, status } = useSession()
+    const { data: session } = useSession()
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
