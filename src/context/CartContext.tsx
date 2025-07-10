@@ -13,6 +13,7 @@ type ProductoBase = {
 
 type ProductoEnCarrito = ProductoBase & {
   cantidad: number
+  color:string
   variant?: {
     id: number | string
     attributes?: {

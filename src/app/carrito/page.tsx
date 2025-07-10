@@ -29,7 +29,7 @@ export default function CarritoPage() {
       price: item.price,
       compare_price: item.compare_price || null,
       quantity: item.cantidad,
-      image: item.img?.[0] || '/images/default.png',
+      image: item.image?.[0] || '/images/default.png',
       variant: item.variant?.id ? {
         id: String(item.variant.id),
         attributes: item.variant.attributes?.map(attr => ({
@@ -84,7 +84,7 @@ export default function CarritoPage() {
                     <div className="flex items-center gap-5">
                       <div className="relative">
                         <Image 
-                          src={item.img?.[0] || '/images/default.png'}
+                          src={item.image?.[0] || '/images/default.png'}
                           onError={(e) => {
                             const target = e.target as HTMLImageElement  
                             target.onerror = null
