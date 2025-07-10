@@ -363,7 +363,7 @@ export default function ProductoDetalle({ params }: Props) {
       name: producto.name,
       price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
       compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) :
-        producto.compare_price ? parseFloat(producto.compare_price) : null,
+        producto.compare_price ? parseFloat(producto.compare_price) : 0,
       quantity: 1,
       image: producto.images[0] ? getImageUrl(producto.images[0].url) : '/images/default.png',
       variant: selectedVariant ? {
