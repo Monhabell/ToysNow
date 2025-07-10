@@ -3,6 +3,8 @@
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic'; // ← Añade esto
+
 export default function FailurePage() {
   const params = useSearchParams();
 
