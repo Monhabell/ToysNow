@@ -1,16 +1,14 @@
 'use client'
 import { useState } from 'react'
-import Image from 'next/image'
-
 import Link from 'next/link'
 import Navbar from "@/components/Navbar";
 import Perfil from "@/components/Perfil/Perfil";
 
 import '../../styles/login.css';
-import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, Phone, MapPin } from 'lucide-react'
+import {  Mail, Lock, User, Eye, EyeOff, } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession,  } from 'next-auth/react'
 
 type UserData = {
     email: string;
@@ -29,7 +27,7 @@ export default function AuthPage() {
         password_confirmation: ''
     })
 
-    const { data: session, status } = useSession()
+    const { data: session } = useSession()
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
     const router = useRouter()
@@ -56,7 +54,9 @@ export default function AuthPage() {
             setUserData(prev => ({
                 ...prev,
                 [parent]: {
-                    ...prev[parent as keyof UserData],
+                    ...((typeof prev[parent as keyof UserData] === 'object' && prev[parent as keyof UserData] !== null)
+                        ? prev[parent as keyof UserData] as unknown as object
+                        : {}),
                     [child]: value
                 }
             }))

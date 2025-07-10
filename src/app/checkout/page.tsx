@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import '../../styles/checkout.css';
 import { useSession } from 'next-auth/react';
 import { FaCheckDouble } from "react-icons/fa";
+import Image from 'next/image';
+
 
 
 interface ProductVariant {
@@ -34,7 +36,7 @@ interface Order {
 
 interface DeliveryInfo {
   address: string;
-  apartment: string;
+  department: string;
   city: string;
   province: string;
   postalCode: string;
@@ -55,7 +57,7 @@ const CheckoutForm = () => {
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo>({
     address: '',
-    apartment: '',
+    department: '',
     city: '',
     province: '',
     postalCode: '',
@@ -69,8 +71,6 @@ const CheckoutForm = () => {
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
 
-  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'success' | 'failed'>('pending');
-  const [paymentMessage, setPaymentMessage] = useState('');
 
   const colombiaData: Record<string, string[]> = {
     "Bogota": ["Bogotá"],
@@ -79,7 +79,7 @@ const CheckoutForm = () => {
     "Valle del Cauca": ["Cali", "Palmira", "Tuluá", "Buenaventura"],
     "Atlántico": ["Barranquilla", "Soledad", "Malambo"],
     "Bolívar": ["Cartagena", "Magangué", "Turbaco"],
-    
+
     // Agrega más departamentos y ciudades según necesites
   };
 
@@ -107,10 +107,10 @@ const CheckoutForm = () => {
   useEffect(() => {
     if (preferenceId) {
       console.log("Preference Object:", preferenceId);
-      console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
+      //console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
 
       const popup = window.open(
-        preferenceId.init_point, // ✅ Aquí debe ir la URL, no el objeto completo
+        preferenceId, // ✅ Aquí debe ir la URL, no el objeto completo
         'PagoMercadoPago',
         'width=1000,height=600,scrollbars=yes,resizable=yes'
       );
@@ -142,7 +142,7 @@ const CheckoutForm = () => {
   const calculateShippingCost = (city: string) => {
     const shippingRates: Record<string, number> = {
       'Bogotá': 15500,
-      'Soacha': 20000, 
+      'Soacha': 20000,
       'Medellín': 25000,
       'Cali': 25000,
       // Add more cities as needed
@@ -211,7 +211,7 @@ const CheckoutForm = () => {
         setError('Cupón no válido o expirado');
       }
     } catch (err) {
-      setError('Error al validar el cupón');
+      setError('Error al validar el cupón' + err);
     }
   };
 
@@ -219,7 +219,7 @@ const CheckoutForm = () => {
   const handlePayment = async () => {
     setLoading(true);
     setError('');
-    setPaymentStatus('pending');
+    //setPaymentStatus('pending');
 
     try {
       // Validate order exists
@@ -396,7 +396,7 @@ const CheckoutForm = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    
+
 
                     <div>
                       <label className="block text-sm font-medium text-gray-300 mb-1">Ciudad</label>
@@ -439,7 +439,7 @@ const CheckoutForm = () => {
                     </div>
                   </div>
 
-                  
+
 
 
                   <div>
@@ -493,13 +493,13 @@ const CheckoutForm = () => {
               ) : (
                 <div className="text-gray-300">
                   <p className="font-medium">{deliveryInfo.address || 'No especificada'}</p>
-                  {deliveryInfo.apartment && <p>Departamento: {deliveryInfo.apartment}</p>}
+                  {deliveryInfo.department && <p>Departamento: {deliveryInfo.department}</p>}
                   <p>{deliveryInfo.city}, {deliveryInfo.province} {deliveryInfo.postalCode}</p>
                   <p>Teléfono: {deliveryInfo.phone || 'No especificado'}</p>
                   <p>Recibir en: {{
-                    'casa': 'Casa',
-                    'oficina': 'Oficina',
-                    'otro': 'Otro'
+                    "casa": "Casa",
+                    "oficina": "Oficina",
+                    "otro": "Otro"
                   }[deliveryInfo.deliveryType]}</p>
                   {deliveryInfo.deliveryNotes && (
                     <p className="mt-2 italic">Notas: {deliveryInfo.deliveryNotes}</p>
@@ -577,7 +577,7 @@ const CheckoutForm = () => {
                     defaultChecked
                   />
                   <label htmlFor="mercadoPago" className="ml-3 flex items-center">
-                    <img
+                    <Image
                       src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.18.9/mercadopago/logo__small@2x.png"
                       alt="Mercado Pago"
                       className="h-8 ml-2"
@@ -692,7 +692,7 @@ const CheckoutForm = () => {
               </button>
 
               <div className="mt-4 text-center text-xs text-gray-500">
-                <p>Al hacer clic en "Finalizar compra", aceptas nuestros Términos y Condiciones</p>
+                <p>Al hacer clic en Finalizar compra, aceptas nuestros Términos y Condiciones</p>
               </div>
             </div>
           </div>

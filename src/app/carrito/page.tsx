@@ -1,31 +1,37 @@
 'use client'
 import { useCart } from '@/context/CartContext'
 import Navbar from '@/components/Navbar'
-import { useSession, signOut } from 'next-auth/react'
-import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+import Link from 'next/link'
 
 
 export default function CarritoPage() {
-  const { data: session, status } = useSession()
-    const router = useRouter();
-
-  const { carrito, eliminarProducto, aumentarCantidad, disminuirCantidad, calcularSubtotal, calcularEnvioTotal, calcularTotalFinal} = useCart()
-
-  console.log(carrito)
+  const { data: session } = useSession()
+  const router = useRouter()
+  const { 
+    carrito, 
+    eliminarProducto, 
+    aumentarCantidad, 
+    disminuirCantidad, 
+    calcularSubtotal, 
+    calcularEnvioTotal, 
+    calcularTotalFinal 
+  } = useCart()
 
   const handleComprarAhora = () => {
-    if (carrito.length === 0) return;
+    if (carrito.length === 0) return
 
-    // Crear array de productos para el checkout
-    const productsToCheckout = carrito.map(item => ({
-      id: item.id,
+    const productsToCheckout = carrito.map((item) => ({
+      id: String(item.id),
       name: item.name,
       price: item.price,
       compare_price: item.compare_price || null,
       quantity: item.cantidad,
-      image: item.image[0] || '/images/default.png',
+      image: item.image?.[0] || '/images/default.png',
       variant: item.variant?.id ? {
-        id: item.variant.id,
+        id: String(item.variant.id),
         attributes: item.variant.attributes?.map(attr => ({
           name: attr.name,
           value: attr.value
@@ -33,38 +39,33 @@ export default function CarritoPage() {
       } : null,
       stock: item.stock,
       shipment: item.shipment || 0
-    }));
+    }))
 
-    // Calcular totales
-    const subtotal = calcularSubtotal();
-    const shipping = calcularEnvioTotal();
-    const total = calcularTotalFinal();
+    const subtotal = calcularSubtotal()
+    const shipping = calcularEnvioTotal()
+    const total = calcularTotalFinal()
 
-    // Guardar en sessionStorage para el checkout
     sessionStorage.setItem('currentOrder', JSON.stringify({
       items: productsToCheckout,
       subtotal,
       shipping,
       total
-    }));
+    }))
 
-    // Guardar la página actual para posible redirección después del login
-    sessionStorage.setItem('currentPage', window.location.href);
+    sessionStorage.setItem('currentPage', window.location.href)
 
-    // Redirigir al checkout
     if (!session) {
-      router.push('/login');
-      return;
+      router.push('/login')
+      return
     }
 
-    router.push('/checkout');
-  };
-
+    router.push('/checkout')
+  }
 
   return (
     <>
       <Navbar />
-      <div className="p-6  min-h-screen mt-32 text-gray-100">
+      <div className="p-6 min-h-screen mt-32 text-gray-100">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* Columna de Productos */}
@@ -82,14 +83,16 @@ export default function CarritoPage() {
                   <div key={`${item.id}-${item.variant?.id || '0'}`} className="flex justify-between items-center py-6 group hover:bg-gray-800/50 transition-all duration-300 px-2 rounded-lg">
                     <div className="flex items-center gap-5">
                       <div className="relative">
-                        <img 
-                          src={item.image[0]} 
+                        <Image 
+                          src={item.image?.[0] || '/images/default.png'}
                           onError={(e) => {
-                            const target = e.target as HTMLImageElement;  
-                            target.onerror = null;
-                            target.src = '/images/default.webp';
+                            const target = e.target as HTMLImageElement  
+                            target.onerror = null
+                            target.src = '/images/default.webp'
                           }}
                           alt={item.name} 
+                          width={80}
+                          height={80}
                           className="w-20 h-20 object-cover rounded-lg border-2 border-gray-700 group-hover:border-yellow-500 transition-all" 
                         />
                         <span className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
@@ -98,9 +101,11 @@ export default function CarritoPage() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-100 group-hover:text-yellow-400 transition-colors">{item.name}</p>
-                        {item.variant.id &&(
+                        {item.variant?.id && (
                           <p className="text-sm text-gray-400 mt-1">
-                            Detalle: <span className="text-yellow-400">{item.variant.attributes[0].name}  {item.variant.attributes[0].value}</span>
+                            Detalle: <span className="text-yellow-400">
+                              {item.variant.attributes?.[0]?.name || ''} {item.variant.attributes?.[0]?.value || ''}
+                            </span>
                           </p>
                         )}
                         {item.color && (
@@ -177,9 +182,9 @@ export default function CarritoPage() {
                 </div>
                 <p className="text-sm text-gray-400 mt-3">
                   Agrega más productos para obtener envío gratis
-                  <a href="#" className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors">
+                  <Link href="#" className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors">
                     Ver productos premium ›
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>
@@ -197,7 +202,6 @@ export default function CarritoPage() {
                   <span>Productos ({carrito.reduce((acc, i) => acc + i.cantidad, 0)})</span>
                   <span>${calcularSubtotal().toLocaleString()}</span>
                 </div>
-
 
                 <div className="pt-4 border-t border-gray-800">
                   <button className="text-yellow-400 hover:text-yellow-300 text-sm underline flex items-center transition-colors">
@@ -217,14 +221,13 @@ export default function CarritoPage() {
 
               <button
                 onClick={handleComprarAhora}
-               className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-black font-bold py-4 rounded-xl mt-8 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 flex items-center justify-center gap-2">
+                className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-black font-bold py-4 rounded-xl mt-8 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 flex items-center justify-center gap-2"
+              >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
                 </svg>
                 Finalizar Compra
               </button>
-
-              
             </div>
           </div>
         </div>

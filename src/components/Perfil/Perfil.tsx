@@ -1,12 +1,14 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState } from 'react';
 import Head from 'next/head';
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 
 
 const UserProfile = () => {
 
 
-    const { data: session, status } = useSession()
+    const { data: session } = useSession()
 
     console.log(session?.user?.name)
 

@@ -1,83 +1,28 @@
+// Agregar en la primera línea de cada archivo:
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client'
 
 import { useEffect, useState, use } from 'react';
 import { useCart } from '@/context/CartContext';
-import { CiHeart, CiShoppingCart } from "react-icons/ci";
-import { FaHeart, FaShoppingCart, FaStar, FaRegStar, FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import { CiHeart } from "react-icons/ci";
 import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
 import '../../../styles/detalles.css';
-import { Separator } from "@/components/ui/separator"
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
+import Image from 'next/image';
+
+import type { 
+  Producto, 
+  Variant, 
+  ApiResponse
+} from '@/types/productos'
 
 
-interface Variant {
-  id: number;
-  price: string | null;
-  stock: number;
-  is_available: boolean;
-  compare_price: string | null;
-  shipment: string | null;
-  attributes: {
-    id: number;
-    name: string;
-    value: string;
-  }[];
-}
 
-interface Category {
-  name: string;
-  slug: string;
-  description: string | null;
-  image: string | null;
-}
-
-interface Image {
-  id: number;
-  product_id: number;
-  url: string;
-}
-
-interface Brand {
-  id: number;
-  name: string;
-}
-
-interface SEO {
-  title: string | null;
-  description: string | null;
-  keywords: string | null;
-}
-
-interface Producto {
-  id: number;
-  name: string;
-  slug: string | null;
-  description: string;
-  price: string;
-  compare_price: string | null;
-  stock: number;
-  is_available: boolean;
-  is_feature: boolean;
-  relevance: number;
-  qualification: number;
-  brand: Brand;
-  variants: Variant[];
-  images: Image[];
-  categories: Category[];
-  reviews: any[];
-  reviews_count: number;
-  created_at: string;
-  updated_at: string;
-  seo: SEO;
-}
-
-interface ApiResponse {
-  data: Producto;
-}
 
 interface Props {
   params: Promise<{
@@ -100,8 +45,23 @@ export default function ProductoDetalle({ params }: Props) {
   const [nuevaPregunta, setNuevaPregunta] = useState('');
   const [selectedVariant, setSelectedVariant] = useState<Variant | null>(null);
   const [loading, setLoading] = useState(true);
-  const { data: session, status } = useSession()
+  const { data: session } = useSession()
   const router = useRouter();
+
+  const calcularRatingPromedio = (producto: Producto) => {
+  if (!producto.qualification?.count_users) return 0;
+  
+  const counts = producto.qualification.count_users;
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  if (total === 0) return 0;
+
+  const sum = Object.entries(counts).reduce(
+    (total, [stars, count]) => total + (parseInt(stars) * count),
+    0
+  );
+
+  return sum / total;
+};
 
   useEffect(() => {
     const obtenerProducto = async () => {
@@ -282,13 +242,10 @@ export default function ProductoDetalle({ params }: Props) {
 
     // Encontrar la variante que coincide con todos los atributos seleccionados
     let matchingVariant = validVariants.find(variant => {
-      // Verificar que todos los atributos de variante coincidan con los seleccionados
-      return Object.entries(variantes).every(([name, _]) => {
-        // Si este es el atributo que estamos cambiando, verificar el nuevo valor
+      return Object.entries(variantes).every(([name]) => {  // <-- Eliminamos el _
         if (name === attributeName) {
           return variant.attributes.some(attr => attr.name === name && attr.value === value);
         }
-        // Para otros atributos, verificar que coincidan con la selección actual
         if (selectedVariant) {
           const currentValue = selectedVariant.attributes.find(attr => attr.name === name)?.value;
           return variant.attributes.some(attr => attr.name === name && attr.value === currentValue);
@@ -363,19 +320,18 @@ export default function ProductoDetalle({ params }: Props) {
       name: producto.name,
       price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
       compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) :
-        producto.compare_price ? parseFloat(producto.compare_price) : null,
-      quantity: 1,
+        producto.compare_price ? parseFloat(producto.compare_price) : 0,
+      color: selectedVariant?.attributes.find(attr => attr.name.toLowerCase() === 'color')?.value || 'N/A', // ✅ importante
       image: producto.images[0] ? getImageUrl(producto.images[0].url) : '/images/default.png',
+      stock: selectedVariant?.stock || producto.stock,
+      shipment: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0,
+      cantidad: 1,
       variant: selectedVariant ? {
         id: selectedVariant.id,
-        attributes: selectedVariant.attributes.map(attr => ({
-          name: attr.name,
-          value: attr.value
-        }))
-      } : null,
-      stock: selectedVariant?.stock || producto.stock,
-      shipment: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0
-    });
+        attributes: selectedVariant.attributes
+      } : undefined
+    })
+
   };
 
   if (loading) {
@@ -431,7 +387,7 @@ export default function ProductoDetalle({ params }: Props) {
           <div className='grid-container'>
             <div className='itemgrupImg'>
               {producto.images.map((img, index) => (
-                <img
+                <Image
                   key={img.id}
                   src={getImageUrl(img.url)}
                   onError={(e) => {
@@ -447,7 +403,7 @@ export default function ProductoDetalle({ params }: Props) {
             </div>
 
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
-              <img
+              <Image
                 src={producto.images[imgSeleccionada] ? getImageUrl(producto.images[imgSeleccionada].url) : '/images/default.png'}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -475,9 +431,12 @@ export default function ProductoDetalle({ params }: Props) {
 
                 <h1 className='detail_text text-gold-600'>{producto.name}</h1>
 
-                {producto.qualification >= 0 && (
+                {calcularRatingPromedio(producto) > 0 && (
                   <div className='star_qualifications'>
-                    <StarRating rating={producto.qualification} onRate={handleRating} />
+                    <StarRating 
+                      rating={calcularRatingPromedio(producto)} 
+                      onRate={handleRating} 
+                    />
                     <p className='ml-2 '>({producto.reviews_count})</p>
                   </div>
                 )}
@@ -555,10 +514,10 @@ export default function ProductoDetalle({ params }: Props) {
                               <button
                                 key={idx}
                                 className={`cursor-pointer px-3 py-1 border rounded text-sm ${isSelected
-                                    ? 'bg-black text-gold-600 border-gold-500'
-                                    : isAvailable
-                                      ? 'bg-gray border-gray-600 hover:text-gold-600 hover:bg-gold-50'
-                                      : 'bg-gold-600 border-gray-200 text-gray-400 cursor-not-allowed'
+                                  ? 'bg-black text-gold-600 border-gold-500'
+                                  : isAvailable
+                                    ? 'bg-gray border-gray-600 hover:text-gold-600 hover:bg-gold-50'
+                                    : 'bg-gold-600 border-gray-200 text-gray-400 cursor-not-allowed'
                                   }`}
                                 onClick={() => handleVariantSelect(name, value)}
                                 disabled={!isAvailable}
@@ -601,13 +560,13 @@ export default function ProductoDetalle({ params }: Props) {
                     <div className="seccion mb-4">
                       <strong className="block mb-2">Tarjetas de crédito</strong>
                       <div className="iconos flex gap-3">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
+                        <Image src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
                           alt="Visa"
                           className="h-8" />
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
+                        <Image src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                           alt="MasterCard"
                           className="h-8" />
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
+                        <Image src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
                           alt="American Express"
                           className="h-8" />
                       </div>
@@ -651,7 +610,10 @@ export default function ProductoDetalle({ params }: Props) {
                   id='slider'
                   className='overflow-x-auto p-2 scroll-smooth scrollbar-hide whitespace-nowrap'
                 >
-                  <ListaProductos productos={relacionados} isSlider />
+                  <ListaProductos 
+                    productos={relacionados as Producto[]} 
+                    isSlider 
+                  />
                 </div>
 
                 {mostrarBotones && (

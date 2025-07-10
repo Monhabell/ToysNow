@@ -1,22 +1,31 @@
 'use client'
 import { createContext, useContext, useState, ReactNode } from 'react'
 
-type Producto = {
+type ProductoBase = {
   id: number
   name: string
   price: number
   compare_price: number
-  img: string
+  image?: string
   stock: number
-  color: string
-  shipment: number // Costo de envío
+  shipment: number
 }
 
-type ProductoEnCarrito = Producto & { cantidad: number }
+type ProductoEnCarrito = ProductoBase & {
+  cantidad: number
+  color:string
+  variant?: {
+    id: number | string
+    attributes?: {
+      name: string
+      value: string
+    }[]
+  }
+}
 
 type CartContextType = {
   carrito: ProductoEnCarrito[]
-  agregarProducto: (producto: Producto) => void
+  agregarProducto: (producto: ProductoEnCarrito) => void
   eliminarProducto: (id: number) => void
   aumentarCantidad: (id: number) => void
   disminuirCantidad: (id: number) => void
@@ -30,17 +39,17 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 export function CartProvider({ children }: { children: ReactNode }) {
   const [carrito, setCarrito] = useState<ProductoEnCarrito[]>([])
 
-  const agregarProducto = (producto: Producto) => {
+  const agregarProducto = (producto: ProductoEnCarrito) => {
     setCarrito(prev => {
-      const existe = prev.find(p => p.id === producto.id)
+      const existe = prev.find(p => p.id === producto.id && p.variant?.id === producto.variant?.id)
       if (existe) {
         return prev.map(p =>
-          p.id === producto.id
-            ? { ...p, cantidad: Math.min(p.cantidad + 1, p.stock) }
+          p.id === producto.id && p.variant?.id === producto.variant?.id
+            ? { ...p, cantidad: Math.min(p.cantidad + producto.cantidad, p.stock) }
             : p
         )
       } else {
-        return [...prev, { ...producto, cantidad: 1 }]
+        return [...prev, producto]
       }
     })
   }
@@ -75,18 +84,15 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const calcularEnvioTotal = () => {
     const subtotal = calcularSubtotal()
-    console.log(subtotal)
     if (subtotal > 150000) {
       return 0
     } else {
-      let subtotalEnvio = carrito.reduce((total, producto) => total + producto.price * producto.cantidad, 0)
-       let total = 150000 - subtotalEnvio
-      return total
+      return 150000 - subtotal
     }
   }
 
   const calcularTotalFinal = () => {
-    return calcularSubtotal()
+    return calcularSubtotal() + calcularEnvioTotal()
   }
 
   return (

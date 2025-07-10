@@ -1,3 +1,7 @@
+// Agregar en la primera línea de cada archivo:
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +16,7 @@ export default function Navbar() {
   const [search, setSearch] = useState('');
   const router = useRouter();
 
-  const { data: session, status } = useSession()
+  const { data: session,  } = useSession()
 
   const handleSearch = (e: any) => {
     e.preventDefault();

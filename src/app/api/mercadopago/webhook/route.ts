@@ -1,24 +1,35 @@
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
-// Configuración de tipos para TypeScript
-interface PaymentData {
+// Configuración de tipos mejorados
+interface Metadata {
+  token_id_user?: string;
+  [key: string]: unknown; // Para propiedades dinámicas pero con tipo más seguro
+}
+
+interface PaymentOrder {
+  id: string;
+  // Agrega aquí otros campos específicos del order si los conoces
+}
+
+interface Payment {
   id: string;
   status: string;
   transaction_amount: number;
-  order?: {
-    id: string;
-  };
-  metadata?: any;
-  [key: string]: any;
+  order?: PaymentOrder;
+  metadata?: Metadata;
+  // Agrega aquí otros campos específicos del pago
 }
 
-interface MerchantOrderData {
+interface MerchantOrderPayment {
   id: string;
-  payments: Array<{
-    id: string;
-  }>;
-  [key: string]: any;
+  // Agrega aquí otros campos específicos del pago en la orden
+}
+
+interface MerchantOrder {
+  id: string;
+  payments: MerchantOrderPayment[];
+  // Agrega aquí otros campos específicos de la orden
 }
 
 interface WebhookPayload {
@@ -27,17 +38,28 @@ interface WebhookPayload {
   data: {
     id: string;
   };
-  [key: string]: any;
+  // Solo si realmente necesitas propiedades dinámicas
+  [key: string]: unknown;
 }
 
-// Función para validar la firma del webhook (opcional pero recomendado)
-function validateWebhookSignature(signature: string | null, payload: any): boolean {
-  // Implementación real debería verificar la firma con tu secret key
-  return true; // En producción, implementar validación real
+interface DatabasePayload {
+  eventType: string;
+  paymentId?: string;
+  paymentData?: Payment;
+  orderData?: MerchantOrder;
+  orderId?: string;
+  paymentsData?: Payment[];
+  receivedAt: string;
 }
+
+// Función para validar la firma del webhook
+// function validateWebhookSignature(signature: string | null, payload: unknown): boolean {
+//   // Implementación real debería verificar la firma con tu secret key
+//   return true; // En producción, implementar validación real
+// }
 
 // Función para obtener detalles de un pago
-async function getPaymentDetails(paymentId: string, accessToken: string): Promise<PaymentData> {
+async function getPaymentDetails(paymentId: string, accessToken: string): Promise<Payment> {
   const paymentRes = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -49,11 +71,11 @@ async function getPaymentDetails(paymentId: string, accessToken: string): Promis
     throw new Error(`Error al obtener pago: ${paymentRes.status}`);
   }
 
-  return await paymentRes.json();
+  return await paymentRes.json() as Payment;
 }
 
 // Función para obtener detalles de una orden
-async function getOrderDetails(orderId: string, accessToken: string): Promise<MerchantOrderData> {
+async function getOrderDetails(orderId: string, accessToken: string): Promise<MerchantOrder> {
   const orderRes = await fetch(`https://api.mercadopago.com/merchant_orders/${orderId}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -65,17 +87,17 @@ async function getOrderDetails(orderId: string, accessToken: string): Promise<Me
     throw new Error(`Error al obtener orden: ${orderRes.status}`);
   }
 
-  return await orderRes.json();
+  return await orderRes.json() as MerchantOrder;
 }
 
 // Función para guardar en la base de datos
-async function saveToDatabase(data: any): Promise<void> {
-  const tokem = data.paymentData?.metadata?.token_id_user || '';
+async function saveToDatabase(data: DatabasePayload): Promise<void> {
+  const token = data.paymentData?.metadata?.token_id_user || '';
   const response = await fetch(`${process.env.API_TENANT_BASE_URL_V1}/order-payments`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${tokem}`,
+      Authorization: `Bearer ${token}`,
       'X-API-Key': process.env.API_KEY || '',
     },
     body: JSON.stringify(data),
@@ -87,7 +109,7 @@ async function saveToDatabase(data: any): Promise<void> {
 }
 
 // Función para guardar logs en archivo
-async function saveToLogFile(data: any, prefix: string): Promise<void> {
+async function saveToLogFile(data: unknown, prefix: string): Promise<void> {
   try {
     const dir = path.resolve(process.cwd(), 'webhook_logs');
     await mkdir(dir, { recursive: true });
@@ -108,20 +130,20 @@ export async function POST(req: Request) {
 
     // Validar tamaño del payload
     const contentLength = Number(req.headers.get('content-length') || '0');
-    if (contentLength > 1000000) { // 1MB máximo
+    if (contentLength > 1000000) {
       return new Response('Payload demasiado grande', { status: 413 });
     }
 
-    // Parsear el cuerpo
-    const body: WebhookPayload = await req.json();
+    // Parsear el cuerpo con tipo específico
+    const body = await req.json() as WebhookPayload;
     console.log('📩 Webhook recibido:', body);
 
     // Validar firma del webhook
-    const signature = req.headers.get('x-signature') || null;
-    if (!validateWebhookSignature(signature, body)) {
-      console.warn('⚠️ Firma de webhook inválida');
-      return new Response('Firma inválida', { status: 401 });
-    }
+    // const signature = req.headers.get('x-signature') || null;
+    // if (!validateWebhookSignature(signature, body)) {
+    //   console.warn('⚠️ Firma de webhook inválida');
+    //   return new Response('Firma inválida', { status: 401 });
+    // }
 
     const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
     if (!accessToken) {
@@ -130,7 +152,7 @@ export async function POST(req: Request) {
 
     const eventType = body.type;
     const resourceId = body.data.id;
-    let output: any;
+    let output: DatabasePayload;
 
     if (eventType === 'payment') {
       // Procesar notificación de pago
@@ -138,7 +160,7 @@ export async function POST(req: Request) {
       console.log("💳 Pago obtenido:", paymentData);
 
       // Buscar orden asociada si existe
-      let orderData = null;
+      let orderData: MerchantOrder | undefined;
       if (paymentData.order?.id) {
         try {
           orderData = await getOrderDetails(paymentData.order.id, accessToken);
@@ -164,22 +186,22 @@ export async function POST(req: Request) {
 
       // Obtener detalles de todos los pagos asociados
       const paymentsData = await Promise.all(
-        orderData.payments.map(async (pago: { id: string }) => {
+        orderData.payments.map(async (pago) => {
           try {
             return await getPaymentDetails(pago.id, accessToken);
           } catch (error) {
             console.error(`Error obteniendo pago ${pago.id}:`, error);
-            return null;
+            return undefined;
           }
         })
       );
 
-      // Filtrar pagos nulos y preparar datos
+      // Filtrar pagos undefined y preparar datos
       output = {
         eventType,
         orderId: resourceId,
         orderData,
-        paymentsData: paymentsData.filter(p => p !== null),
+        paymentsData: paymentsData.filter((p): p is Payment => p !== undefined),
         receivedAt: new Date().toISOString(),
       };
 

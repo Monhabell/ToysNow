@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import '../../styles/Category.css';
+import Image from 'next/image';
 
 interface Subcategory {
   name: string;
@@ -130,7 +131,7 @@ const CategoryMenu: React.FC = () => {
                   ? "bg-gold-600 border-2 border-red-600"
                   : "bg-gray-800 border-2 border-gray-700 group-hover:border-gold-500 group-hover:bg-gold-600"
               }`}>
-                <img
+                <Image 
                   src={category.image || '/images/icons/logoDefaulCategories.png'}
                   alt={category.name}
                   className="rounded-full" 

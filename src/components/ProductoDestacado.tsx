@@ -1,5 +1,7 @@
 import '../styles/ProductDest.css';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+
 
 interface ProductoDestacadoProps {
   id: string | number;
@@ -19,7 +21,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price,
       
       {/* Imagen del producto */}
       <div className="flex justify-center items-center mb-4 relative z-10">
-        <img
+        <Image
           src={img}
           onError={(e) => {
             const target = e.target as HTMLImageElement;  
