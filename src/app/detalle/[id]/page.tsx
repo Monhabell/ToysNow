@@ -18,8 +18,6 @@ import Image from 'next/image';
 import type { 
   Producto, 
   Variant, 
-  Category, 
-  Brand,
   ApiResponse
 } from '@/types/productos'
 

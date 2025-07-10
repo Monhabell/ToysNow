@@ -55,7 +55,7 @@ export type Producto = {
   variants: Variant[]
   images: Image[]
   categories: Category[] // Usa el tipo Category definido arriba
-  reviews: any[]
+  reviews: unknown[]
   reviews_count: number
   created_at: string
   updated_at: string
