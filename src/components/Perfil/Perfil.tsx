@@ -27,12 +27,12 @@ const UserProfile = () => {
     const [activeTab, setActiveTab] = useState('personal');
     const [isEditing, setIsEditing] = useState(false);
 
-    const handleInputChange = (e: any) => {
+    const handleInputChange = (e: MyCustomType) => {
         const { name, value } = e.target;
         setUserData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: MyCustomType) => {
         e.preventDefault();
         // Aquí iría la lógica para actualizar los datos del usuario
         console.log('Datos actualizados:', userData);

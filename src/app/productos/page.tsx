@@ -113,7 +113,7 @@ export default function ProductosPage() {
 
         const categoryMap = new Map<string, Category>();
 
-        prodcto.data.forEach((product: any) => {
+        prodcto.data.forEach((product: MyCustomType) => {
           (product.categories || []).forEach((cat: Category) => {
             const key = `${cat.name}`; // Simplificado, solo usa el nombre
             if (!categoryMap.has(key)) {
@@ -143,7 +143,7 @@ export default function ProductosPage() {
   }, []);
 
   // Normalizar texto para búsquedas
-  const normalizarTexto = (texto: any) => {
+  const normalizarTexto = (texto: MyCustomType) => {
     if (!texto) return '';
     return String(texto)
       .normalize("NFD")
