@@ -6,24 +6,6 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 
-interface ProductoEnCarrito {
-  id: string
-  name: string
-  price: number
-  compare_price?: number
-  cantidad: number
-  img: string[]
-  variant?: {
-    id: string
-    attributes: Array<{
-      name: string
-      value: string
-    }>
-  }
-  stock: number
-  shipment?: number
-  color?: string
-}
 
 export default function CarritoPage() {
   const { data: session } = useSession()
@@ -41,15 +23,15 @@ export default function CarritoPage() {
   const handleComprarAhora = () => {
     if (carrito.length === 0) return
 
-    const productsToCheckout = carrito.map(item => ({
-      id: item.id,
+    const productsToCheckout = carrito.map((item) => ({
+      id: String(item.id),
       name: item.name,
       price: item.price,
       compare_price: item.compare_price || null,
       quantity: item.cantidad,
       image: item.img?.[0] || '/images/default.png',
       variant: item.variant?.id ? {
-        id: item.variant.id,
+        id: String(item.variant.id),
         attributes: item.variant.attributes?.map(attr => ({
           name: attr.name,
           value: attr.value
