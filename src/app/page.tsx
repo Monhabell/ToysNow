@@ -15,7 +15,7 @@ type Producto = {
   id: string | number
   name: string
   price: number | string
-  compare_price?: number | string
+  compare_price: string | null
   stock?: number
   images?: { id: number, product_id: number, url: string }[]
   created_at?: string | Date
