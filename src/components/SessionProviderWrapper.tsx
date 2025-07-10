@@ -1,3 +1,6 @@
+// components/SessionProviderWrapper.tsx
+// Agregar en la primera línea de cada archivo:
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import { SessionProvider } from 'next-auth/react'
