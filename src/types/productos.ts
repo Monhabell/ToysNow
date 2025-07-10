@@ -5,6 +5,8 @@ export type Image = {
 }
 
 export type Variant = {
+  cost_shipping: number
+  color?: string;
   id: number
   price: string | null
   stock: number
@@ -50,7 +52,7 @@ export type Producto = {
   is_available: boolean
   is_feature: boolean
   relevance: number
-  qualification: number
+  qualification: Qualification;
   brand: Brand
   variants: Variant[]
   images: Image[]
@@ -60,6 +62,23 @@ export type Producto = {
   created_at: string
   updated_at: string
   seo: SEO
+  features: Feature[];
+  shipment: number
+
+}
+
+interface Qualification {
+  count_users: {
+    [key: string]: number;
+  };
+  comments: {
+    text: string;
+    date: string;
+  }[];
+}
+
+interface Feature {
+  variants: Variant[];
 }
 
 export type ApiResponse = {

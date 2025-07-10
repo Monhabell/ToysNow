@@ -19,26 +19,12 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { generateProductListSchema, generateBreadcrumbsSchema } from '../../utils/schemaUtils';
+import type { Producto } from '@/types/productos'
 
 
 
 
 
-interface Variant {
-  color?: string;
-  size?: string;
-  weight?: string;
-  cost_shipping?: number;
-  dimensions?: string;
-  price: number;
-  compare_price: number;
-  stock: number;
-  images: string[];
-}
-
-interface Feature {
-  variants: Variant[];
-}
 
 interface Qualification {
   count_users: {
@@ -63,29 +49,29 @@ interface Category {
   name: string;
 }
 
-interface Producto1 {
-  id: number;
-  name: string;
-  price: number;
-  compare_price: number;
-  slug: string;
-  description: string;
-  brand: string;
-  stock: number;
-  shipment: number;
-  is_available: boolean;
-  is_feature: boolean;
-  features: Feature[];
-  img: string[];
-  categories: Category[];
-  subcategories: Category[];
-  qualification: Qualification;
-  questions: Question[];
-  created_at: string;
-}
+// interface Producto {
+//   id: number;
+//   name: string;
+//   price: number;
+//   compare_price: number;
+//   slug: string;
+//   description: string;
+//   brand: string;
+//   stock: number;
+//   shipment: number;
+//   is_available: boolean;
+//   is_feature: boolean;
+//   features: Feature[];
+//   img: string[];
+//   categories: Category[];
+//   subcategories: Category[];
+//   qualification: Qualification;
+//   questions: Question[];
+//   created_at: string;
+// }
 
 export default function ProductosPage() {
-  const [allProductos, setAllProductos] = useState<Producto1[]>([]);
+  const [allProductos, setAllProductos] = useState<Producto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const searchParams = useSearchParams();
@@ -135,7 +121,7 @@ export default function ProductosPage() {
         setCategorias(cats);
 
         // Extraer marcas únicas
-        const marcas = Array.from(new Set(prodcto.map((p: Producto1) => p.brand).filter(Boolean))) as string[];
+        const marcas = Array.from(new Set(prodcto.map((p: Producto) => p.brand).filter(Boolean))) as string[];
         setMarcasDisponibles(marcas);
 
       } catch (error) {
@@ -158,7 +144,7 @@ export default function ProductosPage() {
   };
 
   // Calcular rating promedio para un producto
-  const calcularRatingPromedio = (producto: Producto1) => {
+  const calcularRatingPromedio = (producto: Producto) => {
     const qualificationCounts = producto.qualification?.count_users || {};
     const totalRatings = Object.values(qualificationCounts).reduce((a, b) => a + b, 0);
     if (totalRatings === 0) return 0;
@@ -208,14 +194,15 @@ export default function ProductosPage() {
     if (precioMin !== '') {
       filtrados = filtrados.filter(producto => {
         const precio = producto.features?.[0]?.variants?.[0]?.price || producto.price;
-        return precio >= precioMin;
+        return Number(precio) >= precioMin;
+
       });
     }
 
     if (precioMax !== '') {
       filtrados = filtrados.filter(producto => {
         const precio = producto.features?.[0]?.variants?.[0]?.price || producto.price;
-        return precio <= precioMax;
+        return Number(precio) <= precioMax;
       });
     }
 
@@ -241,7 +228,7 @@ export default function ProductosPage() {
         filtrados = filtrados.filter(producto => {
           const precioBase = producto.price;
           const precioComparacion = producto.compare_price;
-          return precioComparacion > precioBase;
+          return precioComparacion != null && precioComparacion > precioBase;
         });
       }
     }
@@ -339,7 +326,7 @@ export default function ProductosPage() {
         productosOrdenados.sort((a, b) => {
           const precioA = a.features?.[0]?.variants?.[0]?.price || a.price;
           const precioB = b.features?.[0]?.variants?.[0]?.price || b.price;
-          return precioA - precioB;
+          return Number(precioA) - Number(precioB);
         });
         break;
 
@@ -372,7 +359,8 @@ export default function ProductosPage() {
   // Dentro del componente:
   const productListSchema = generateProductListSchema(metaTitle, metaDescription, canonicalUrl, productosPaginados);
   const breadcrumbsSchema = generateBreadcrumbsSchema(canonicalUrl, categoriaSeleccionada);
-
+  
+  
   return (
     <>
       <Head>
