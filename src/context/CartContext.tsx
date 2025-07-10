@@ -12,7 +12,17 @@ type Producto = {
   shipment: number // Costo de envío
 }
 
-type ProductoEnCarrito = Producto & { cantidad: number }
+type ProductoEnCarrito = Producto & { 
+  cantidad: number 
+  variant?: {
+    id: number | string
+    attributes?: {
+      name: string
+      value: string
+    }[]
+  }
+}
+
 
 type CartContextType = {
   carrito: ProductoEnCarrito[]
