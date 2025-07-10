@@ -52,7 +52,7 @@ export type Producto = {
   is_available: boolean
   is_feature: boolean
   relevance: number
-  qualification: Qualification;
+  qualification?: Qualification;
   brand: Brand
   variants: Variant[]
   images: Image[]
@@ -67,7 +67,7 @@ export type Producto = {
 
 }
 
-interface Qualification {
+export type Qualification = {
   count_users: {
     [key: string]: number;
   };

@@ -6,31 +6,16 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import '../../styles/Listaproductos.css'
-import type { Producto } from '@/types/productos'
+import type { Producto, Qualification } from '@/types/productos'
+
 // Utility function to ensure valid image URL
 const getValidImageUrl = (url: string | undefined) => {
-  if (!url) return '/default-product-image.png' // Imagen por defecto local
-
-  // Si ya es una URL completa (http/https)
-  if (/^https?:\/\//i.test(url)) {
-    return url
-  }
-
-  // Si es una ruta local que comienza con /images
-  if (url.startsWith('/images/')) {
-    return `http://127.0.0.1:8000${url}`
-  }
-
-  // Si es una ruta relativa de productos
-  if (url.startsWith('products/')) {
-    return `http://127.0.0.1:8000/images/${url}`
-  }
-
-  // Para cualquier otro caso, usa la URL directamente
+  if (!url) return '/default-product-image.png'
+  if (/^https?:\/\//i.test(url)) return url
+  if (url.startsWith('/images/')) return `http://127.0.0.1:8000${url}`
+  if (url.startsWith('products/')) return `http://127.0.0.1:8000/images/${url}`
   return url
 }
-
-
 
 type ListaProductosProps = {
   productos: Producto[]
@@ -49,16 +34,29 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
   const handleRating = (value: number) => {
     setRating(value)
     console.log('Usuario calificó con:', value)
-    console.log(rating)
   }
 
   const calculateIsNew = (createdAt: string | Date | undefined) => {
     if (!isClient || !createdAt) return false
-
-    const fechaCreacion = createdAt instanceof Date ? createdAt : new Date(createdAt)
+    const fechaCreacion = new Date(createdAt)
     const hoy = new Date()
     const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24))
     return diffDias <= 15
+  }
+
+  const calcularRatingPromedio = (qualification?: Qualification): number => {
+    if (!qualification || !qualification.count_users) return 0
+      
+    const counts = qualification.count_users
+    const totalVotos = Object.values(counts).reduce((sum: number, count) => sum + Number(count), 0)
+    if (totalVotos === 0) return 0
+
+    const sumaPonderada = Object.entries(counts).reduce(
+      (total, [estrellas, cantidad]) => total + (parseInt(estrellas) * Number(cantidad)),
+      0
+    )
+
+    return sumaPonderada / totalVotos
   }
 
   return (
@@ -86,7 +84,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
         const EnvioGratis = Number(finalShipment) === 0
         const nuevoOk = isClient && calculateIsNew(p.created_at)
 
-        const TotalCalifi = p.qualification || 0
+        const ratingPromedio = calcularRatingPromedio(p.qualification)
         const cantUs = p.reviews_count || 0
 
         return (
@@ -116,9 +114,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                   -{Math.round(((finalComparePrice - finalPrice) / finalComparePrice) * 100)}%
                 </span>
               )}
-              {nuevoOk && (
-                <span className="nuevo">Nuevo</span>
-              )}
+              {nuevoOk && <span className="nuevo">Nuevo</span>}
             </div>
 
             <div className="p-4 space-y-2">
@@ -133,23 +129,17 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
               <div className="text-md">
                 {tieneDescuento ? (
                   <div className="flex items-center space-x-2">
-                    <span className="font-bold">
-                      $ {finalPrice.toLocaleString('en-CO')}
-                    </span>
-                    <span className="valorAnterior line-through">
-                      $ {finalComparePrice.toLocaleString('en-CO')}
-                    </span>
+                    <span className="font-bold">$ {finalPrice.toLocaleString('en-CO')}</span>
+                    <span className="valorAnterior line-through">$ {finalComparePrice.toLocaleString('en-CO')}</span>
                   </div>
                 ) : (
-                  <span className="font-medium">
-                    $ {finalPrice.toLocaleString('en-CO')}
-                  </span>
+                  <span className="font-medium">$ {finalPrice.toLocaleString('en-CO')}</span>
                 )}
               </div>
 
-              {Number(TotalCalifi) >= 0 && (
+              {ratingPromedio > 0 && (
                 <div className='star_qualifications'>
-                  <StarRating rating={TotalCalifi} onRate={handleRating} />
+                  <StarRating rating={ratingPromedio} onRate={handleRating} />
                   <p className='ml-2 mt-1'>({cantUs})</p>
                 </div>
               )}
