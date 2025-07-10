@@ -6,6 +6,8 @@ import Navbar from "@/components/Navbar";
 import '../../styles/checkout.css';
 import { useSession } from 'next-auth/react';
 import { FaCheckDouble } from "react-icons/fa";
+import Image from 'next/image';
+
 
 
 interface ProductVariant {
@@ -577,7 +579,7 @@ const CheckoutForm = () => {
                     defaultChecked
                   />
                   <label htmlFor="mercadoPago" className="ml-3 flex items-center">
-                    <img
+                    <Image
                       src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.18.9/mercadopago/logo__small@2x.png"
                       alt="Mercado Pago"
                       className="h-8 ml-2"

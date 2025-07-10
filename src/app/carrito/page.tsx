@@ -3,6 +3,9 @@ import { useCart } from '@/context/CartContext'
 import Navbar from '@/components/Navbar'
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+
 
 
 export default function CarritoPage() {
@@ -82,7 +85,7 @@ export default function CarritoPage() {
                   <div key={`${item.id}-${item.variant?.id || '0'}`} className="flex justify-between items-center py-6 group hover:bg-gray-800/50 transition-all duration-300 px-2 rounded-lg">
                     <div className="flex items-center gap-5">
                       <div className="relative">
-                        <img 
+                        <Image 
                           src={item.image[0]} 
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;  
@@ -177,9 +180,9 @@ export default function CarritoPage() {
                 </div>
                 <p className="text-sm text-gray-400 mt-3">
                   Agrega más productos para obtener envío gratis
-                  <a href="#" className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors">
+                  <Link href="#" className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors">
                     Ver productos premium ›
-                  </a>
+                  </Link>
                 </p>
               </div>
             </div>

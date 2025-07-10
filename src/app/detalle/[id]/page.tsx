@@ -12,6 +12,8 @@ import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
+import Image from 'next/image';
+
 
 
 interface Variant {
@@ -431,7 +433,7 @@ export default function ProductoDetalle({ params }: Props) {
           <div className='grid-container'>
             <div className='itemgrupImg'>
               {producto.images.map((img, index) => (
-                <img
+                <Image
                   key={img.id}
                   src={getImageUrl(img.url)}
                   onError={(e) => {
@@ -447,7 +449,7 @@ export default function ProductoDetalle({ params }: Props) {
             </div>
 
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
-              <img
+              <Image
                 src={producto.images[imgSeleccionada] ? getImageUrl(producto.images[imgSeleccionada].url) : '/images/default.png'}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -601,13 +603,13 @@ export default function ProductoDetalle({ params }: Props) {
                     <div className="seccion mb-4">
                       <strong className="block mb-2">Tarjetas de crédito</strong>
                       <div className="iconos flex gap-3">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
+                        <Image src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
                           alt="Visa"
                           className="h-8" />
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
+                        <Image src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                           alt="MasterCard"
                           className="h-8" />
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
+                        <Image src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
                           alt="American Express"
                           className="h-8" />
                       </div>

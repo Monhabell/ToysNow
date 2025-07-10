@@ -9,6 +9,7 @@ import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import { FiArrowRight } from "react-icons/fi";
 import Image from 'next/image';
 import WhatsAppButton from '@/components/WhatsAppButton'
+import Link from 'next/link';
 
 type Producto = {
   id: string | number
@@ -51,18 +52,18 @@ export default function Home() {
     const fetchData = async () => {
       try {
         setLoading(true)
-        
+
         // Verificar si hay datos en cache y si aún son válidos
         const cachedData = localStorage.getItem('productosCache');
         const cacheTimestamp = localStorage.getItem('productosCacheTimestamp');
-        
+
         if (cachedData && cacheTimestamp) {
           const now = new Date().getTime();
           const cachedTime = parseInt(cacheTimestamp, 10);
-          
+
           if (now - cachedTime < CACHE_LIFETIME) {
             // Usar datos del cache
-            const { promociones: cachedPromociones, destacado: cachedDestacado, productoDestacado2:productoDestacado2, shuffled: shuffled  } = JSON.parse(cachedData);
+            const { promociones: cachedPromociones, destacado: cachedDestacado, productoDestacado2: productoDestacado2, shuffled: shuffled } = JSON.parse(cachedData);
             setPromociones(cachedPromociones);
             setProductoDestacado(cachedDestacado);
             setProductoDestacado2(productoDestacado2);
@@ -139,7 +140,7 @@ export default function Home() {
           productoDestacado2: productoDestacado2,
           shuffled: shuffled,
         };
-        
+
         localStorage.setItem('productosCache', JSON.stringify(cacheData));
         localStorage.setItem('productosCacheTimestamp', new Date().getTime().toString());
 
@@ -154,7 +155,7 @@ export default function Home() {
     fetchData()
   }, [])
 
-  
+
 
 
   const scrollLeft = (deslizar: string) => {
@@ -202,7 +203,7 @@ export default function Home() {
           </p>
         </div>
 
-        
+
       </div>
     )
   }
@@ -246,7 +247,7 @@ export default function Home() {
           <div className="card-destacado">
             {/* Carrusel de productos - ocupa 2/3 del espacio en pantallas grandes */}
             <div className="carrusel_productos">
-              
+
               <button
                 onClick={() => scrollLeft('slider')}
                 className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
@@ -298,10 +299,10 @@ export default function Home() {
                 <h2 className="text-2xl sm:text-3xl font-bold text-gold-600 mb-1 sm:mb-2">OFERTAS CALIENTES</h2>
                 <p className="text-sm sm:text-base text-gold-500">Productos que despertarán tus sentidos</p>
               </div>
-              <a href="/productos" className="self-end sm:self-auto flex items-center text-sm sm:text-base text-gold-600 hover:text-gold-300 group transition-colors">
+              <Link href="/productos" className="self-end sm:self-auto flex items-center text-sm sm:text-base text-gold-600 hover:text-gold-300 group transition-colors">
                 Ver todas
                 <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-              </a>
+              </Link>
             </div>
 
             {/* Slider  productos mas vendidos*/}
@@ -339,10 +340,10 @@ export default function Home() {
           {productoDestacado2 && (
             <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
-              <img
+              <Image
                 src={productoDestacado2.images[0].url}
                 onError={(e) => {
-                  const target = e.target as HTMLImageElement;  
+                  const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src = '/images/default.webp';
                 }}
@@ -352,21 +353,21 @@ export default function Home() {
               <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">
                 <span className="text-sm sm:text-base text-white font-semibold">DESTACADO DEL MES</span>
                 <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">{productoDestacado2.name}</h2>
-                
-                <a 
+
+                <Link
                   href={`/detalle/${productoDestacado2.id}`}
                   className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group"
                 >
                   DESCUBRIR
                   <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </a>
+                </Link>
               </div>
             </section>
           )}
 
-          
-       
-          
+
+
+
         </main>
 
         {/* Newsletter */}
