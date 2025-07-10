@@ -100,9 +100,10 @@ export default function Home() {
           if (!destacado.images || destacado.images.length === 0) {
             destacado.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
           } else {
-            destacado.images = destacado.images.map((img: Image) => ({
-              url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
-            }))
+            destacado.images = destacado.images.map((img: { url: string }) => ({
+            url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
+          }))
+
           }
         }
         setProductoDestacado(destacado)
@@ -113,7 +114,7 @@ export default function Home() {
           if (!productoDestacado2.images || productoDestacado2.images.length === 0) {
             productoDestacado2.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }];
           } else {
-            productoDestacado2.images = productoDestacado2.images.map((img: Image) => ({
+            productoDestacado2.images = productoDestacado2.images.map((img: { url: string }) => ({
               url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
             }));
           }
