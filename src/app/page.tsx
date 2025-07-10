@@ -197,22 +197,23 @@ export default function Home() {
     )
   }
 
-  // if (error) {
-  //   return (
-  //     <div className="flex justify-center items-center min-h-screen bg-black text-white">
-  //       <div className="text-center p-6 max-w-md">
-  //         <h2 className="text-2xl font-bold text-red-500 mb-4">Error</h2>
-  //         <p className="mb-6">{error}</p>
-  //         <button
-  //           onClick={() => window.location.reload()}
-  //           className="bg-gold-600 hover:bg-gold-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
-  //         >
-  //           Reintentar
-  //         </button>
-  //       </div>
-  //     </div>
-  //   )
-  // }
+  if (error) {
+    return (
+      <div className="flex justify-center items-center min-h-screen bg-black text-white">
+        <div className="text-center p-6 max-w-md">
+          <h2 className="text-2xl font-bold text-red-500 mb-4">Error</h2>
+          <p className="mb-6">{error}</p>
+          <p>prueba</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="bg-gold-600 hover:bg-gold-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
+          >
+            Reintentar
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <>
