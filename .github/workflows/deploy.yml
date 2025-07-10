@@ -7,10 +7,12 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
 
-      - name: Install Node.js
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "20"
@@ -19,9 +21,8 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Next.js application (optional)
+      - name: (Optional) Build locally to catch early errors
         run: |
-          echo "✅ Build local (opcional, para probar errores antes del deploy)"
           cat <<EOF > .env.local
           MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
           MERCADO_PAGO_PUBLIC_KEY=${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
@@ -43,14 +44,16 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Cargar nvm (si aplica)
+            echo "🚀 Iniciando deploy en VPS"
+
+            # Activar nvm si se usa
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-            echo "📁 Entrando al proyecto"
+            echo "📁 Ir a la carpeta del proyecto"
             cd /home/toysnow/htdocs/www.toysnow.com.co
 
-            echo "🔐 Configurando variables de entorno"
+            echo "🔐 Generando .env.local"
             cat <<EOF > .env.local
             MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
             MERCADO_PAGO_PUBLIC_KEY=${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
@@ -64,18 +67,20 @@ jobs:
             API_KEY=${{ secrets.API_KEY }}
             EOF
 
-            echo "📦 Obteniendo últimos cambios"
+            echo "📥 Obteniendo últimos cambios"
             git fetch origin
             git reset --hard origin/main
 
             echo "📦 Instalando dependencias"
             npm install --production
 
-            echo "⚙️ Compilando aplicación"
+            echo "🔨 Ejecutando build"
             npm run build
 
-            echo "🚀 Reiniciando aplicación con PM2"
+            echo "📦 Reiniciando aplicación con PM2"
             pm2 delete toysnow || true
             pm2 start npm --name "toysnow" -- start
             pm2 save
             pm2 startup
+
+            echo "✅ Deploy completado"
