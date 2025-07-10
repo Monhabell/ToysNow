@@ -23,6 +23,7 @@ interface Variant {
   stock: number;
   is_available: boolean;
   compare_price: string | null;
+  quantity: 1
   shipment: string | null;
   attributes: {
     id: number;
@@ -62,6 +63,7 @@ interface Producto {
   description: string;
   price: string;
   compare_price: string | null;
+  quantity: 1;
   stock: number;
   is_available: boolean;
   is_feature: boolean;
@@ -364,18 +366,16 @@ export default function ProductoDetalle({ params }: Props) {
       price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
       compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) :
         producto.compare_price ? parseFloat(producto.compare_price) : 0,
-      quantity: 1,
       image: producto.images[0] ? getImageUrl(producto.images[0].url) : '/images/default.png',
+      stock: selectedVariant?.stock || producto.stock,
+      shipment: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0,
+      cantidad: 1,
       variant: selectedVariant ? {
         id: selectedVariant.id,
-        attributes: selectedVariant.attributes.map(attr => ({
-          name: attr.name,
-          value: attr.value
-        }))
-      } : null,
-      stock: selectedVariant?.stock || producto.stock,
-      shipment: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0
-    });
+        attributes: selectedVariant.attributes
+      } : undefined
+    })
+
   };
 
   if (loading) {
