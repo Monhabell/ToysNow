@@ -158,43 +158,93 @@ export default function Home() {
   }
 
   if (loading) {
-    return (
-      <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center space-y-6">
-        {/* Logo animado (puedes reemplazar con tu propio logo) */}
-        <div className="relative w-24 h-24 mb-6">
-          <div className="absolute inset-0 border-4 border-gold-600 rounded-full animate-ping opacity-75"></div>
-          <div className="absolute inset-2 border-2 border-gold-400 rounded-full flex items-center justify-center">
-            <span className="text-gold-400 font-bold text-xl">NOIR</span>
+      return (
+        <div className="fixed inset-0 bg-gradient-to-b from-black to-purple-900/20 z-50 flex flex-col items-center justify-center space-y-8 p-6">
+          {/* Logo animado con efecto sensual */}
+          <div className="relative group">
+            {/* Efecto de neón alrededor del logo */}
+            <div className="absolute -inset-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-all duration-500 animate-pulse"></div>
+            
+            {/* Contenedor del logo */}
+            <div className="relative w-32 h-32 flex items-center justify-center">
+              {/* Logo principal con efecto de latido */}
+              <div className="absolute inset-0 border-2 border-pink-500/30 rounded-full animate-[pulse_3s_ease-in-out_infinite]"></div>
+              <div className="absolute inset-4 border border-pink-400/50 rounded-full animate-[pulse_3s_ease-in-out_infinite] delay-100"></div>
+              
+              {/* Puedes reemplazar esto con tu imagen de logo */}
+              <div className="relative z-10 w-20 h-20">
+                <Image 
+                  src="/images/logos/icono-logo-toys.ico" 
+                  alt="ToysNow" 
+                  fill
+                  className="object-contain drop-shadow-lg"
+                  priority
+                />
+              </div>
+            </div>
           </div>
+
+          {/* Barra de progreso mejorada */}
+          <div className="w-full max-w-md">
+            <div className="h-1.5 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
+              <div 
+                className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full animate-progress" 
+                style={{
+                  backgroundSize: '200% 100%',
+                  animation: 'progress 2s ease-in-out infinite',
+                  boxShadow: '0 0 8px rgba(236, 72, 153, 0.6)'
+                }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Texto con animación mejorada */}
+          <div className="text-center space-y-3 max-w-md">
+            <h2 className="text-2xl md:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">
+              <span className="animate-fadeIn">Curando tu experiencia sensual...</span>
+            </h2>
+            <p className="text-sm text-pink-200/80 font-light tracking-wider">
+              <span className="inline-block animate-typing overflow-hidden whitespace-nowrap border-r-2 border-pink-400/50 pr-1">
+                Seleccionando los productos más exclusivos para tu placer...
+              </span>
+            </p>
+          </div>
+
+          {/* Efectos decorativos sutiles */}
+          <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-4">
+            {[...Array(5)].map((_, i) => (
+              <div 
+                key={i}
+                className="w-2 h-2 bg-pink-400/30 rounded-full animate-bounce"
+                style={{
+                  animationDelay: `${i * 0.1}s`,
+                  animationDuration: '1.5s'
+                }}
+              ></div>
+            ))}
+          </div>
+
+          <style jsx global>{`
+            @keyframes progress {
+              0% { background-position: 0% 50%; }
+              50% { background-position: 100% 50%; }
+              100% { background-position: 0% 50%; }
+            }
+            @keyframes pulse {
+              0%, 100% { opacity: 0.8; transform: scale(1); }
+              50% { opacity: 0.4; transform: scale(0.98); }
+            }
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(5px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes typing {
+              from { width: 0 }
+              to { width: 100% }
+            }
+          `}</style>
         </div>
-
-        {/* Barra de progreso animada */}
-        <div className="w-64 md:w-80 h-2 bg-gray-800 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-gradient-to-r from-gold-500 to-gold-300 rounded-full animate-progress"
-            style={{
-              animation: 'progress 2.5s ease-in-out infinite',
-              backgroundSize: '200% 100%',
-              backgroundPosition: '100% 0%'
-            }}
-          ></div>
-        </div>
-
-        {/* Texto con animación */}
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold text-gold-400 animate-pulse text-center">
-            <span className="text-white">Experiencia ToysNow</span>
-          </h2>
-          <p className="text-gray-400 max-w-md px-4">
-            <span className="inline-block animate-typing overflow-hidden whitespace-nowrap border-r-2 border-gold-500 pr-1">
-              Preparando los productos más exclusivos para ti...
-            </span>
-          </p>
-        </div>
-
-
-      </div>
-    )
+      )
   }
 
   if (error) {
