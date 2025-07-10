@@ -18,9 +18,6 @@ jobs:
           node-version: "20"
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm install
-
       - name: (Optional) Build locally to catch early errors
         run: |
           cat <<EOF > .env.local
@@ -35,6 +32,7 @@ jobs:
           API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
           API_KEY=${{ secrets.API_KEY }}
           EOF
+          npm install
           npm run build
 
       - name: Deploy to VPS via SSH
@@ -46,7 +44,6 @@ jobs:
           script: |
             echo "🚀 Iniciando deploy en VPS"
 
-            # Activar nvm si se usa
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
@@ -71,15 +68,21 @@ jobs:
             git fetch origin
             git reset --hard origin/main
 
+            echo "🧹 Limpiando .next"
+            rm -rf .next
+
             echo "📦 Instalando dependencias"
             npm install
 
             echo "🔨 Ejecutando build"
             npm run build
 
-            echo "📦 Reiniciando aplicación con PM2"
+            echo "🛑 Deteniendo app actual si existe"
+            pm2 delete toysnow || true
+
+            echo "🚀 Iniciando app"
             pm2 start npm --name "toysnow" -- start
             pm2 save
             pm2 startup
 
-            echo "✅ Deploy completado"
+            echo "✅ Deploy completado correctamente"
