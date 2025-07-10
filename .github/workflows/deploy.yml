@@ -1,4 +1,4 @@
-name: Deploy to VPS
+name: Deploy Next.js to VPS
 
 on:
   push:
@@ -16,14 +16,10 @@ jobs:
           node-version: "20"
           cache: 'npm'
 
-      - name: Install dependencies and generate lockfile
-        run: |
-          npm install
-          git add package-lock.json
-          git commit -m "Update package-lock.json" || echo "No changes to package-lock.json"
-          git push origin main || echo "Nothing to push"
+      - name: Install dependencies
+        run: npm install
 
-      - name: Build project
+      - name: Build Next.js application
         run: |
           cat <<EOF > .env.local
           MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
@@ -39,32 +35,32 @@ jobs:
           EOF
           npm run build
 
-      - name: Deploy to VPS via SSH
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            # Cargar Node.js si se usa nvm
+            # Configurar Node.js y NPM
             export NVM_DIR="$HOME/.nvm"
-            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" || echo "nvm not found"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
             
+            # Ir al directorio de la aplicación
             cd /home/toysnow/htdocs/www.toysnow.com.co
+            
+            # Detener PM2 si está corriendo
+            pm2 delete next-app || true
             
             # Actualizar código
             git fetch origin
             git reset --hard origin/main
             
-            # Instalar dependencias
-            if [ -f "package-lock.json" ]; then
-              npm ci --omit=dev
-            else
-              npm install --omit=dev
-            fi
+            # Instalar dependencias y construir
+            npm install --production
+            npm run build
             
-            # Reiniciar aplicación
-            pm2 delete next-app || echo "No existing next-app process"
-            pm2 delete next-toysnow || echo "No existing next-toysnow process"
+            # Iniciar la aplicación con PM2
             pm2 start npm --name "next-app" -- start
             pm2 save
+            pm2 startup
