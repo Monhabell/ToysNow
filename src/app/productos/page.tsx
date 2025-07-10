@@ -81,7 +81,7 @@ interface Producto {
 export default function ProductosPage() {
   const [allProductos, setAllProductos] = useState<Producto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-   const router = useRouter();
+
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get('buscar')?.toLowerCase() || '';
   const categoriaParam = searchParams.get('categoria') || '';

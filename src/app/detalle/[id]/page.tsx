@@ -2,14 +2,12 @@
 
 import { useEffect, useState, use } from 'react';
 import { useCart } from '@/context/CartContext';
-import { CiHeart, CiShoppingCart } from "react-icons/ci";
-import { FaHeart, FaShoppingCart, FaStar, FaRegStar, FaChevronRight, FaChevronLeft } from "react-icons/fa";
+import { CiHeart } from "react-icons/ci";
 import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
 import '../../../styles/detalles.css';
-import { Separator } from "@/components/ui/separator"
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
-import { useSession, signOut } from 'next-auth/react'
+import { useSession  } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
 import Image from 'next/image';

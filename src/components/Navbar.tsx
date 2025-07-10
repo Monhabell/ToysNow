@@ -12,7 +12,7 @@ export default function Navbar() {
   const [search, setSearch] = useState('');
   const router = useRouter();
 
-  const { data: session, status } = useSession()
+  const { data: session,  } = useSession()
 
   const handleSearch = (e: any) => {
     e.preventDefault();

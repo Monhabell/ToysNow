@@ -71,8 +71,6 @@ const CheckoutForm = () => {
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
 
-  const [paymentStatus, setPaymentStatus] = useState<'pending' | 'success' | 'failed'>('pending');
-  const [paymentMessage, setPaymentMessage] = useState('');
 
   const colombiaData: Record<string, string[]> = {
     "Bogota": ["Bogotá"],
@@ -213,7 +211,7 @@ const CheckoutForm = () => {
         setError('Cupón no válido o expirado');
       }
     } catch (err) {
-      setError('Error al validar el cupón');
+      setError('Error al validar el cupón' + err);
     }
   };
 
@@ -221,7 +219,7 @@ const CheckoutForm = () => {
   const handlePayment = async () => {
     setLoading(true);
     setError('');
-    setPaymentStatus('pending');
+    //setPaymentStatus('pending');
 
     try {
       // Validate order exists
@@ -499,9 +497,9 @@ const CheckoutForm = () => {
                   <p>{deliveryInfo.city}, {deliveryInfo.province} {deliveryInfo.postalCode}</p>
                   <p>Teléfono: {deliveryInfo.phone || 'No especificado'}</p>
                   <p>Recibir en: {{
-                    'casa': 'Casa',
-                    'oficina': 'Oficina',
-                    'otro': 'Otro'
+                    "casa": "Casa",
+                    "oficina": "Oficina",
+                    "otro": "Otro"
                   }[deliveryInfo.deliveryType]}</p>
                   {deliveryInfo.deliveryNotes && (
                     <p className="mt-2 italic">Notas: {deliveryInfo.deliveryNotes}</p>

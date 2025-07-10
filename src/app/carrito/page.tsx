@@ -1,7 +1,7 @@
 'use client'
 import { useCart } from '@/context/CartContext'
 import Navbar from '@/components/Navbar'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -9,7 +9,7 @@ import Link from 'next/link';
 
 
 export default function CarritoPage() {
-  const { data: session, status } = useSession()
+  const { data: session,  } = useSession()
     const router = useRouter();
 
   const { carrito, eliminarProducto, aumentarCantidad, disminuirCantidad, calcularSubtotal, calcularEnvioTotal, calcularTotalFinal} = useCart()

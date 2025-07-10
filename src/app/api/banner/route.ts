@@ -36,9 +36,9 @@ import { NextResponse } from 'next/server'
                     'Content-Type': 'application/json',
                 }
             })
-        } catch (error) {
+        } catch (e) {
             return NextResponse.json(
-                { error: 'Error al obtener categorías' },
+                { error: 'Error al obtener categorías' + e },
                 { status: 500 }
             )
         }

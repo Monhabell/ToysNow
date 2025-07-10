@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function PendingPage() {
   const params = useSearchParams();
@@ -20,12 +21,12 @@ export default function PendingPage() {
         <p><strong>Estado:</strong> {status}</p>
       </div>
 
-      <a
+      <Link 
         href="/"
         className="mt-8 inline-block px-6 py-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
       >
         Volver al inicio
-      </a>
+      </Link >
     </div>
   );
 }

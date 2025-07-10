@@ -1,6 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function FailurePage() {
   const params = useSearchParams();
@@ -20,12 +21,12 @@ export default function FailurePage() {
         <p><strong>Estado:</strong> {status || 'Fallido'}</p>
       </div>
 
-      <a
+      <Link 
         href="/"
         className="mt-8 inline-block px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
       >
         Volver al inicio
-      </a>
+      </Link >
     </div>
   );
 }

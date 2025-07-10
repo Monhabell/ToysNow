@@ -1,16 +1,14 @@
 'use client'
 import { useState } from 'react'
-import Image from 'next/image'
-
 import Link from 'next/link'
 import Navbar from "@/components/Navbar";
 import Perfil from "@/components/Perfil/Perfil";
 
 import '../../styles/login.css';
-import { ArrowLeft, Mail, Lock, User, Eye, EyeOff, Phone, MapPin } from 'lucide-react'
+import {  Mail, Lock, User, Eye, EyeOff, } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { useSession, signOut } from 'next-auth/react'
+import { useSession,  } from 'next-auth/react'
 
 type UserData = {
     email: string;
