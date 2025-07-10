@@ -48,6 +48,21 @@ export default function ProductoDetalle({ params }: Props) {
   const { data: session } = useSession()
   const router = useRouter();
 
+  const calcularRatingPromedio = (producto: Producto) => {
+  if (!producto.qualification?.count_users) return 0;
+  
+  const counts = producto.qualification.count_users;
+  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+  if (total === 0) return 0;
+
+  const sum = Object.entries(counts).reduce(
+    (total, [stars, count]) => total + (parseInt(stars) * count),
+    0
+  );
+
+  return sum / total;
+};
+
   useEffect(() => {
     const obtenerProducto = async () => {
       try {
@@ -416,9 +431,12 @@ export default function ProductoDetalle({ params }: Props) {
 
                 <h1 className='detail_text text-gold-600'>{producto.name}</h1>
 
-                {producto.qualification >= 0 && (
+                {calcularRatingPromedio(producto) > 0 && (
                   <div className='star_qualifications'>
-                    <StarRating rating={producto.qualification} onRate={handleRating} />
+                    <StarRating 
+                      rating={calcularRatingPromedio(producto)} 
+                      onRate={handleRating} 
+                    />
                     <p className='ml-2 '>({producto.reviews_count})</p>
                   </div>
                 )}
