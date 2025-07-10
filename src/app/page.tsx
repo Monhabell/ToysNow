@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 import { useEffect, useState } from 'react'
 import Navbar from "@/components/Navbar"
@@ -74,12 +75,12 @@ export default function Home() {
 
 
         // Procesar promociones
-        const filtrados = productosData.data.filter((p: MyCustomType) => p.compare_price > 0)
+        const filtrados = productosData.data.filter((p: any) => p.compare_price > 0)
         setPromociones(filtrados)
 
         // mostrar 10 productos al azar
         const shuffled = productosData.data
-          .filter((p: MyCustomType) => p.compare_price >= 0) // Filtramos promociones
+          .filter((p: any) => p.compare_price >= 0) // Filtramos promociones
           .sort(() => 0.5 - Math.random()) // Mezclamos
           .slice(0, 5); // Tomamos 5
         setProductCant(shuffled);
