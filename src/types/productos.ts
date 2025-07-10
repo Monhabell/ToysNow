@@ -19,13 +19,7 @@ export type Producto = {
     id: number
     name: string
   }
-  categories?: Array<{
-    name: string
-    slug: string
-    description: string | null
-    image: string | null
-    parent_id: number | null
-  }>
+    categories: Category[]
   variants?: Array<{
     id: number
     price: string | null
@@ -39,4 +33,12 @@ export type Producto = {
     }>
   }>
   reviews_count?: number
+}
+
+export type Category = {
+  name: string
+  slug: string
+  description: string | null
+  image: string | null
+  parent_id: number | null
 }

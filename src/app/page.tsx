@@ -13,7 +13,6 @@ import Link from 'next/link';
 import type { Producto } from '@/types/productos'
 
 
-
 type ProductoDestacadoType = {
   id: string | number
   name: string
