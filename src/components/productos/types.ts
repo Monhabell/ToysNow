@@ -14,7 +14,7 @@ type Producto = {
   categories?: Array<{name: string, slug: string, description: string | null, image: string | null, parent_id: number | null}>
 }
   
-  interface ListaProductosProps {
-    productos: Producto[];
-    isSlider?: boolean;
-  }
+  // interface ListaProductosProps {
+  //   productos: Producto[];
+  //   isSlider?: boolean;
+  // }

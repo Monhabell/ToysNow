@@ -10,22 +10,22 @@ import '../../styles/Listaproductos.css'
 // Utility function to ensure valid image URL
 const getValidImageUrl = (url: string | undefined) => {
   if (!url) return '/default-product-image.png' // Imagen por defecto local
-  
+
   // Si ya es una URL completa (http/https)
   if (/^https?:\/\//i.test(url)) {
     return url
   }
-  
+
   // Si es una ruta local que comienza con /images
   if (url.startsWith('/images/')) {
     return `http://127.0.0.1:8000${url}`
   }
-  
+
   // Si es una ruta relativa de productos
   if (url.startsWith('products/')) {
     return `http://127.0.0.1:8000/images/${url}`
   }
-  
+
   // Para cualquier otro caso, usa la URL directamente
   return url
 }
@@ -79,11 +79,12 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
   const handleRating = (value: number) => {
     setRating(value)
     console.log('Usuario calificó con:', value)
+    console.log(rating)
   }
 
   const calculateIsNew = (createdAt: string) => {
     if (!isClient) return false
-    
+
     const fechaCreacion = new Date(createdAt)
     const hoy = new Date()
     const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24))
@@ -99,7 +100,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
         const basePrice = parseFloat(p.price)
         const baseComparePrice = parseFloat(p.compare_price)
         const baseStock = p.stock
-        
+
         const variantPrice = p.variants?.[0]?.price ? parseFloat(p.variants[0].price) : null
         const variantComparePrice = p.variants?.[0]?.compare_price ? parseFloat(p.variants[0].compare_price) : null
         const variantStock = p.variants?.[0]?.stock || baseStock
@@ -129,7 +130,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
               <Image
                 src={getValidImageUrl(p.images?.[0]?.url)}
                 onError={(e) => {
-                  const target = e.target as HTMLImageElement;  
+                  const target = e.target as HTMLImageElement;
                   target.onerror = null;
                   target.src = '/images/default.webp';
                 }}
@@ -158,7 +159,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                 {stockBajo && <p className="text-sm">¡Últimas unidades!</p>}
                 {EnvioGratis && <p className="text-sm">¡Envio Gratis!</p>}
               </div>
-              
+
               <div className="text-md">
                 {tieneDescuento ? (
                   <div className="flex items-center space-x-2">
@@ -170,7 +171,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                     </span>
                   </div>
                 ) : (
-                  <span className="font-medium"> 
+                  <span className="font-medium">
                     $ {finalPrice.toLocaleString('en-CO')}
                   </span>
                 )}

@@ -10,7 +10,7 @@ import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
 import '../../../styles/detalles.css';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
-import { useSession  } from 'next-auth/react'
+import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
 import Image from 'next/image';
@@ -285,13 +285,10 @@ export default function ProductoDetalle({ params }: Props) {
 
     // Encontrar la variante que coincide con todos los atributos seleccionados
     let matchingVariant = validVariants.find(variant => {
-      // Verificar que todos los atributos de variante coincidan con los seleccionados
-      return Object.entries(variantes).every(([name, _]) => {
-        // Si este es el atributo que estamos cambiando, verificar el nuevo valor
+      return Object.entries(variantes).every(([name]) => {  // <-- Eliminamos el _
         if (name === attributeName) {
           return variant.attributes.some(attr => attr.name === name && attr.value === value);
         }
-        // Para otros atributos, verificar que coincidan con la selección actual
         if (selectedVariant) {
           const currentValue = selectedVariant.attributes.find(attr => attr.name === name)?.value;
           return variant.attributes.some(attr => attr.name === name && attr.value === currentValue);
@@ -558,10 +555,10 @@ export default function ProductoDetalle({ params }: Props) {
                               <button
                                 key={idx}
                                 className={`cursor-pointer px-3 py-1 border rounded text-sm ${isSelected
-                                    ? 'bg-black text-gold-600 border-gold-500'
-                                    : isAvailable
-                                      ? 'bg-gray border-gray-600 hover:text-gold-600 hover:bg-gold-50'
-                                      : 'bg-gold-600 border-gray-200 text-gray-400 cursor-not-allowed'
+                                  ? 'bg-black text-gold-600 border-gold-500'
+                                  : isAvailable
+                                    ? 'bg-gray border-gray-600 hover:text-gold-600 hover:bg-gold-50'
+                                    : 'bg-gold-600 border-gray-200 text-gray-400 cursor-not-allowed'
                                   }`}
                                 onClick={() => handleVariantSelect(name, value)}
                                 disabled={!isAvailable}
