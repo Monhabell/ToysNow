@@ -54,7 +54,9 @@ export default function AuthPage() {
             setUserData(prev => ({
                 ...prev,
                 [parent]: {
-                    ...prev[parent as keyof UserData],
+                    ...((typeof prev[parent as keyof UserData] === 'object' && prev[parent as keyof UserData] !== null)
+                        ? prev[parent as keyof UserData] as unknown as object
+                        : {}),
                     [child]: value
                 }
             }))
