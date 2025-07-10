@@ -366,6 +366,7 @@ export default function ProductoDetalle({ params }: Props) {
       price: selectedVariant?.price ? parseFloat(selectedVariant.price) : parseFloat(producto.price),
       compare_price: selectedVariant?.compare_price ? parseFloat(selectedVariant.compare_price) :
         producto.compare_price ? parseFloat(producto.compare_price) : 0,
+      color: selectedVariant?.attributes.find(attr => attr.name.toLowerCase() === 'color')?.value || 'N/A', // ✅ importante
       image: producto.images[0] ? getImageUrl(producto.images[0].url) : '/images/default.png',
       stock: selectedVariant?.stock || producto.stock,
       shipment: selectedVariant?.shipment ? parseFloat(selectedVariant.shipment) : 0,
