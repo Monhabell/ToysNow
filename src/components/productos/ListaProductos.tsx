@@ -23,7 +23,7 @@ type ListaProductosProps = {
 }
 
 export default function ListaProductos({ productos, isSlider = false }: ListaProductosProps) {
-  const [rating, setRating] = useState(0)
+  const [, setRating] = useState(0)
   const [isClient, setIsClient] = useState(false)
   const router = useRouter()
 
