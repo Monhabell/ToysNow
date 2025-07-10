@@ -15,74 +15,16 @@ import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
 import Image from 'next/image';
 
+import type { 
+  Producto, 
+  Variant, 
+  Category, 
+  Brand,
+  ApiResponse
+} from '@/types/productos'
 
 
-interface Variant {
-  id: number;
-  price: string | null;
-  stock: number;
-  is_available: boolean;
-  compare_price: string | null;
-  quantity: 1
-  shipment: string | null;
-  attributes: {
-    id: number;
-    name: string;
-    value: string;
-  }[];
-}
 
-interface Category {
-  name: string;
-  slug: string;
-  description: string | null;
-  image: string | null;
-}
-
-interface Image {
-  id: number;
-  product_id: number;
-  url: string;
-}
-
-interface Brand {
-  id: number;
-  name: string;
-}
-
-interface SEO {
-  title: string | null;
-  description: string | null;
-  keywords: string | null;
-}
-
-interface Producto {
-  id: number;
-  name: string;
-  slug: string | null;
-  description: string;
-  price: string;
-  compare_price: string | null;
-  quantity: 1;
-  stock: number;
-  is_available: boolean;
-  is_feature: boolean;
-  relevance: number;
-  qualification: number;
-  brand: Brand;
-  variants: Variant[];
-  images: Image[];
-  categories: Category[];
-  reviews: any[];
-  reviews_count: number;
-  created_at: string;
-  updated_at: string;
-  seo: SEO;
-}
-
-interface ApiResponse {
-  data: Producto;
-}
 
 interface Props {
   params: Promise<{
