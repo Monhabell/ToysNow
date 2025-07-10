@@ -208,7 +208,7 @@ export default function Home() {
             onClick={() => window.location.reload()}
             className="bg-gold-600 hover:bg-gold-700 text-white font-bold py-2 px-6 rounded-full transition-colors"
           >
-            Reintentar
+            Reintentar prueba
           </button>
         </div>
       </div>
