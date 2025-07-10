@@ -53,6 +53,7 @@ jobs:
             pm2 delete next-app || true
             
             # Actualizar código
+            git pull origin
             git fetch origin
             git reset --hard origin/main
             
