@@ -25,25 +25,6 @@ import type { Producto } from '@/types/productos'
 
 
 
-
-interface Qualification {
-  count_users: {
-    [key: string]: number;
-  };
-  comments: {
-    text: string;
-    date: string;
-  }[];
-}
-
-interface Question {
-  user_id: number;
-  question: string;
-  answer: string;
-  is_approved: boolean;
-  created_at: string;
-}
-
 interface Category {
   id: number;
   name: string;
