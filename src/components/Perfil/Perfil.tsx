@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { useState } from 'react';
 import Head from 'next/head';
 import { useSession } from 'next-auth/react'
@@ -27,12 +29,12 @@ const UserProfile = () => {
     const [activeTab, setActiveTab] = useState('personal');
     const [isEditing, setIsEditing] = useState(false);
 
-    const handleInputChange = (e: MyCustomType) => {
+    const handleInputChange = (e: any) => {
         const { name, value } = e.target;
         setUserData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e: MyCustomType) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
         // Aquí iría la lógica para actualizar los datos del usuario
         console.log('Datos actualizados:', userData);
