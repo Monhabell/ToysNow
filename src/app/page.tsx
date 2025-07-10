@@ -310,7 +310,7 @@ export default function Home() {
                 <ListaProductos
                   productos={promociones.map(p => ({
                     ...p,
-                    img: p.img || ['https://www.jcprola.com/data/sinfoto.png']
+                    img: p.images || ['https://www.jcprola.com/data/sinfoto.png']
                   }))}
                   isSlider
                 />
