@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 'use client'
 import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams } from 'next/navigation'
@@ -17,6 +19,10 @@ import {
 } from "@/components/ui/select"
 import { Separator } from "@/components/ui/separator"
 import { generateProductListSchema, generateBreadcrumbsSchema } from '../../utils/schemaUtils';
+
+
+
+
 
 interface Variant {
   color?: string;
@@ -57,7 +63,7 @@ interface Category {
   name: string;
 }
 
-interface Producto {
+interface Producto1 {
   id: number;
   name: string;
   price: number;
@@ -79,7 +85,7 @@ interface Producto {
 }
 
 export default function ProductosPage() {
-  const [allProductos, setAllProductos] = useState<Producto[]>([]);
+  const [allProductos, setAllProductos] = useState<Producto1[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const searchParams = useSearchParams();
@@ -113,7 +119,7 @@ export default function ProductosPage() {
 
         const categoryMap = new Map<string, Category>();
 
-        prodcto.data.forEach((product: MyCustomType) => {
+        prodcto.data.forEach((product: any) => {
           (product.categories || []).forEach((cat: Category) => {
             const key = `${cat.name}`; // Simplificado, solo usa el nombre
             if (!categoryMap.has(key)) {
@@ -129,7 +135,7 @@ export default function ProductosPage() {
         setCategorias(cats);
 
         // Extraer marcas únicas
-        const marcas = Array.from(new Set(prodcto.map((p: Producto) => p.brand).filter(Boolean))) as string[];
+        const marcas = Array.from(new Set(prodcto.map((p: Producto1) => p.brand).filter(Boolean))) as string[];
         setMarcasDisponibles(marcas);
 
       } catch (error) {
@@ -143,7 +149,7 @@ export default function ProductosPage() {
   }, []);
 
   // Normalizar texto para búsquedas
-  const normalizarTexto = (texto: MyCustomType) => {
+  const normalizarTexto = (texto: any) => {
     if (!texto) return '';
     return String(texto)
       .normalize("NFD")
@@ -152,7 +158,7 @@ export default function ProductosPage() {
   };
 
   // Calcular rating promedio para un producto
-  const calcularRatingPromedio = (producto: Producto) => {
+  const calcularRatingPromedio = (producto: Producto1) => {
     const qualificationCounts = producto.qualification?.count_users || {};
     const totalRatings = Object.values(qualificationCounts).reduce((a, b) => a + b, 0);
     if (totalRatings === 0) return 0;
@@ -366,7 +372,7 @@ export default function ProductosPage() {
   // Dentro del componente:
   const productListSchema = generateProductListSchema(metaTitle, metaDescription, canonicalUrl, productosPaginados);
   const breadcrumbsSchema = generateBreadcrumbsSchema(canonicalUrl, categoriaSeleccionada);
-  
+
   return (
     <>
       <Head>
