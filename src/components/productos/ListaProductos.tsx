@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 import '../../styles/Listaproductos.css'
-
+import type { Producto } from '@/types/productos'
 // Utility function to ensure valid image URL
 const getValidImageUrl = (url: string | undefined) => {
   if (!url) return '/default-product-image.png' // Imagen por defecto local
@@ -30,37 +30,7 @@ const getValidImageUrl = (url: string | undefined) => {
   return url
 }
 
-type Producto = {
-  id: string | number
-  name: string
-  price: string
-  compare_price: string
-  stock: number
-  images: Array<{
-    id: number
-    product_id: number
-    url: string
-  }>
-  created_at: string
-  qualification?: number
-  brand?: {
-    id: number
-    name: string
-  }
-  variants?: Array<{
-    id: number
-    price: string | null
-    stock: number
-    compare_price: string | null
-    shipment: number | null
-    attributes: Array<{
-      id: number
-      name: string
-      value: string
-    }>
-  }>
-  reviews_count?: number
-}
+
 
 type ListaProductosProps = {
   productos: Producto[]
@@ -82,10 +52,10 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
     console.log(rating)
   }
 
-  const calculateIsNew = (createdAt: string) => {
-    if (!isClient) return false
-
-    const fechaCreacion = new Date(createdAt)
+  const calculateIsNew = (createdAt: string | Date | undefined) => {
+    if (!isClient || !createdAt) return false
+  
+    const fechaCreacion = createdAt instanceof Date ? createdAt : new Date(createdAt)
     const hoy = new Date()
     const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24))
     return diffDias <= 15
@@ -97,18 +67,18 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
       : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4"
     }>
       {productos.map((p) => {
-        const basePrice = parseFloat(p.price)
-        const baseComparePrice = parseFloat(p.compare_price)
+        const basePrice = parseFloat(String(p.price))
+        const baseComparePrice = parseFloat(String(p.compare_price))
         const baseStock = p.stock
 
-        const variantPrice = p.variants?.[0]?.price ? parseFloat(p.variants[0].price) : null
-        const variantComparePrice = p.variants?.[0]?.compare_price ? parseFloat(p.variants[0].compare_price) : null
+        const variantPrice = p.variants?.[0]?.price ? parseFloat(String(p.variants[0].price)) : null
+        const variantComparePrice = p.variants?.[0]?.compare_price ? parseFloat(String(p.variants[0].compare_price)) : null
         const variantStock = p.variants?.[0]?.stock || baseStock
         const variantShipment = p.variants?.[0]?.shipment || null
 
         const finalPrice = variantPrice || basePrice
         const finalComparePrice = variantComparePrice || baseComparePrice
-        const finalStock = variantStock
+        const finalStock = variantStock ?? 0
         const finalShipment = variantShipment
 
         const tieneDescuento = finalComparePrice > 0 && finalComparePrice > finalPrice

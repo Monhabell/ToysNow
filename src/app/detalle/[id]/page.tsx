@@ -652,7 +652,10 @@ export default function ProductoDetalle({ params }: Props) {
                   id='slider'
                   className='overflow-x-auto p-2 scroll-smooth scrollbar-hide whitespace-nowrap'
                 >
-                  <ListaProductos productos={relacionados} isSlider />
+                  <ListaProductos 
+                    productos={relacionados as Producto[]} 
+                    isSlider 
+                  />
                 </div>
 
                 {mostrarBotones && (

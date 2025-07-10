@@ -10,22 +10,9 @@ import { FiArrowRight } from "react-icons/fi";
 import Image from 'next/image';
 import WhatsAppButton from '@/components/WhatsAppButton'
 import Link from 'next/link';
+import type { Producto } from '@/types/productos'
 
-type Producto = {
-  id: string | number
-  name: string
-  price: number | string
-  compare_price: string | null
-  stock?: number
-  images?: { id: number, product_id: number, url: string }[]
-  created_at?: string | Date
-  qualification?: number
-  relevance?: number
-  slug?: string | null
-  description?: string
-  brand?: { id: number, name: string }
-  categories?: Array<{ name: string, slug: string, description: string | null, image: string | null, parent_id: number | null }>
-}
+
 
 type ProductoDestacadoType = {
   id: string | number
