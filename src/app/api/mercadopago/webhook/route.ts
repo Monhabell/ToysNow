@@ -53,10 +53,10 @@ interface DatabasePayload {
 }
 
 // Función para validar la firma del webhook
-function validateWebhookSignature(signature: string | null, payload: unknown): boolean {
-  // Implementación real debería verificar la firma con tu secret key
-  return true; // En producción, implementar validación real
-}
+// function validateWebhookSignature(signature: string | null, payload: unknown): boolean {
+//   // Implementación real debería verificar la firma con tu secret key
+//   return true; // En producción, implementar validación real
+// }
 
 // Función para obtener detalles de un pago
 async function getPaymentDetails(paymentId: string, accessToken: string): Promise<Payment> {
@@ -139,11 +139,11 @@ export async function POST(req: Request) {
     console.log('📩 Webhook recibido:', body);
 
     // Validar firma del webhook
-    const signature = req.headers.get('x-signature') || null;
-    if (!validateWebhookSignature(signature, body)) {
-      console.warn('⚠️ Firma de webhook inválida');
-      return new Response('Firma inválida', { status: 401 });
-    }
+    // const signature = req.headers.get('x-signature') || null;
+    // if (!validateWebhookSignature(signature, body)) {
+    //   console.warn('⚠️ Firma de webhook inválida');
+    //   return new Response('Firma inválida', { status: 401 });
+    // }
 
     const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
     if (!accessToken) {
