@@ -12,8 +12,8 @@ import type { Producto, Qualification } from '@/types/productos'
 const getValidImageUrl = (url: string | undefined) => {
   if (!url) return '/default-product-image.png'
   if (/^https?:\/\//i.test(url)) return url
-  if (url.startsWith('/images/')) return `http://127.0.0.1:8000${url}`
-  if (url.startsWith('products/')) return `http://127.0.0.1:8000/images/${url}`
+  if (url.startsWith('/images/')) return `http://softgenix.space/images/${url}`
+  if (url.startsWith('products/')) return `http://softgenix.space/images/${url}`
   return url
 }
 

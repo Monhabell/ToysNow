@@ -1,18 +1,17 @@
 // src/app/api/productos/route.ts
 import { NextResponse } from 'next/server'
 
-const API_URL = `${process.env.API_TENANT_BASE_URL_V1}/products`;
-
 export async function GET() {
+  const API_URL = `${process.env.API_TENANT_BASE_URL_V1}/products`;
+  const API_KEY = process.env.API_KEY || '';
+
   try {
     const res = await fetch(API_URL, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'X-API-Key': process.env.API_KEY || ''
-
+        'X-API-Key': API_KEY
       },
-      // Si usas Next.js 13+, puedes deshabilitar la caché:
       cache: 'no-store'
     })
 
@@ -28,3 +27,4 @@ export async function GET() {
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 })
   }
 }
+
