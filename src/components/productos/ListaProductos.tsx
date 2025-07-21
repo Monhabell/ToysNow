@@ -87,6 +87,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
         const ratingPromedio = calcularRatingPromedio(p.qualification)
         const cantUs = p.reviews_count || 0
 
+        
         return (
           <motion.div
             key={p.id}

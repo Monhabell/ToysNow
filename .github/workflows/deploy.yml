@@ -37,6 +37,17 @@ jobs:
 
       - name: Deploy to VPS via SSH
         uses: appleboy/ssh-action@master
+        env:
+          MERCADO_PAGO_ACCESS_TOKEN: ${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
+          MERCADO_PAGO_PUBLIC_KEY: ${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
+          NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY }}
+          NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          NEXTAUTH_URL: ${{ secrets.NEXTAUTH_URL }}
+          API_TENANT_BASE_URL_V1: ${{ secrets.API_TENANT_BASE_URL_V1 }}
+          API_KEY: ${{ secrets.API_KEY }}
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
@@ -52,16 +63,16 @@ jobs:
 
             echo "🔐 Generando .env.local"
             cat <<EOF > .env.local
-            MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
-            MERCADO_PAGO_PUBLIC_KEY=${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
-            NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY }}
-            NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-            API_BASE_URL=${{ secrets.API_BASE_URL }}
-            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
-            API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
-            API_KEY=${{ secrets.API_KEY }}
+            MERCADO_PAGO_ACCESS_TOKEN=$MERCADO_PAGO_ACCESS_TOKEN
+            MERCADO_PAGO_PUBLIC_KEY=$MERCADO_PAGO_PUBLIC_KEY
+            NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY=$NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY
+            NEXT_PUBLIC_BASE_URL=$NEXT_PUBLIC_BASE_URL
+            GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID
+            GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET
+            API_BASE_URL=$API_BASE_URL
+            NEXTAUTH_URL=$NEXTAUTH_URL
+            API_TENANT_BASE_URL_V1=$API_TENANT_BASE_URL_V1
+            API_KEY=$API_KEY
             EOF
 
             echo "📥 Obteniendo últimos cambios"
