@@ -43,7 +43,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             echo "🚀 Iniciando deploy en VPS"
-            
+
             export NVM_DIR="$HOME/.nvm"
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
@@ -63,11 +63,6 @@ jobs:
             API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
             API_KEY=${{ secrets.API_KEY }}
             EOF
-
-            # Verificación
-            echo "🔍 Verificando .env.local:"
-            ls -la .env.local
-            cat .env.local
 
             echo "📥 Obteniendo últimos cambios"
             git fetch origin
@@ -89,8 +84,5 @@ jobs:
             pm2 start npm --name "toysnow" -- start
             pm2 save
             pm2 startup
-
-            echo "🔄 Reiniciando para asegurar carga de variables"
-            pm2 restart toysnow
 
             echo "✅ Deploy completado correctamente"

@@ -360,7 +360,7 @@ export default function Home() {
             </div>
 
             {/* Producto destacado - ocupa 1/3 del espacio en pantallas grandes */}
-            {/* <div className="producto_destacado">
+            <div className="producto_destacado">
               {productoDestacado && (
                 <ProductoDestacado
                   img={productoDestacado.images[0].url}
@@ -369,7 +369,7 @@ export default function Home() {
                   id={productoDestacado.id}
                 />
               )}
-            </div> */}
+            </div>
           </div>
         </div>
 
@@ -420,7 +420,7 @@ export default function Home() {
           </section>
 
           {/* Destacado del mes */}
-          {/* {productoDestacado2 && (
+          {productoDestacado2 && (
             <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
               <Image
@@ -447,7 +447,7 @@ export default function Home() {
                 </Link>
               </div>
             </section>
-          )} */}
+          )}
 
 
 
