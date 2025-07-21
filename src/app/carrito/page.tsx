@@ -93,6 +93,7 @@ export default function CarritoPage() {
                           alt={item.name} 
                           width={80}
                           height={80}
+                          fill
                           className="w-20 h-20 object-cover rounded-lg border-2 border-gray-700 group-hover:border-yellow-500 transition-all" 
                         />
                         <span className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">

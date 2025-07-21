@@ -430,6 +430,7 @@ export default function Home() {
                   target.onerror = null;
                   target.src = '/images/default.webp';
                 }}
+                fill
                 alt={productoDestacado2.name}
                 className="w-full h-full object-cover"
               />

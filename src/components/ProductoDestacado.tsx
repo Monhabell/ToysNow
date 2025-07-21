@@ -28,6 +28,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price,
             target.onerror = null;
             target.src = '/images/default.png';
           }}
+          fill
           alt={name}
           onClick={() => router.push(`/detalle/${id}`)}
           className="border-amber-600/30 object-cover w-full  transition-transform duration-300 group-hover:scale-105 cursor-pointer"

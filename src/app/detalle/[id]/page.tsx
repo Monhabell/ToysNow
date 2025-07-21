@@ -395,6 +395,7 @@ export default function ProductoDetalle({ params }: Props) {
                     target.onerror = null;
                     target.src = '/images/default.png';
                   }}
+                  fill
                   alt={producto.name}
                   onClick={() => setImgSeleccionada(index)}
                   className={`cursor-pointer ${imgSeleccionada === index ? 'border-2 border-gold-500' : ''}`}
@@ -413,6 +414,7 @@ export default function ProductoDetalle({ params }: Props) {
                 style={{
                   transformOrigin: `${posicion.x}% ${posicion.y}%`
                 }}
+                fill
                 alt={producto.name}
                 className="w-full h-full object-contain"
               />
@@ -562,13 +564,15 @@ export default function ProductoDetalle({ params }: Props) {
                       <div className="iconos flex gap-3">
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
                           alt="Visa"
-                          className="h-8" />
+                          className="h-8"
+                          fill />
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                           alt="MasterCard"
                           className="h-8" />
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
                           alt="American Express"
-                          className="h-8" />
+                          className="h-8"
+                          fill />
                       </div>
                     </div>
                   </div>

@@ -55,6 +55,7 @@ export default function Navbar() {
                     width={24}
                     height={24}
                     className="rounded-full"
+                    fill
                   />
                   <span className="font-medium truncate max-w-[100px]">{session.user.name}</span>
 
