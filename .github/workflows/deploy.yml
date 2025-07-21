@@ -36,61 +36,61 @@ jobs:
           npm run build
 
       - name: Deploy to VPS via SSH
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          echo "🚀 Iniciando deploy en VPS"
-          
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            echo "🚀 Iniciando deploy en VPS"
+            
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-          echo "📁 Ir a la carpeta del proyecto"
-          cd /home/toysnow/htdocs/www.toysnow.com.co
+            echo "📁 Ir a la carpeta del proyecto"
+            cd /home/toysnow/htdocs/www.toysnow.com.co
 
-          echo "🔐 Generando .env.local"
-          cat <<EOF > .env.local
-          MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
-          MERCADO_PAGO_PUBLIC_KEY=${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
-          NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY }}
-          NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}
-          GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
-          API_BASE_URL=${{ secrets.API_BASE_URL }}
-          NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
-          API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
-          API_KEY=${{ secrets.API_KEY }}
-          EOF
+            echo "🔐 Generando .env.local"
+            cat <<EOF > .env.local
+            MERCADO_PAGO_ACCESS_TOKEN=${{ secrets.MERCADO_PAGO_ACCESS_TOKEN }}
+            MERCADO_PAGO_PUBLIC_KEY=${{ secrets.MERCADO_PAGO_PUBLIC_KEY }}
+            NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY=${{ secrets.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY }}
+            NEXT_PUBLIC_BASE_URL=${{ secrets.NEXT_PUBLIC_BASE_URL }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
+            API_BASE_URL=${{ secrets.API_BASE_URL }}
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
+            API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
+            API_KEY=${{ secrets.API_KEY }}
+            EOF
 
-          # Verificación
-          echo "🔍 Verificando .env.local:"
-          ls -la .env.local
-          cat .env.local
+            # Verificación
+            echo "🔍 Verificando .env.local:"
+            ls -la .env.local
+            cat .env.local
 
-          echo "📥 Obteniendo últimos cambios"
-          git fetch origin
-          git reset --hard origin/main
+            echo "📥 Obteniendo últimos cambios"
+            git fetch origin
+            git reset --hard origin/main
 
-          echo "🧹 Limpiando .next"
-          rm -rf .next
+            echo "🧹 Limpiando .next"
+            rm -rf .next
 
-          echo "📦 Instalando dependencias"
-          npm install
+            echo "📦 Instalando dependencias"
+            npm install
 
-          echo "🔨 Ejecutando build"
-          npm run build
+            echo "🔨 Ejecutando build"
+            npm run build
 
-          echo "🛑 Deteniendo app actual si existe"
-          pm2 delete toysnow || true
+            echo "🛑 Deteniendo app actual si existe"
+            pm2 delete toysnow || true
 
-          echo "🚀 Iniciando app"
-          pm2 start npm --name "toysnow" -- start
-          pm2 save
-          pm2 startup
+            echo "🚀 Iniciando app"
+            pm2 start npm --name "toysnow" -- start
+            pm2 save
+            pm2 startup
 
-          echo "🔄 Reiniciando para asegurar carga de variables"
-          pm2 restart toysnow
+            echo "🔄 Reiniciando para asegurar carga de variables"
+            pm2 restart toysnow
 
-          echo "✅ Deploy completado correctamente"
+            echo "✅ Deploy completado correctamente"
