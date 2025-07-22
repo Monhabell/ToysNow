@@ -87,7 +87,6 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
         const ratingPromedio = calcularRatingPromedio(p.qualification)
         const cantUs = p.reviews_count || 0
 
-        
         return (
           <motion.div
             key={p.id}
@@ -98,11 +97,6 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
             <div className="relative h-52">
               <Image
                 src={getValidImageUrl(p.images?.[0]?.url)}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = '/images/default.webp';
-                }}
                 alt={p.name}
                 fill
                 className="object-cover"

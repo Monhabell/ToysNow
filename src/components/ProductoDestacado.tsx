@@ -13,6 +13,8 @@ interface ProductoDestacadoProps {
 const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price, id }) => {
   const router = useRouter();
 
+  console.log(img)
+
   return (
     <div className="group relative   overflow-hidden rounded-2xl bg-gradient-to-br from-black  to-black p-4 shadow-lg border border-amber-600/30 transition-all hover:shadow-amber-500/30">
       

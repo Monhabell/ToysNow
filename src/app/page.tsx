@@ -13,26 +13,45 @@ import WhatsAppButton from '@/components/WhatsAppButton'
 import Link from 'next/link';
 import type { Producto } from '@/types/productos'
 
-
-
 type ProductoDestacadoType = {
   id: string | number
   name: string
   price: number | string
-  description?: string
+  description: string
   images: { url: string }[]
+  relevance?: number
+  compare_price?: number
 } | null
 
 // Tiempo de vida del cache en milisegundos (5 minutos)
 const CACHE_LIFETIME = 5 * 60 * 1000;
 
+// Función para normalizar productos
+const normalizeProduct = (product: any): ProductoDestacadoType => {
+  if (!product) return null
+  
+  return {
+    id: product.id || 0,
+    name: product.name || 'Producto sin nombre',
+    price: product.price || 0,
+    description: product.description || '',
+    images: product.images?.length > 0 
+      ? product.images.map((img: any) => ({
+          url: img.url?.startsWith('http') 
+            ? img.url 
+            : `http://softgenix.space/images/${img.url}`
+        }))
+      : [{ url: 'https://www.jcprola.com/data/sinfoto.png' }],
+    relevance: product.relevance || 0,
+    compare_price: product.compare_price || 0
+  }
+}
+
 export default function Home() {
   const [promociones, setPromociones] = useState<Producto[]>([])
   const [promocionesCant, setProductCant] = useState<Producto[]>([])
-
   const [productoDestacado, setProductoDestacado] = useState<ProductoDestacadoType>(null)
   const [productoDestacado2, setProductoDestacado2] = useState<ProductoDestacadoType>(null)
-
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -51,11 +70,11 @@ export default function Home() {
 
           if (now - cachedTime < CACHE_LIFETIME) {
             // Usar datos del cache
-            const { promociones: cachedPromociones, destacado: cachedDestacado, productoDestacado2: productoDestacado2, shuffled: shuffled } = JSON.parse(cachedData);
+            const { promociones: cachedPromociones, destacado: cachedDestacado, productoDestacado2: cachedDestacado2, shuffled: cachedShuffled } = JSON.parse(cachedData);
             setPromociones(cachedPromociones);
             setProductoDestacado(cachedDestacado);
-            setProductoDestacado2(productoDestacado2);
-            setProductCant(shuffled)
+            setProductoDestacado2(cachedDestacado2);
+            setProductCant(cachedShuffled);
             setLoading(false);
             return;
           }
@@ -74,59 +93,36 @@ export default function Home() {
         const productosData = await productosRes.json()
         const destacadoData = await destacadoRes.json()
 
-
         // Procesar promociones
         const filtrados = productosData.data.filter((p: any) => p.compare_price > 0)
         setPromociones(filtrados)
 
-        // mostrar 10 productos al azar
+        // Mostrar 10 productos al azar
         const shuffled = productosData.data
-          .filter((p: any) => p.compare_price >= 0) // Filtramos promociones
-          .sort(() => 0.5 - Math.random()) // Mezclamos
-          .slice(0, 5); // Tomamos 5
+          .filter((p: any) => p.compare_price >= 0)
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 5);
         setProductCant(shuffled);
 
-        // Procesar producto destacado
-        let destacado = destacadoData.data.find((p: Producto) => p.relevance === 1) || destacadoData.data[0]
-        if (!destacado) {
-          destacado = {
-            id: 0,
-            name: 'Producto destacado',
-            price: 0,
-            images: [{ url: 'https://www.jcprola.com/data/sinfoto.png' }],
-            description: 'Producto de ejemplo'
-          }
-        } else {
-          if (!destacado.images || destacado.images.length === 0) {
-            destacado.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
-          } else {
-            destacado.images = destacado.images.map((img: { url: string }) => ({
-              url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
-            }))
-
-          }
-        }
+        // Procesar productos destacados
+        const destacado = normalizeProduct(
+          destacadoData.data.find((p: Producto) => p.relevance === 1) || 
+          destacadoData.data[0]
+        )
         setProductoDestacado(destacado)
 
-        const productoDestacado2 = destacadoData.data.find((p: Producto) => p.relevance === 2) || destacadoData.data[1] || destacadoData.data[0]; // Usamos el segundo o el primero si no hay con relevance=2
-
-        if (productoDestacado2) {
-          if (!productoDestacado2.images || productoDestacado2.images.length === 0) {
-            productoDestacado2.images = [{ url: 'https://www.jcprola.com/data/sinfoto.png' }];
-          } else {
-            productoDestacado2.images = productoDestacado2.images.map((img: { url: string }) => ({
-              url: img.url.startsWith('http') ? img.url : `http://127.0.0.1:8000/images/${img.url}`
-            }));
-          }
-        }
-        setProductoDestacado2(productoDestacado2);
-
+        const destacadoSecundario = normalizeProduct(
+          destacadoData.data.find((p: Producto) => p.relevance === 2) || 
+          destacadoData.data[1] || 
+          destacadoData.data[0]
+        )
+        setProductoDestacado2(destacadoSecundario)
 
         // Guardar en cache
         const cacheData = {
           promociones: filtrados,
           destacado: destacado,
-          productoDestacado2: productoDestacado2,
+          productoDestacado2: destacadoSecundario,
           shuffled: shuffled,
         };
 
@@ -144,9 +140,6 @@ export default function Home() {
     fetchData()
   }, [])
 
-
-
-
   const scrollLeft = (deslizar: string) => {
     const slider = document.getElementById(deslizar)
     slider?.scrollBy({ left: -300, behavior: 'smooth' })
@@ -158,99 +151,68 @@ export default function Home() {
   }
 
   if (loading) {
-      return (
-        <div className="fixed inset-0 bg-gradient-to-b from-black to-purple-900/20 z-50 flex flex-col items-center justify-center space-y-8 p-6">
-          {/* Logo animado con efecto sensual */}
-          <div className="relative group">
-            {/* Efecto de neón alrededor del logo */}
-            <div className="absolute -inset-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-all duration-500 animate-pulse"></div>
-            
-            {/* Contenedor del logo */}
-            <div className="relative w-32 h-32 flex items-center justify-center">
-              {/* Logo principal con efecto de latido */}
-              <div className="absolute inset-0 border-2 border-pink-500/30 rounded-full animate-[pulse_3s_ease-in-out_infinite]"></div>
-              <div className="absolute inset-4 border border-pink-400/50 rounded-full animate-[pulse_3s_ease-in-out_infinite] delay-100"></div>
-              
-              {/* Puedes reemplazar esto con tu imagen de logo */}
-              <div className="relative z-10 w-20 h-20">
-                <Image 
-                  src="/images/logos/icono-logo-toys.ico" 
-                  alt="ToysNow" 
-                  fill
-                  className="object-contain drop-shadow-lg"
-                  priority
-                />
-              </div>
+    return (
+      <div className="fixed inset-0 bg-gradient-to-b from-black to-purple-900/20 z-50 flex flex-col items-center justify-center space-y-8 p-6">
+        <div className="relative group">
+          <div className="absolute -inset-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-all duration-500 animate-pulse"></div>
+          <div className="relative w-32 h-32 flex items-center justify-center">
+            <div className="absolute inset-0 border-2 border-pink-500/30 rounded-full animate-[pulse_3s_ease-in-out_infinite]"></div>
+            <div className="absolute inset-4 border border-pink-400/50 rounded-full animate-[pulse_3s_ease-in-out_infinite] delay-100"></div>
+            <div className="relative z-10 w-20 h-20">
+              <Image 
+                src="/images/logos/icono-logo-toys.ico" 
+                alt="ToysNow" 
+                fill
+                className="object-contain drop-shadow-lg"
+                priority
+              />
             </div>
           </div>
-
-          {/* Barra de progreso mejorada */}
-          <div className="w-full max-w-md">
-            <div className="h-1.5 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
-              <div 
-                className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full animate-progress" 
-                style={{
-                  backgroundSize: '200% 100%',
-                  animation: 'progress 2s ease-in-out infinite',
-                  boxShadow: '0 0 8px rgba(236, 72, 153, 0.6)'
-                }}
-              ></div>
-            </div>
-          </div>
-
-          {/* Texto con animación mejorada */}
-          <div className="text-center space-y-3 max-w-md">
-            <h2 className="text-2xl md:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">
-              <span className="animate-fadeIn">Curando tu experiencia sensual...</span>
-            </h2>
-            <p className="text-sm text-pink-200/80 font-light tracking-wider">
-              <span className="inline-block animate-typing overflow-hidden whitespace-nowrap border-r-2 border-pink-400/50 pr-1">
-                Seleccionando los productos más exclusivos para tu placer...
-              </span>
-            </p>
-          </div>
-
-          {/* Efectos decorativos sutiles */}
-          <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-4">
-            {[...Array(5)].map((_, i) => (
-              <div 
-                key={i}
-                className="w-2 h-2 bg-pink-400/30 rounded-full animate-bounce"
-                style={{
-                  animationDelay: `${i * 0.1}s`,
-                  animationDuration: '1.5s'
-                }}
-              ></div>
-            ))}
-          </div>
-
-          <style jsx global>{`
-            @keyframes progress {
-              0% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-              100% { background-position: 0% 50%; }
-            }
-            @keyframes pulse {
-              0%, 100% { opacity: 0.8; transform: scale(1); }
-              50% { opacity: 0.4; transform: scale(0.98); }
-            }
-            @keyframes fadeIn {
-              from { opacity: 0; transform: translateY(5px); }
-              to { opacity: 1; transform: translateY(0); }
-            }
-            @keyframes typing {
-              from { width: 0 }
-              to { width: 100% }
-            }
-          `}</style>
         </div>
-      )
+
+        <div className="w-full max-w-md">
+          <div className="h-1.5 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
+            <div 
+              className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full animate-progress" 
+              style={{
+                backgroundSize: '200% 100%',
+                animation: 'progress 2s ease-in-out infinite',
+                boxShadow: '0 0 8px rgba(236, 72, 153, 0.6)'
+              }}
+            ></div>
+          </div>
+        </div>
+
+        <div className="text-center space-y-3 max-w-md">
+          <h2 className="text-2xl md:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">
+            <span className="animate-fadeIn">Cargando tu experiencia sensual...</span>
+          </h2>
+          <p className="text-sm text-pink-200/80 font-light tracking-wider">
+            <span className="inline-block animate-typing overflow-hidden whitespace-nowrap border-r-2 border-pink-400/50 pr-1">
+              Seleccionando los productos más exclusivos para tu placer...
+            </span>
+          </p>
+        </div>
+
+        <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-4">
+          {[...Array(5)].map((_, i) => (
+            <div 
+              key={i}
+              className="w-2 h-2 bg-pink-400/30 rounded-full animate-bounce"
+              style={{
+                animationDelay: `${i * 0.1}s`,
+                animationDuration: '1.5s'
+              }}
+            ></div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   if (error) {
     return (
       <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6">
-        {/* Logo animado con temática sensual */}
         <div className="relative mb-8 group">
           <div className="absolute -inset-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition-all duration-500 animate-tilt"></div>
           <div className="relative flex items-center justify-center p-6 bg-black rounded-lg border border-pink-500/30">
@@ -271,7 +233,6 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Mensaje de error */}
         <div className="text-center max-w-md">
           <div className="mb-6 flex justify-center">
             <div className="animate-pulse">
@@ -318,19 +279,15 @@ export default function Home() {
           <Banner />
           <div className="inset-0 bg-gradient-to-t from-black via-black/70 to-transparent z-1"></div>
           <div className="bottom-10 sm:bottom-20 left-0 right-0 text-center z-2 px-4">
-
             <div className='mr-5'>
               <Category />
             </div>
-
           </div>
         </div>
 
         <div className='z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 content '>
           <div className="card-destacado">
-            {/* Carrusel de productos - ocupa 2/3 del espacio en pantallas grandes */}
             <div className="carrusel_productos">
-
               <button
                 onClick={() => scrollLeft('slider')}
                 className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
@@ -345,7 +302,7 @@ export default function Home() {
                 <ListaProductos
                   productos={promocionesCant.map(p => ({
                     ...p,
-                    images: p.images || ['https://www.jcprola.com/data/sinfoto.png']
+                    images: p.images || [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
                   }))}
                   isSlider
                 />
@@ -358,12 +315,11 @@ export default function Home() {
                 <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
               </button>
             </div>
-
-            {/* Producto destacado - ocupa 1/3 del espacio en pantallas grandes */}
+            
             <div className="producto_destacado">
               {productoDestacado && (
                 <ProductoDestacado
-                  img={productoDestacado.images[0].url}
+                  img={productoDestacado.images[0]?.url || '/images/default.webp'}
                   name={productoDestacado.name}
                   price={productoDestacado.price.toString()}
                   id={productoDestacado.id}
@@ -388,7 +344,7 @@ export default function Home() {
               </Link>
             </div>
 
-            {/* Slider  productos mas vendidos*/}
+            {/* Slider productos mas vendidos*/}
             <div className="mt-2 sm:mt-8 content relative">
               <button
                 onClick={() => scrollLeft('slider2')}
@@ -404,7 +360,7 @@ export default function Home() {
                 <ListaProductos
                   productos={promociones.map(p => ({
                     ...p,
-                    img: p.images || ['https://www.jcprola.com/data/sinfoto.png']
+                    images: p.images || [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
                   }))}
                   isSlider
                 />
@@ -424,7 +380,7 @@ export default function Home() {
             <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
               <Image
-                src={productoDestacado2.images[0].url}
+                src={productoDestacado2.images[0]?.url || '/images/default.webp'}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
@@ -448,10 +404,6 @@ export default function Home() {
               </div>
             </section>
           )}
-
-
-
-
         </main>
 
         {/* Newsletter */}
