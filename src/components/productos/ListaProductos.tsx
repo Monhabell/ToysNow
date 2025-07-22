@@ -97,6 +97,11 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
             <div className="relative h-52">
               <Image
                 src={getValidImageUrl(p.images?.[0]?.url)}
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.onerror = null;
+                  target.src = '/images/default.png';
+                }}
                 alt={p.name}
                 fill
                 className="object-cover"
