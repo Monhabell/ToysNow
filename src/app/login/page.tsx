@@ -5,10 +5,10 @@ import Navbar from "@/components/Navbar";
 import Perfil from "@/components/Perfil/Perfil";
 
 import '../../styles/login.css';
-import {  Mail, Lock, User, Eye, EyeOff, } from 'lucide-react'
+import { Mail, Lock, User, Eye, EyeOff, } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { useSession,  } from 'next-auth/react'
+import { useSession, } from 'next-auth/react'
 
 type UserData = {
     email: string;
@@ -99,6 +99,33 @@ export default function AuthPage() {
             return;
         }
 
+        try {
+            const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData)
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.message || 'Error en la autenticación')
+            }
+
+            // Guardar token y redirigir
+            localStorage.setItem('token', data.token)
+            localStorage.setItem('user', JSON.stringify(data.user))
+
+            router.push('/')
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado')
+        } finally {
+            setLoading(false)
+        }
+
         const result = await signIn("credentials", {
             redirect: false,
             email: userData.email,
@@ -113,8 +140,8 @@ export default function AuthPage() {
         } else {
             router.push(result?.url || '/');
         }
-        };
-  
+    };
+
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -233,7 +260,7 @@ export default function AuthPage() {
                                         </button>
                                     </div>
                                 </div>
-                                
+
                             </div>
                             {!isLogin && (
                                 <div>
@@ -271,7 +298,7 @@ export default function AuthPage() {
                                             La contraseña debe tener al menos 8 caracteres.
                                         </p>
                                     )}
-                                    
+
                                 </div>
                             )}
 

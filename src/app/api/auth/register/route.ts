@@ -13,7 +13,6 @@ export async function POST(request: Request) {
         'X-API-Key': process.env.API_KEY || ''
 
       },
-
       cache: 'no-store'
     })
 
