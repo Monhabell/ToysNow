@@ -2,6 +2,13 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel'
 import '../styles/banner.css'
 
 type BannerItem = {
@@ -13,52 +20,31 @@ type BannerItem = {
 export default function Banner() {
   const router = useRouter()
   const [bannerData, setBannerData] = useState<BannerItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
+  // Cargar datos del banner
   useEffect(() => {
-    fetch('/api/banner') // tu endpoint real aquí
-      .then(res => res.json())
-      .then(data => setBannerData(data))
-      .catch(err => console.error('Error al cargar banners:', err))
+    const fetchBannerData = async () => {
+      try {
+        setIsLoading(true)
+        const response = await fetch('/api/banner')
+        if (!response.ok) throw new Error('Error al cargar banners')
+        const data = await response.json()
+        setBannerData(data)
+      } catch (err) {
+        console.error('Error:', err)
+        setError('No se pudieron cargar los banners')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchBannerData()
   }, [])
 
-  const extendedData = bannerData.length
-    ? [bannerData[bannerData.length - 1], ...bannerData, bannerData[0]]
-    : []
-
-  const [currentIndex, setCurrentIndex] = useState(1)
-  const [isTransitioning, setIsTransitioning] = useState(true)
-
-  const goToPrevious = () => {
-    setCurrentIndex(prev => prev - 1)
-    setIsTransitioning(true)
-  }
-
-  const goToNext = () => {
-    setCurrentIndex(prev => prev + 1)
-    setIsTransitioning(true)
-  }
-
-  useEffect(() => {
-    if (bannerData.length > 1) {
-      const interval = setInterval(goToNext, 5000)
-      return () => clearInterval(interval)
-    }
-  }, [bannerData])
-
-  const handleTransitionEnd = () => {
-    if (currentIndex === extendedData.length - 1) {
-      setIsTransitioning(false)
-      setCurrentIndex(1)
-    } else if (currentIndex === 0) {
-      setIsTransitioning(false)
-      setCurrentIndex(extendedData.length - 2)
-    }
-  }
-
-  const realIndex = (currentIndex - 1 + bannerData.length) % bannerData.length
-
-  const handleClick = () => {
-    const item = bannerData[realIndex]
+  // Manejar clic en el banner
+  const handleClick = (item: BannerItem) => {
     if (!item) return
 
     switch (item.type) {
@@ -69,47 +55,60 @@ export default function Banner() {
         router.push(`/productos?buscar=${encodeURIComponent(item.payload)}`)
         break
       case 'external':
-        window.open(item.payload, '_blank')
+        window.open(item.payload, '_blank', 'noopener,noreferrer')
         break
       case 'whatsapp':
-        window.open(`https://wa.me/${item.payload}`, '_blank')
+        window.open(`https://wa.me/${item.payload}`, '_blank', 'noopener,noreferrer')
         break
       default:
         console.warn('Tipo de acción desconocido:', item.type)
     }
   }
 
-  return (
-    <div className="banner_publicitario overflow-hidden cursor-pointer">
-      <div
-        className="banner_slider"
-        style={{
-          transform: `translateX(-${currentIndex * 100}%)`,
-          transition: isTransitioning ? 'transform 0.5s ease' : 'none'
-        }}
-        onTransitionEnd={handleTransitionEnd}
-        onClick={handleClick}
-      >
-        {extendedData.map((item, index) => (
-         <Image 
-            key={`${item.image}-${index}-${Date.now()}`}
-            src={item.image} 
-            alt={`Banner ${index}`} 
-            className="banner_image" 
-            width={2200}
-            height={700}
-            priority
-            unoptimized={process.env.NODE_ENV === 'development'} 
-          />
-        ))}
-      </div>
+  if (isLoading) return <div className="banner_publicitario banner-loading">Cargando...</div>
+  if (error) return <div className="banner_publicitario banner-error">{error}</div>
+  if (bannerData.length === 0) return <div className="banner_publicitario banner-empty">No hay banners disponibles</div>
 
-      {bannerData.length > 1 && (
-        <>
-          <button className="z-80 banner-button left" onClick={goToPrevious}>❮</button>
-          <button className="z-80 banner-button right" onClick={goToNext}>❯</button>
-        </>
-      )}
+  return (
+    <div className="banner_publicitario w-full">
+      <Carousel 
+        opts={{
+          loop: true,
+          align: 'start',
+        }}
+        className="w-full"
+      >
+        <CarouselContent>
+          {bannerData.map((item, index) => (
+            <CarouselItem key={`banner-${index}`} className="basis-full">
+              <div 
+                className="w-full cursor-pointer"
+                onClick={() => handleClick(item)}
+              >
+                <Image 
+                  src={item.image} 
+                  alt={`Banner ${index}`} 
+                  className="banner_image w-full" 
+                  width={2200}
+                  height={700}
+                  priority={index === 0}
+                  unoptimized={process.env.NODE_ENV === 'development'}
+                  onError={(e) => {
+                    console.error('Error al cargar imagen:', item.image)
+                    e.currentTarget.style.display = 'none'
+                  }}
+                />
+              </div>
+            </CarouselItem>
+          ))}
+        </CarouselContent>
+        {bannerData.length > 1 && (
+          <>
+            <CarouselPrevious className="z-80 banner-button left" />
+            <CarouselNext className="z-80 banner-button right" />
+          </>
+        )}
+      </Carousel>
     </div>
   )
 }

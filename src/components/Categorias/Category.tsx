@@ -135,8 +135,8 @@ const CategoryMenu: React.FC = () => {
                   src={category.image || '/images/icons/logoDefaulCategories.png'}
                   alt={category.name}
                   className="rounded-full" 
-                  width={80}
-                  height={80}
+                  width={60}
+                  height={60}
                 />
               </div>
               <span className="text-lg font-medium">{category.name}</span>

@@ -28,8 +28,14 @@ const CACHE_LIFETIME = 5 * 60 * 1000;
 
 // Función para normalizar productos
 const normalizeProduct = (product: any): ProductoDestacadoType => {
-  if (!product) return null
+  if (!product) return null;
   
+  const getImageUrl = (url: string) => {
+    if (!url) return 'https://www.jcprola.com/data/sinfoto.png';
+    if (url.startsWith('http')) return url;
+    return `https://softgenix.space${url.startsWith('/') ? url : `/images/${url}`}`;
+  };
+
   return {
     id: product.id || 0,
     name: product.name || 'Producto sin nombre',
@@ -37,15 +43,13 @@ const normalizeProduct = (product: any): ProductoDestacadoType => {
     description: product.description || '',
     images: product.images?.length > 0 
       ? product.images.map((img: any) => ({
-          url: img.url?.startsWith('http') 
-            ? img.url 
-            : `http://softgenix.space/images/${img.url}`
+          url: getImageUrl(img.url)
         }))
       : [{ url: 'https://www.jcprola.com/data/sinfoto.png' }],
     relevance: product.relevance || 0,
     compare_price: product.compare_price || 0
-  }
-}
+  };
+};
 
 export default function Home() {
   const [promociones, setPromociones] = useState<Producto[]>([])
@@ -273,11 +277,10 @@ export default function Home() {
     <>
       <Navbar />
       <WhatsAppButton />
-      <div className="relative bg-black min-h-screen mt-32">
+      <div className="relative bg-black min-h-screen mt-42 sm:mt-30">
         {/* Banner */}
         <div className="overflow-hidden">
           <Banner />
-          <div className="inset-0 bg-gradient-to-t from-black via-black/70 to-transparent z-1"></div>
           <div className="bottom-10 sm:bottom-20 left-0 right-0 text-center z-2 px-4">
             <div className='mr-5'>
               <Category />
@@ -286,11 +289,13 @@ export default function Home() {
         </div>
 
         <div className='z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 content '>
+
           <div className="card-destacado">
             <div className="carrusel_productos">
+              {/* Botón izquierdo - visible solo en desktop */}
               <button
                 onClick={() => scrollLeft('slider')}
-                className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
+                className="hidden sm:block absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronLeft size={20} className="sm:w-6 sm:h-6" />
               </button>
@@ -308,9 +313,10 @@ export default function Home() {
                 />
               </div>
 
+              {/* Botón derecho - visible solo en desktop */}
               <button
                 onClick={() => scrollRight('slider')}
-                className="absolute right-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
+                className="hidden sm:block absolute right-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
               </button>
@@ -376,7 +382,7 @@ export default function Home() {
           </section>
 
           {/* Destacado del mes */}
-          {productoDestacado2 && (
+          {/* {productoDestacado2 && (
             <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
               <Image
@@ -403,7 +409,7 @@ export default function Home() {
                 </Link>
               </div>
             </section>
-          )}
+          )} */}
         </main>
 
         {/* Newsletter */}

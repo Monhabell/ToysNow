@@ -353,20 +353,16 @@ scrollbar-width: none;     /* Firefox */
 }
 
 
-.card-destacado {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr; /* Sin comas */
-  gap: 1rem;
-}
+
 
 .carrusel_productos {
   grid-column-start: 1;
-  grid-column-end: 3; /* Ocupa columnas 1 y 2 */
+  grid-column-end: 2; /* Ocupa columnas 1 y 2 */
   position: relative;
 }
 
 .producto_destacado {
-  grid-column-start: 3;
+  grid-column-start: 2;
   grid-column-end: 4; /* Ocupa solo la columna 3 */
 }
 
@@ -380,10 +376,76 @@ scrollbar-width: none;     /* Firefox */
   background-color: var(--magenta-100);
 }
 
+/* Versión para móviles primero */
+.card-destacado {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 
-@media (min-width: 1024px) {
+.carrusel_productos {
+  position: relative;
+  width: 100%;
+}
+
+.producto_destacado {
+  width: 100%;
+}
+
+/* Versión para tablets (md) */
+@media (min-width: 768px) {
   .card-destacado {
     flex-direction: row;
+  }
+  
+  .carrusel_productos {
+    width: 60%;
+  }
+  
+  .producto_destacado {
+    width: 40%;
+  }
+}
+
+/* Versión para desktop (lg) */
+@media (min-width: 1024px) {
+  .card-destacado {
+    grid-template-columns: 2fr 1fr; /* Ahora sí usamos grid para desktop */
+    display: grid;
+    gap: 1.5rem;
+  }
+  
+  .carrusel_productos {
+    width: 100%;
+  }
+  
+  .producto_destacado {
+    width: 100%;
+  }
+}
+
+/* Estilos específicos para móviles */
+.carrusel_productos {
+  overflow: hidden;
+}
+
+#slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 1rem 0;
+}
+
+/* Botones de navegación */
+.carrusel_productos button {
+  display: none; /* Ocultamos por defecto en móviles */
+}
+
+@media (min-width: 640px) {
+  .carrusel_productos button {
+    display: block; /* Mostramos en tablets y desktop */
   }
 }
 
