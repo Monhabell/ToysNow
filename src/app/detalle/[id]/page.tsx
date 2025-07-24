@@ -389,13 +389,14 @@ export default function ProductoDetalle({ params }: Props) {
               {producto.images.map((img, index) => (
                 <Image
                   key={img.id}
-                  src={getImageUrl(img.url)}
+                  src={getImageUrl("http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + img.url)}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
                     target.src = '/images/default.png';
                   }}
-                  fill
+                  width={100}
+                  height={100}
                   alt={producto.name}
                   onClick={() => setImgSeleccionada(index)}
                   className={`cursor-pointer ${imgSeleccionada === index ? 'border-2 border-gold-500' : ''}`}
@@ -405,7 +406,7 @@ export default function ProductoDetalle({ params }: Props) {
 
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
               <Image
-                src={producto.images[imgSeleccionada] ? getImageUrl(producto.images[imgSeleccionada].url) : '/images/default.png'}
+                src={"http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[imgSeleccionada] ? getImageUrl("http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[imgSeleccionada].url) : '/images/default.png'}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
@@ -414,7 +415,8 @@ export default function ProductoDetalle({ params }: Props) {
                 style={{
                   transformOrigin: `${posicion.x}% ${posicion.y}%`
                 }}
-                fill
+                width={500}
+                height={500}
                 alt={producto.name}
                 className="w-full h-full object-contain"
               />
@@ -565,14 +567,19 @@ export default function ProductoDetalle({ params }: Props) {
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
                           alt="Visa"
                           className="h-8"
-                          fill />
+                          width={32}
+                          height={32}
+                           />
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                           alt="MasterCard"
-                          className="h-8" />
+                          className="h-8" 
+                          width={32}
+                          height={32}/>
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
                           alt="American Express"
                           className="h-8"
-                          fill />
+                          width={32}
+                          height={32} />
                       </div>
                     </div>
                   </div>

@@ -8,6 +8,7 @@ const nextConfig = {
       'img.freepik.com',
       'softgenix.space',
       'www.softgenix.space',
+      'upload.wikimedia.org'
     ],
   },
 }

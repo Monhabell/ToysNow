@@ -12,8 +12,6 @@ interface ProductoDestacadoProps {
 const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price, id }) => {
   const router = useRouter();
 
-
-
   // separar por "/" img
   const imgParts = img.split('/');
   const lastPart = "http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/products/"+imgParts[imgParts.length - 1];
@@ -60,7 +58,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price,
       </h2>
 
       {/* Etiqueta de producto destacado */}
-      <div className="text-center text-xs text-amber-300 italic mb-2">Producto destacado {imageUrl}</div>
+      <div className="text-center text-xs text-amber-300 italic mb-2">Producto destacado </div>
 
       {/* Precio */}
       {price && (
