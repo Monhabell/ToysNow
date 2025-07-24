@@ -12,8 +12,8 @@ import type { Producto, Qualification } from '@/types/productos'
 const getValidImageUrl = (url: string | undefined) => {
   if (!url) return '/default-product-image.png'
   if (/^https?:\/\//i.test(url)) return url
-  if (url.startsWith('/images/')) return `http://softgenix.space/images/${url}`
-  if (url.startsWith('products/')) return `http://softgenix.space/images/${url}`
+  if (url.startsWith('/images/')) return `http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`
+  if (url.startsWith('products/')) return `http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`
   return url
 }
 
@@ -95,6 +95,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
             transition={{ type: 'spring', stiffness: 200 }}
           >
             <div className="relative h-52">
+              
               <Image
                 src={getValidImageUrl(p.images?.[0]?.url)}
                 onError={(e) => {

@@ -12,22 +12,26 @@ interface ProductoDestacadoProps {
 const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price, id }) => {
   const router = useRouter();
 
-  // Función para manejar errores de imagen
-  
+
+
+  // separar por "/" img
+  const imgParts = img.split('/');
+  const lastPart = "http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/products/"+imgParts[imgParts.length - 1];
+  console.log(lastPart, 'huy');
+
   const getImageUrl = (url: string) => {
     if (!url) return '/images/default.webp';
     if (url.startsWith('http')) return url;
-    if (url.startsWith('/images')) return `https://softgenix.space${url}`;
+    if (url.startsWith('/images')) return `http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`;
     return `/images/${url}`;
   };
 
   // Verifica si la imagen es válida antes de renderizar
-  const imageUrl = getImageUrl(img);
+  const imageUrl = getImageUrl(lastPart);
 
   return (
      <div className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-black to-black p-4 shadow-lg border border-amber-600/30 transition-all hover:shadow-amber-500/30">
       <div className="absolute inset-0 rounded-2xl border border-amber-500/30 group-hover:border-amber-400/70 transition-all duration-500 pointer-events-none"></div>
-      
       <div className="relative h-70 mb-4 z-10">
         <Image
           src={imageUrl}
@@ -56,7 +60,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price,
       </h2>
 
       {/* Etiqueta de producto destacado */}
-      <div className="text-center text-xs text-amber-300 italic mb-2">Producto destacado</div>
+      <div className="text-center text-xs text-amber-300 italic mb-2">Producto destacado {imageUrl}</div>
 
       {/* Precio */}
       {price && (

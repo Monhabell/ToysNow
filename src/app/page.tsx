@@ -31,9 +31,11 @@ const normalizeProduct = (product: any): ProductoDestacadoType => {
   if (!product) return null;
   
   const getImageUrl = (url: string) => {
+    console.log(url, 'URL de la imagen del producto destacado');
     if (!url) return 'https://www.jcprola.com/data/sinfoto.png';
     if (url.startsWith('http')) return url;
-    return `https://softgenix.space${url.startsWith('/') ? url : `/images/${url}`}`;
+    
+    return `${url.startsWith('/') ? url : `${url}`}`;
   };
 
   return {
@@ -120,6 +122,7 @@ export default function Home() {
           destacadoData.data[1] || 
           destacadoData.data[0]
         )
+       
         setProductoDestacado2(destacadoSecundario)
 
         // Guardar en cache
@@ -384,9 +387,10 @@ export default function Home() {
           {/* Destacado del mes */}
           {productoDestacado2 && (
             <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
+              <div>{productoDestacado2.images[0]?.url}</div>
               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
               <Image
-                src={productoDestacado2.images[0]?.url || '/images/default.webp'}
+                src={"http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
