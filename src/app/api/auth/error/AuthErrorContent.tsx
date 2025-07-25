@@ -10,6 +10,7 @@ export default function AuthErrorContent() {
 
   useEffect(() => {
     const error = searchParams.get("error")
+    console.log("Error de autenticación:", error)
     switch (error) {
       case "OAuthAccountNotLinked":
         setMessage("Esta cuenta ya está asociada a otro método de inicio de sesión.")
