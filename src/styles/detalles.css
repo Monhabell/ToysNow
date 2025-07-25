@@ -227,4 +227,41 @@
   border-radius: 15px;
 }
 
+@media (max-width: 768px) {
+  .grid-container {
+    display: block;
+    grid-template-columns: 1fr !important;
+    grid-template-rows: auto;
+  }
+
+  .itemgrupImg,
+  .itemImg,
+  .itemData,
+  .itemProducRel {
+    grid-column: span 1 !important;
+    grid-column-start: auto !important;
+    grid-column-end: auto !important;
+    width: 100% !important;
+  }
+
+  .itemgrupImg{
+    
+  }
+
+  .itemImg img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .itemData,
+  .itemProducRel {
+    padding: 10px;
+  }
+
+  .imgProduct {
+    padding: 0;
+  }
+}
+
+
 

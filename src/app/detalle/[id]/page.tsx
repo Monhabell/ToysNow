@@ -382,14 +382,15 @@ export default function ProductoDetalle({ params }: Props) {
         <Navbar />
       </div>
 
-      <div className='mt-32'>
+      <div className='mt-42 xs:mt-32'>
         <div className='max-w-6xl mx-auto content-detalle mt-32'>
           <div className='grid-container'>
+            
             <div className='itemgrupImg'>
               {producto.images.map((img, index) => (
                 <Image
                   key={img.id}
-                  src={getImageUrl("http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + img.url)}
+                  src={getImageUrl("https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + img.url)}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;
@@ -406,7 +407,7 @@ export default function ProductoDetalle({ params }: Props) {
 
             <div className="imgProduct itemImg" onMouseMove={handleMouseMove}>
               <Image
-                src={"http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[imgSeleccionada] ? getImageUrl("http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[imgSeleccionada].url) : '/images/default.png'}
+                src={"http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[imgSeleccionada] ? getImageUrl("https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[imgSeleccionada].url) : '/images/default.png'}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;

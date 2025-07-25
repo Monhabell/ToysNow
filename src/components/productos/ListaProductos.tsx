@@ -12,10 +12,11 @@ import type { Producto, Qualification } from '@/types/productos'
 const getValidImageUrl = (url: string | undefined) => {
   if (!url) return '/default-product-image.png'
   if (/^https?:\/\//i.test(url)) return url
-  if (url.startsWith('/images/')) return `http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`
-  if (url.startsWith('products/')) return `http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`
+  if (url.startsWith('/images/')) return `https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`
+  if (url.startsWith('products/')) return `https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`
   return url
 }
+
 
 type ListaProductosProps = {
   productos: Producto[]

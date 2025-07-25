@@ -390,7 +390,7 @@ export default function Home() {
               <div>{productoDestacado2.images[0]?.url}</div>
               <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
               <Image
-                src={"http://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
+                src={"https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
                   target.onerror = null;
