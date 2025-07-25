@@ -31,6 +31,7 @@ jobs:
           NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}
           API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
           API_KEY=${{ secrets.API_KEY }}
+          NEXTAUTH_SECRET${{ secrets.NEXTAUTH_SECRET }}
           EOF
           npm install
           npm run build
