@@ -100,32 +100,44 @@ export default function AuthPage() {
         }
 
         try {
-            const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register'
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(userData)
-            })
+            console.log(userData)
+            const endpoint = !isLogin ? '/api/auth/register' : false
 
-            const data = await response.json()
+            if (!endpoint) {
+                console.log("Iniciando sesión...")
+            }else{
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Error en la autenticación')
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData)
+                })
+
+                const data = await response.json()
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Error en la autenticación')
+                }
+                console.log("Registro exitoso:")
+                console.log(data)
+                console.log("...")
+
+                //localStorage.setItem('token', data.token)
+                //localStorage.setItem('user', JSON.stringify(data.user))
+                router.push('login')
+
             }
 
-            // Guardar token y redirigir
-            localStorage.setItem('token', data.token)
-            localStorage.setItem('user', JSON.stringify(data.user))
-
-            router.push('/')
+            
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Ocurrió un error inesperado')
         } finally {
             setLoading(false)
         }
 
+        // inicio de sesion
         const result = await signIn("credentials", {
             redirect: false,
             email: userData.email,
