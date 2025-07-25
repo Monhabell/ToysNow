@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+
 // Extiende tipos personalizados
 declare module "next-auth" {
   interface Session {
@@ -87,7 +88,7 @@ const handler = NextAuth({
           }
 
           return true;
-        } catch (err: any) {
+        } catch (err) {
           console.error("Error en Google login:", err);
           // Lanza error para redirigir a la página de error
           throw new Error("No se pudo iniciar sesión con Google. Intenta más tarde.");
