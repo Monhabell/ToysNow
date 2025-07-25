@@ -343,13 +343,13 @@ const CheckoutForm = () => {
     <div className="bg-black min-h-screen text-white">
       <Navbar />
 
-      <div className="container mx-auto py-8 px-4 mt-32">
+      <div className="container mx-auto py-8 px-4 mt-42 xs:mt-32">
         <h1 className="text-3xl font-bold mb-8 text-gold-500 text-center">Finalizar compra</h1>
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Left section - Delivery info */}
           <div className="lg:w-2/3">
-            <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-vinotinto">
+            <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-gold-500">1. Dirección de entrega</h2>
                 {!editAddress && (
@@ -510,11 +510,11 @@ const CheckoutForm = () => {
 
             <div className="flex flex-col md:flex-row gap-6">
               {/* Order details */}
-              <div className="flex-1 bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
-                <h2 className="text-xl font-bold text-white mb-4">Tu pedido</h2>
+              <div className="fw-full md:w-1/2 bg-gray-900 rounded-lg p-6 mb-6  border border-gray-700 ">
+               
 
                 {deliveryMessage && (
-                  <div className="mt-4 p-4 rounded-lg border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-900 via-yellow-800 to-yellow-700 shadow-lg animate-fade-in">
+                  <div className=" p-4 rounded-lg border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-900 via-yellow-800 to-yellow-700 shadow-lg animate-fade-in">
                     <div className="flex items-center space-x-3">
                       <svg
                         className="w-6 h-6 text-yellow-300"
@@ -538,7 +538,7 @@ const CheckoutForm = () => {
               </div>
 
               {/* Coupon section */}
-              <div className="w-full md:w-1/2 bg-gray-900 rounded-lg p-6 mb-6 border border-vinotinto">
+              <div className="w-full md:w-1/2 bg-gray-900 rounded-lg p-6 mb-6  border border-gray-700 ">
                 <h2 className="text-xl font-bold text-gold-500 mb-4">Cupón de descuento</h2>
                 <div className="flex items-center space-x-3">
                   <input
@@ -564,8 +564,8 @@ const CheckoutForm = () => {
             </div>
 
             {/* Payment method */}
-            <div className="bg-gray-900 rounded-lg p-6 border border-vinotinto">
-              <h2 className="text-xl font-bold text-gold-500 mb-4">2. Método de pago</h2>
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+              <h2 className="text-xl font-bold text-gold-500 mb-6">2. Método de pago</h2>
 
               <div className="space-y-4">
                 <div className="flex items-center p-4 border border-gray-700 rounded-lg hover:border-gold-500 cursor-pointer">
@@ -581,6 +581,8 @@ const CheckoutForm = () => {
                       src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.18.9/mercadopago/logo__small@2x.png"
                       alt="Mercado Pago"
                       className="h-8 ml-2"
+                      width={50}
+                      height={32}
                     />
                     <span className="ml-2 text-gray-300">Paga con Mercado Pago</span>
                   </label>
@@ -606,7 +608,7 @@ const CheckoutForm = () => {
 
           {/* Right section - Order summary */}
           <div className="lg:w-1/3">
-            <div className="bg-gray-900 rounded-lg p-6 border border-vinotinto sticky top-4">
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-700 sticky top-4">
               <h2 className="text-xl font-bold text-gold-500 mb-4">Resumen de tu compra</h2>
 
               <div className="space-y-3 mb-6">
