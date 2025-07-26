@@ -25,7 +25,6 @@ export default function Navbar() {
     }
   };
 
-  const token = session?.apiToken|| '';
 
   return (
     <div className="w-full border-b border-gold-500 fixed top-0 left-0 right-0 z-50 bg-white">
