@@ -29,12 +29,12 @@ const CACHE_LIFETIME = 5 * 60 * 1000;
 // Función para normalizar productos
 const normalizeProduct = (product: any): ProductoDestacadoType => {
   if (!product) return null;
-  
+
   const getImageUrl = (url: string) => {
     console.log(url, 'URL de la imagen del producto destacado');
     if (!url) return 'https://www.jcprola.com/data/sinfoto.png';
     if (url.startsWith('http')) return url;
-    
+
     return `${url.startsWith('/') ? url : `${url}`}`;
   };
 
@@ -43,10 +43,10 @@ const normalizeProduct = (product: any): ProductoDestacadoType => {
     name: product.name || 'Producto sin nombre',
     price: product.price || 0,
     description: product.description || '',
-    images: product.images?.length > 0 
+    images: product.images?.length > 0
       ? product.images.map((img: any) => ({
-          url: getImageUrl(img.url)
-        }))
+        url: getImageUrl(img.url)
+      }))
       : [{ url: 'https://www.jcprola.com/data/sinfoto.png' }],
     relevance: product.relevance || 0,
     compare_price: product.compare_price || 0
@@ -112,17 +112,17 @@ export default function Home() {
 
         // Procesar productos destacados
         const destacado = normalizeProduct(
-          destacadoData.data.find((p: Producto) => p.relevance === 1) || 
+          destacadoData.data.find((p: Producto) => p.relevance === 1) ||
           destacadoData.data[0]
         )
         setProductoDestacado(destacado)
 
         const destacadoSecundario = normalizeProduct(
-          destacadoData.data.find((p: Producto) => p.relevance === 2) || 
-          destacadoData.data[1] || 
+          destacadoData.data.find((p: Producto) => p.relevance === 2) ||
+          destacadoData.data[1] ||
           destacadoData.data[0]
         )
-       
+
         setProductoDestacado2(destacadoSecundario)
 
         // Guardar en cache
@@ -166,9 +166,9 @@ export default function Home() {
             <div className="absolute inset-0 border-2 border-pink-500/30 rounded-full animate-[pulse_3s_ease-in-out_infinite]"></div>
             <div className="absolute inset-4 border border-pink-400/50 rounded-full animate-[pulse_3s_ease-in-out_infinite] delay-100"></div>
             <div className="relative z-10 w-20 h-20">
-              <Image 
-                src="/images/logos/icono-logo-toys.ico" 
-                alt="ToysNow" 
+              <Image
+                src="/images/logos/icono-logo-toys.ico"
+                alt="ToysNow"
                 fill
                 className="object-contain drop-shadow-lg"
                 priority
@@ -179,8 +179,8 @@ export default function Home() {
 
         <div className="w-full max-w-md">
           <div className="h-1.5 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
-            <div 
-              className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full animate-progress" 
+            <div
+              className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full animate-progress"
               style={{
                 backgroundSize: '200% 100%',
                 animation: 'progress 2s ease-in-out infinite',
@@ -203,7 +203,7 @@ export default function Home() {
 
         <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-4">
           {[...Array(5)].map((_, i) => (
-            <div 
+            <div
               key={i}
               className="w-2 h-2 bg-pink-400/30 rounded-full animate-bounce"
               style={{
@@ -324,7 +324,7 @@ export default function Home() {
                 <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
               </button>
             </div>
-            
+
             <div className="producto_destacado">
               {productoDestacado && (
                 <ProductoDestacado
@@ -352,6 +352,37 @@ export default function Home() {
                 <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
+
+            {/* Destacado del mes */}
+            {productoDestacado2 && (
+              <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
+                <div>{productoDestacado2.images[0]?.url}</div>
+                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
+                <Image
+                  src={"https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.onerror = null;
+                    target.src = '/images/default.webp';
+                  }}
+                  fill
+                  alt={productoDestacado2.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">
+                  <span className="text-sm sm:text-base text-white font-semibold">DESTACADO DEL MES</span>
+                  <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">{productoDestacado2.name}</h2>
+
+                  <Link
+                    href={`/detalle/${productoDestacado2.id}`}
+                    className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group"
+                  >
+                    DESCUBRIR
+                    <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                </div>
+              </section>
+            )}
 
             {/* Slider productos mas vendidos*/}
             <div className="mt-2 sm:mt-8 content relative">
@@ -384,36 +415,7 @@ export default function Home() {
             </div>
           </section>
 
-          {/* Destacado del mes */}
-          {productoDestacado2 && (
-            <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
-              <div>{productoDestacado2.images[0]?.url}</div>
-              <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
-              <Image
-                src={"https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.onerror = null;
-                  target.src = '/images/default.webp';
-                }}
-                fill
-                alt={productoDestacado2.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">
-                <span className="text-sm sm:text-base text-white font-semibold">DESTACADO DEL MES</span>
-                <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">{productoDestacado2.name}</h2>
 
-                <Link
-                  href={`/detalle/${productoDestacado2.id}`}
-                  className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group"
-                >
-                  DESCUBRIR
-                  <FiArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </div>
-            </section>
-          )}
         </main>
 
         {/* Newsletter */}
