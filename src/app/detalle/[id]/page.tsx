@@ -15,9 +15,9 @@ import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
 import Image from 'next/image';
 
-import type { 
-  Producto, 
-  Variant, 
+import type {
+  Producto,
+  Variant,
   ApiResponse
 } from '@/types/productos'
 
@@ -49,19 +49,19 @@ export default function ProductoDetalle({ params }: Props) {
   const router = useRouter();
 
   const calcularRatingPromedio = (producto: Producto) => {
-  if (!producto.qualification?.count_users) return 0;
-  
-  const counts = producto.qualification.count_users;
-  const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
-  if (total === 0) return 0;
+    if (!producto.qualification?.count_users) return 0;
 
-  const sum = Object.entries(counts).reduce(
-    (total, [stars, count]) => total + (parseInt(stars) * count),
-    0
-  );
+    const counts = producto.qualification.count_users;
+    const total = Object.values(counts).reduce((sum, count) => sum + count, 0);
+    if (total === 0) return 0;
 
-  return sum / total;
-};
+    const sum = Object.entries(counts).reduce(
+      (total, [stars, count]) => total + (parseInt(stars) * count),
+      0
+    );
+
+    return sum / total;
+  };
 
   useEffect(() => {
     const obtenerProducto = async () => {
@@ -385,7 +385,7 @@ export default function ProductoDetalle({ params }: Props) {
       <div className='mt-42 xs:mt-32'>
         <div className='max-w-6xl mx-auto content-detalle mt-32'>
           <div className='grid-container'>
-            
+
             <div className='itemgrupImg'>
               {producto.images.map((img, index) => (
                 <Image
@@ -438,9 +438,9 @@ export default function ProductoDetalle({ params }: Props) {
 
                 {calcularRatingPromedio(producto) > 0 && (
                   <div className='star_qualifications'>
-                    <StarRating 
-                      rating={calcularRatingPromedio(producto)} 
-                      onRate={handleRating} 
+                    <StarRating
+                      rating={calcularRatingPromedio(producto)}
+                      onRate={handleRating}
                     />
                     <p className='ml-2 '>({producto.reviews_count})</p>
                   </div>
@@ -514,7 +514,6 @@ export default function ProductoDetalle({ params }: Props) {
                               );
                             }
 
-
                             return (
                               <button
                                 key={idx}
@@ -570,12 +569,12 @@ export default function ProductoDetalle({ params }: Props) {
                           className="h-8"
                           width={32}
                           height={32}
-                           />
+                        />
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
                           alt="MasterCard"
-                          className="h-8" 
+                          className="h-8"
                           width={32}
-                          height={32}/>
+                          height={32} />
                         <Image src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
                           alt="American Express"
                           className="h-8"
@@ -601,9 +600,6 @@ export default function ProductoDetalle({ params }: Props) {
           </div>
         </div>
 
-
-
-
         {relacionados.length > 0 && (
           <div className='productos-relacionados max-w-6xl mx-auto mt-32'>
             <div className='mt-5'>
@@ -622,9 +618,9 @@ export default function ProductoDetalle({ params }: Props) {
                   id='slider'
                   className='overflow-x-auto p-2 scroll-smooth scrollbar-hide whitespace-nowrap'
                 >
-                  <ListaProductos 
-                    productos={relacionados as Producto[]} 
-                    isSlider 
+                  <ListaProductos
+                    productos={relacionados as Producto[]}
+                    isSlider
                   />
                 </div>
 

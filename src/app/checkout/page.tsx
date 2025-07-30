@@ -8,8 +8,6 @@ import { useSession } from 'next-auth/react';
 import { FaCheckDouble } from "react-icons/fa";
 import Image from 'next/image';
 
-
-
 interface ProductVariant {
   id?: number;
   color?: string;
@@ -45,6 +43,13 @@ interface DeliveryInfo {
   deliveryNotes: string;
 }
 
+interface PreferenceId {
+  init_point: string;
+  orderId: string;
+  token_id: string;
+}
+
+
 const CheckoutForm = () => {
   const router = useRouter();
   const { data: session } = useSession();
@@ -54,7 +59,7 @@ const CheckoutForm = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [preferenceId, setPreferenceId] = useState<PreferenceId | null>(null);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo>({
     address: '',
     department: '',
@@ -103,14 +108,13 @@ const CheckoutForm = () => {
     }
   }, [router]);
 
-  // Redirect to MercadoPago if preferenceId is set
+  // Handle preferenceId change to open MercadoPago payment
   useEffect(() => {
-    if (preferenceId) {
+    if (preferenceId && preferenceId.init_point) {
       console.log("Preference Object:", preferenceId);
-      //console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
-
+      console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
       const popup = window.open(
-        preferenceId, // ✅ Aquí debe ir la URL, no el objeto completo
+        preferenceId.init_point, // ✅ Corregido: ahora es la URL real
         'PagoMercadoPago',
         'width=1000,height=600,scrollbars=yes,resizable=yes'
       );
@@ -121,7 +125,6 @@ const CheckoutForm = () => {
       }
     }
   }, [preferenceId]);
-
 
   // Calculate estimated delivery time
   const calculateDeliveryTime = () => {
@@ -298,8 +301,9 @@ const CheckoutForm = () => {
       const data = await res.json();
       console.log(data)
       if (data.init_point) {
+        
         setPreferenceId(data);
-        // El estado de éxito se manejará en el efecto que redirige a MercadoPago
+
       } else {
         throw new Error('No se pudo crear la preferencia de pago');
       }

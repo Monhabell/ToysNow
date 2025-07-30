@@ -1,7 +1,7 @@
 .banner_publicitario {
     position: relative;
     width: 100%;
-    height: auto; /* Ajusta el tamaño para que se vea bien en desktop */
+    height: 500 px; /* Ajusta el tamaño para que se vea bien en desktop */
     overflow: hidden;
     cursor: pointer;
 
