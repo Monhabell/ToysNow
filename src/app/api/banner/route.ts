@@ -3,8 +3,8 @@ import { NextResponse } from 'next/server'
  const banner = [
         {
             "image": "/images/Banners/1.webp",
-            "type": "alert",
-            "payload": "Banner 1: mensaje simple"
+            "type": "internal",
+            "payload": "Aceites"
         },
         {
             "image": "/images/Banners/2.webp",
