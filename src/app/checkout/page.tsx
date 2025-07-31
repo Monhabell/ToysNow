@@ -204,9 +204,7 @@ const CheckoutForm = () => {
   // Apply coupon code
   const applyCoupon = async () => {
     if (!couponCode.trim()) return;
-
     try {
-
       const discount = couponCode.toUpperCase() === 'DESCUENTO10' ? 0.50 : 0;
       setCouponDiscount(discount);
 

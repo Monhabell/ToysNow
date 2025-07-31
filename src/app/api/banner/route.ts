@@ -8,8 +8,8 @@ import { NextResponse } from 'next/server'
         },
         {
             "image": "/images/Banners/2.webp",
-            "type": "alert",
-            "payload": "ofertas"
+            "type": "external",
+            "payload": "https://form.typeform.com/to/kkJSsGaQ?fbclid=PAQ0xDSwL3fxNleHRuA2FlbQIxMQABp7S-a9nuXpR2r9w1R8n9F8X3Ssf2pb6utN_k_hXUPmn1tBPtzkgXILfzVIBS_aem_pdVnCGzV98kLkkUtOx5mKQ&typeform-source=l.instagram.com"
         },
         {
             "image": "/images/Banners/3.webp",
