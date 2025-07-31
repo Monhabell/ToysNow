@@ -3,7 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 export default function WhatsAppButton() {
-  const phoneNumber = '1234567890' // Reemplaza con tu número
+  const phoneNumber = '573114479743' // Reemplaza con tu número
   const message = 'Hola, me gustaría obtener más información sobre sus productos.'
 
   return (

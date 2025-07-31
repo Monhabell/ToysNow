@@ -24,7 +24,7 @@ import { NextResponse } from 'next/server'
         {
             "image": "/images/Banners/5.webp",
             "type": "whatsapp",
-            "payload": "573202371520"
+            "payload": "573114479743"
         }
     ]
     
