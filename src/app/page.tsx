@@ -9,7 +9,7 @@ import Banner from '@/components/Banner'
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import { FiArrowRight } from "react-icons/fi";
 import Image from 'next/image';
-import WhatsAppButton from '@/components/WhatsAppButton'
+
 import Link from 'next/link';
 import type { Producto } from '@/types/productos'
 
@@ -279,7 +279,7 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <WhatsAppButton />
+      
       <div className="relative bg-black min-h-screen mt-42 sm:mt-30">
         {/* Banner */}
         <div className="overflow-hidden">

@@ -10,6 +10,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import '../styles/Navbar.css'
 import { useSession, signOut } from 'next-auth/react'
+import WhatsAppButton from '@/components/WhatsAppButton'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,6 +29,8 @@ export default function Navbar() {
 
   return (
     <div className="w-full border-b border-gold-500 fixed top-0 left-0 right-0 z-50 bg-white">
+
+      <WhatsAppButton />
 
       {/* Top bar */}
       <div className="br-superior py-2 px-4">
