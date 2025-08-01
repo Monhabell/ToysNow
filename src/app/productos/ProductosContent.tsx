@@ -70,7 +70,7 @@ export default function ProductosContent() {
 
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
-  const productosPerPage = 6;
+  const productosPerPage = 15;
 
   // Obtener productos al cargar
   useEffect(() => {
