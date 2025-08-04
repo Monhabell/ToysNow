@@ -7,7 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ListaProductos from '@/components/productos/ListaProductos'
 import '../../styles/productos.css';
-import { Skeleton } from "@/components/ui/skeleton"
+
 import Head from 'next/head'
 import {
   Select,
