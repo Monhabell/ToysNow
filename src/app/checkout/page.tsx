@@ -113,11 +113,13 @@ const CheckoutForm = () => {
     if (preferenceId && preferenceId.init_point) {
       console.log("Preference Object:", preferenceId);
       console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
+
       const popup = window.open(
         preferenceId.init_point, // ✅ Corregido: ahora es la URL real
         'PagoMercadoPago',
         'width=1000,height=600,scrollbars=yes,resizable=yes'
       );
+      
 
       if (!popup || popup.closed || typeof popup.closed === 'undefined') {
         setError("Bloqueado por el navegador: habilita los pop-ups");
@@ -258,18 +260,28 @@ const CheckoutForm = () => {
         }))
       }));
 
-      // Cash on delivery logic
-      if (paymentMethod === 'cashOnDelivery') {
-        console.log('Pedido para contra entrega:', {
-          items: order.items,
+      const orderData = {
           total: calculateTotal(),
-          deliveryInfo,
+          title: items[0].title,
+          unit_price: +items[0].unit_price,
+          quantity: items[0].quantity,
+          delivery_info: deliveryInfo,
+          id_product: items[0].id,
+          variants: items[0].variants_id,
+          variantes_producto: items[0].variantes,
+          coupon: couponDiscount > 0 ? couponCode : null,
+          discount: +items[0].unit_price * couponDiscount,
+          shipping_cost: shippingCost,
           user: {
             email: session?.user?.email,
-            userId: session?.userId
+            userId: session?.userId,
+            token: token,
           }
-        });
-
+      }
+      // Cash on delivery logic
+      if (paymentMethod === 'cashOnDelivery') {
+        console.log("Datos de la orden:", JSON.stringify(orderData, null, 2))
+        // aca para guardar los datos en la base de datos
         alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
         return;
       }

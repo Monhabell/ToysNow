@@ -132,6 +132,7 @@ export async function POST(request: Request) {
     const status = 'pending';
     const delivery_notes = delivery_info || 'No hay notas adicionales';
 
+
     try {
       const orderRes = await fetch(`${process.env.API_TENANT_BASE_URL_V1}/orders`, {
         method: 'POST',
@@ -153,6 +154,8 @@ export async function POST(request: Request) {
     } catch (orderError) {
       console.error('❌ Error al crear la orden en sistema:', orderError);
     }
+
+
 
     return NextResponse.json({
       init_point: response.init_point,

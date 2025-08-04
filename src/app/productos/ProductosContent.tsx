@@ -378,7 +378,7 @@ export default function ProductosContent() {
               <h2 className='text-lg text-gold-600'>Filtros</h2>
               <button
                 onClick={limpiarFiltros}
-                className="text-xs text-blue-500 hover:underline"
+                className="text-xs text-blue-500 hover:underline cursor-pointer"
               >
                 Limpiar todo
               </button>
@@ -396,7 +396,7 @@ export default function ProductosContent() {
                       name="categoria"
                       checked={normalizarTexto(categoriaSeleccionada) === normalizarTexto(cat.name)}
                       onChange={() => setCategoriaSeleccionada(cat.name)}
-                      className="mr-2"
+                      className="mr-2 cursor-pointer"
                     />
                     <label htmlFor={`cat-${cat.id}`} className="flex-1">
                       {cat.name} <span className="text-gray-500 text-sm">({contadorPorCategoria[cat.name] || 0})</span>
@@ -463,17 +463,17 @@ export default function ProductosContent() {
 
             <Separator />
 
-            {/* Filtro por Condición */}
+
             <div className="mb-6 mt-6">
-              <h3 className="font-semibold text-gold-600 mb-2">Condición</h3>
+              <h3 className="font-semibold text-amber-400 mb-2">Condición</h3>
               <select
                 value={condicion}
                 onChange={(e) => setCondicion(e.target.value)}
-                className='border p-2 rounded w-full'
+                className='border border-gray-600 bg-gray-800 text-white p-2 rounded w-full focus:ring-amber-500 focus:border-amber-500'
               >
-                <option value=''>Todas las condiciones</option>
-                <option value='nuevo'>Nuevo</option>
-                <option value='descuento'>Descuento</option>
+                <option value='' className="bg-gray-800">Todas las condiciones</option>
+                <option value='nuevo' className="bg-gray-800">Nuevo</option>
+                <option value='descuento' className="bg-gray-800">Descuento</option>
               </select>
             </div>
 
@@ -481,16 +481,16 @@ export default function ProductosContent() {
 
             {/* Filtro por Envío */}
             <div className="mb-6 mt-6">
-              <h3 className="font-semibold text-gold-600 mb-2">Envío</h3>
+              <h3 className="font-semibold text-amber-400 mb-2">Envío</h3>
               <div className="flex items-center">
                 <input
                   type="checkbox"
                   id="envio-gratis"
                   checked={envioGratis}
                   onChange={(e) => setEnvioGratis(e.target.checked)}
-                  className="mr-2"
+                  className="mr-2 w-4 h-4 text-amber-500 bg-gray-700 border-gray-600 rounded focus:ring-amber-500 focus:ring-offset-gray-800"
                 />
-                <label htmlFor="envio-gratis">Envío gratis</label>
+                <label htmlFor="envio-gratis" className="text-gray-300">Envío gratis</label>
               </div>
             </div>
 
@@ -498,18 +498,18 @@ export default function ProductosContent() {
 
             {/* Filtro por Rating */}
             <div className="mb-6 mt-6">
-              <h3 className="font-semibold text-gold-600 mb-2">Calificación</h3>
+              <h3 className="font-semibold text-amber-400 mb-2">Calificación</h3>
               <select
                 value={ratingMinimo}
                 onChange={(e) => setRatingMinimo(e.target.value ? parseInt(e.target.value) : '')}
-                className='border p-2 rounded w-full'
+                className="border border-gray-600 bg-gray-800 text-white p-2 rounded w-full focus:ring-amber-500 focus:border-amber-500"
               >
-                <option value=''>Todas las calificaciones</option>
-                <option value='5'>5 estrellas</option>
-                <option value='4'>4+ estrellas</option>
-                <option value='3'>3+ estrellas</option>
-                <option value='2'>2+ estrellas</option>
-                <option value='1'>1+ estrella</option>
+                <option value="" className="bg-gray-800">Todas las calificaciones</option>
+                <option value="5" className="bg-gray-800">⭐ 5 estrellas</option>
+                <option value="4" className="bg-gray-800">⭐ 4+ estrellas</option>
+                <option value="3" className="bg-gray-800">⭐ 3+ estrellas</option>
+                <option value="2" className="bg-gray-800">⭐ 2+ estrellas</option>
+                <option value="1" className="bg-gray-800">⭐ 1+ estrella</option>
               </select>
             </div>
           </div>
@@ -545,29 +545,8 @@ export default function ProductosContent() {
             </div>
 
             {isLoading ? (
-              <div className="flex space-y-3">
-                <div className="flex flex-col space-y-3 m-5">
-                  <Skeleton className="h-[125px] w-[250px] rounded-xl bg-gray-900" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                  </div>
-                </div>
-                <div className='flex flex-col space-y-3 m-5'>
-                  <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                  </div>
-                </div>
-                <div className='flex flex-col space-y-3 m-5'>
-                  <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-                  <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                  </div>
-                </div>
-              </div>
+              <div aria-live="assertive" role="alert" className="loader"></div>
+              
             ) : productosFiltrados.length === 0 ? (
               <div className="bg-white p-8 rounded shadow-md text-center">
                 <h3 className="text-lg font-semibold mb-2">No se encontraron productos</h3>

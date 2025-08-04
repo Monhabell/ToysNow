@@ -66,6 +66,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
       : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4"
     }>
       {productos.map((p) => {
+
         const basePrice = parseFloat(String(p.price))
         const baseComparePrice = parseFloat(String(p.compare_price))
         const baseStock = p.stock
@@ -73,16 +74,15 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
         const variantPrice = p.variants?.[0]?.price ? parseFloat(String(p.variants[0].price)) : null
         const variantComparePrice = p.variants?.[0]?.compare_price ? parseFloat(String(p.variants[0].compare_price)) : null
         const variantStock = p.variants?.[0]?.stock || baseStock
-        const variantShipment = p.variants?.[0]?.shipment || null
-
+   
         const finalPrice = variantPrice || basePrice
         const finalComparePrice = variantComparePrice || baseComparePrice
         const finalStock = variantStock ?? 0
-        const finalShipment = variantShipment
+
 
         const tieneDescuento = finalComparePrice > 0 && finalComparePrice > finalPrice
         const stockBajo = finalStock <= 5
-        const EnvioGratis = Number(finalShipment) === 0
+
         const nuevoOk = isClient && calculateIsNew(p.created_at)
 
         const ratingPromedio = calcularRatingPromedio(p.qualification)
@@ -125,7 +125,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
               </h2>
               <div className='flex items-center justify-between'>
                 {stockBajo && <p className="text-sm">¡Últimas unidades!</p>}
-                {EnvioGratis && <p className="text-sm">¡Envio Gratis!</p>}
+                
               </div>
 
               <div className="text-md">

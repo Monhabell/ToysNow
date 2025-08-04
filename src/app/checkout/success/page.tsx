@@ -10,6 +10,19 @@ function SuccessContent() {
   const status = params.get('status');
   const orderId = params.get('merchant_order_id');
 
+
+  fetch('/api/payments/success', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      paymentId,
+      status,
+      orderId,
+    }),
+  })
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-green-50 text-green-800 px-4">
       <h1 className="text-4xl font-bold mb-4">✅ Pago exitoso</h1>

@@ -557,30 +557,17 @@ export default function ProductoDetalle({ params }: Props) {
 
                 <div className='mt-6'>
                   <div className="metodos-pago">
-                    <h3 className="font-medium mb-3">Medios de pago</h3>
-                    <div className="promo bg-blue-50 text-blue-700 p-3 rounded-lg mb-4">
-                      <span role="img" aria-label="tarjeta">💳</span> ¡Paga en hasta 6 cuotas con 0% interés!
+                    <h3 className="font-medium mb-3 text-amber-400">Medios de pago</h3>
+                    
+                    {/* Nota Mercado Pago */}
+                    <div className="mb-4 text-sm text-gray-400 italic">
+                      Todas las compras se procesan a través de Mercado Pago
                     </div>
-                    <div className="seccion mb-4">
-                      <strong className="block mb-2">Tarjetas de crédito</strong>
-                      <div className="iconos flex gap-3">
-                        <Image src="https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
-                          alt="Visa"
-                          className="h-8"
-                          width={32}
-                          height={32}
-                        />
-                        <Image src="https://upload.wikimedia.org/wikipedia/commons/0/04/Mastercard-logo.png"
-                          alt="MasterCard"
-                          className="h-8"
-                          width={32}
-                          height={32} />
-                        <Image src="https://upload.wikimedia.org/wikipedia/commons/3/30/American_Express_logo.svg"
-                          alt="American Express"
-                          className="h-8"
-                          width={32}
-                          height={32} />
-                      </div>
+
+                    {/* Promoción */}
+                    <div className="promo bg-gray-800 border border-amber-600/50 text-amber-300 p-3 rounded-lg mb-4 flex items-center gap-2 shadow-lg shadow-amber-900/20">
+                      <span role="img" aria-label="tarjeta" className="text-xl">💳</span> 
+                      <span>¡Hasta <strong className="text-amber-400">6 cuotas sin interés</strong> con Mercado Pago!</span>
                     </div>
                   </div>
                 </div>
@@ -603,7 +590,7 @@ export default function ProductoDetalle({ params }: Props) {
         {relacionados.length > 0 && (
           <div className='productos-relacionados max-w-6xl mx-auto mt-32'>
             <div className='mt-5'>
-              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Productos relacionados</h1>
+              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Recomendaciones para ti</h1>
               <div className="relative">
                 {mostrarBotones && (
                   <button
