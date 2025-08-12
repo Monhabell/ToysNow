@@ -312,6 +312,7 @@ export default function ProductoDetalle({ params }: Props) {
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
+
     e.stopPropagation();
     if (!producto) return;
 
@@ -331,6 +332,15 @@ export default function ProductoDetalle({ params }: Props) {
         attributes: selectedVariant.attributes
       } : undefined
     })
+
+    // Guardar la página actual para posible redirección después del login
+    sessionStorage.setItem('currentPage', window.location.href);
+
+    // Redirigir al checkout
+    if (!session) {
+      router.push('/login');
+      return;
+    }
 
   };
 

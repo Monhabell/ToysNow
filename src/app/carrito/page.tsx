@@ -1,238 +1,368 @@
 'use client'
-import { useCart } from '@/context/CartContext'
-import Navbar from '@/components/Navbar'
-import { useSession } from 'next-auth/react'
-import { useRouter } from 'next/navigation'
-import Image from 'next/image'
-import Link from 'next/link'
 
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import Navbar from "@/components/Navbar";
 
-export default function CarritoPage() {
-  const { data: session } = useSession()
-  const router = useRouter()
-  const { 
-    carrito, 
-    eliminarProducto, 
-    aumentarCantidad, 
-    disminuirCantidad, 
-    calcularSubtotal, 
-    calcularEnvioTotal, 
-    calcularTotalFinal 
-  } = useCart()
+import { useSession } from 'next-auth/react';
+import { FaTrash, FaPlus, FaMinus, FaShoppingCart } from "react-icons/fa";
+import Image from 'next/image';
 
-  const handleComprarAhora = () => {
-    if (carrito.length === 0) return
+interface ProductAttribute {
+  name: string;
+  value: string;
+}
 
-    const productsToCheckout = carrito.map((item) => ({
-      id: String(item.id),
-      name: item.name,
-      price: item.price,
-      compare_price: item.compare_price || null,
-      quantity: item.cantidad,
-      image: item.image?.[0] || '/images/default.png',
-      variant: item.variant?.id ? {
-        id: String(item.variant.id),
-        attributes: item.variant.attributes?.map(attr => ({
-          name: attr.name,
-          value: attr.value
-        })) || []
-      } : null,
-      stock: item.stock,
-      shipment: item.shipment || 0
-    }))
+interface ProductVariant {
+  id?: number;
+  attributes?: ProductAttribute[];
+}
 
-    const subtotal = calcularSubtotal()
-    const shipping = calcularEnvioTotal()
-    const total = calcularTotalFinal()
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  compare_price?: number;
+  color?: string;
+  image: string;
+  stock?: number;
+  shipment?: number;
+  cantidad: number;
+  variant?: ProductVariant;
+}
 
-    sessionStorage.setItem('currentOrder', JSON.stringify({
-      items: productsToCheckout,
-      subtotal,
-      shipping,
-      total
-    }))
+const CartPage = () => {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const token = session?.apiToken || '';
 
-    sessionStorage.setItem('currentPage', window.location.href)
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [couponCode, setCouponCode] = useState('');
+  const [couponDiscount, setCouponDiscount] = useState(0);
+  const [shippingCost, setShippingCost] = useState(0);
+  const [selectedCity, setSelectedCity] = useState('');
 
-    if (!session) {
-      router.push('/login')
-      return
+  // Cargar items del carrito desde localStorage
+  useEffect(() => {
+    const savedCart = localStorage.getItem('cart');
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    }
+  }, []);
+
+  // Guardar carrito cuando cambia
+  useEffect(() => {
+    if (cartItems.length > 0) {
+      localStorage.setItem('cart', JSON.stringify(cartItems));
+    } else {
+      localStorage.removeItem('cart');
+    }
+  }, [cartItems]);
+
+  // Calcular subtotal
+  const calculateSubtotal = () => {
+    return cartItems.reduce((sum, item) => sum + (item.price * item.cantidad), 0);
+  };
+
+  // Calcular total con descuentos y envío
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const discountedSubtotal = subtotal * (1 - couponDiscount);
+    return discountedSubtotal + shippingCost;
+  };
+
+  // Actualizar cantidad de un item
+  const updateQuantity = (index: number, newQuantity: number) => {
+    if (newQuantity < 1) return;
+
+    setCartItems(prev => {
+      const updatedItems = [...prev];
+      updatedItems[index] = {
+        ...updatedItems[index],
+        cantidad: newQuantity
+      };
+      return updatedItems;
+    });
+  };
+
+  // Eliminar item del carrito
+  const removeItem = (index: number) => {
+    setCartItems(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Aplicar cupón de descuento
+  const applyCoupon = () => {
+    if (!couponCode.trim()) return;
+    
+    // Ejemplo de lógica de cupón (puedes adaptarla a tu backend)
+    const discount = couponCode.toUpperCase() === 'DESCUENTO10' ? 0.10 : 0;
+    setCouponDiscount(discount);
+
+    if (discount === 0) {
+      setError('Cupón no válido o expirado');
+    } else {
+      setError('');
+    }
+  };
+
+  // Calcular costo de envío basado en ciudad
+  const calculateShipping = (city: string) => {
+    const shippingRates: Record<string, number> = {
+      'Bogotá': 15500,
+      'Soacha': 20000,
+      'Medellín': 25000,
+      'Cali': 25000,
+      // Agrega más ciudades según necesites
+    };
+
+    setShippingCost(shippingRates[city] || 20000); // Costo por defecto
+    setSelectedCity(city);
+  };
+
+  // Proceder al checkout
+  const proceedToCheckout = () => {
+    if (cartItems.length === 0) {
+      setError('No hay productos en el carrito');
+      return;
     }
 
-    router.push('/checkout')
+    // Preparar los datos para el checkout
+    const orderItems = cartItems.map(item => ({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      quantity: item.cantidad,
+      variant: item.variant
+    }));
+
+    const order = {
+      items: orderItems,
+      total: calculateSubtotal(),
+      shipping: shippingCost
+    };
+
+    sessionStorage.setItem('currentOrder', JSON.stringify(order));
+    router.push('/checkout');
+  };
+
+  // Carrito vacío
+  if (cartItems.length === 0) {
+    return (
+      <div className="bg-black min-h-screen text-white">
+        <Navbar />
+        <div className="container mx-auto py-16 px-4 text-center">
+          <div className="max-w-md mx-auto">
+            <FaShoppingCart className="mx-auto text-6xl text-gray-600 mb-6" />
+            <h2 className="text-2xl font-bold text-gray-300 mb-4">Tu carrito está vacío</h2>
+            <p className="text-gray-500 mb-8">Agrega productos para continuar con tu compra</p>
+            <button
+              onClick={() => router.push('/')}
+              className="bg-gold-500 hover:bg-gold-600 text-black font-bold py-3 px-6 rounded-lg"
+            >
+              Seguir comprando
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <>
+    <div className="bg-black min-h-screen text-white">
       <Navbar />
-      <div className="p-6 min-h-screen mt-32 text-gray-100">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Columna de Productos */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-gray-900 rounded-xl p-6 border border-gray-800 shadow-lg">
-              <h2 className="text-xl font-semibold flex items-center gap-3 text-gold-500">
-                <span className="text-2xl">🛒</span> 
-                <span className="bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                  Tu Carrito de Compras
-                </span>
-              </h2>
 
-              <div className="divide-y divide-gray-800 mt-4">
-                {carrito.map((item) => (
-                  <div key={`${item.id}-${item.variant?.id || '0'}`} className="flex justify-between items-center py-6 group hover:bg-gray-800/50 transition-all duration-300 px-2 rounded-lg">
-                    <div className="flex items-center gap-5">
-                      <div className="relative">
-                        <Image 
-                          src={item.image?.[0] || '/images/default.png'}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement  
-                            target.onerror = null
-                            target.src = '/images/default.webp'
-                          }}
-                          alt={item.name} 
-                          width={80}
-                          height={80}
-                          fill
-                          className="w-20 h-20 object-cover rounded-lg border-2 border-gray-700 group-hover:border-yellow-500 transition-all" 
-                        />
-                        <span className="absolute -top-2 -right-2 bg-yellow-500 text-black text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
-                          {item.cantidad}
-                        </span>
+      <div className="container mx-auto py-8 px-4 mt-42 xs:mt-32">
+        <h1 className="text-3xl font-bold mb-8 text-gold-500 text-center">Tu Carrito</h1>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Lista de productos */}
+          <div className="lg:w-2/3">
+            <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
+              <h2 className="text-xl font-bold text-gold-500 mb-6">Productos ({cartItems.length})</h2>
+              
+              <div className="space-y-6">
+                {cartItems.map((item, index) => (
+                  <div key={index} className="flex flex-col sm:flex-row gap-4 py-4 border-b border-gray-700">
+                    <div className="sm:w-1/4">
+                      <Image
+                        src={item.image}
+                        alt={item.name}
+                        width={200}
+                        height={200}
+                        className="rounded-lg object-cover"
+                      />
+                    </div>
+                    
+                    <div className="sm:w-3/4">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="text-lg font-medium text-white">{item.name}</h3>
+                          {item.color && (
+                            <p className="text-gray-400 text-sm">Color: {item.color}</p>
+                          )}
+                          {item.variant?.attributes?.map((attr, idx) => (
+                            <p key={idx} className="text-gray-400 text-sm">
+                              {attr.name}: {attr.value}
+                            </p>
+                          ))}
+                          {item.compare_price && item.compare_price > 0 && (
+                            <div className="mt-1">
+                              <span className="text-gray-500 line-through mr-2">
+                                ${item.compare_price.toLocaleString()}
+                              </span>
+                              <span className="text-green-500">
+                                {Math.round((1 - item.price / item.compare_price) * 100)}% OFF
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => removeItem(index)}
+                          className="text-gray-500 hover:text-red-500"
+                        >
+                          <FaTrash />
+                        </button>
                       </div>
-                      <div>
-                        <p className="font-medium text-gray-100 group-hover:text-yellow-400 transition-colors">{item.name}</p>
-                        {item.variant?.id && (
-                          <p className="text-sm text-gray-400 mt-1">
-                            Detalle: <span className="text-yellow-400">
-                              {item.variant.attributes?.[0]?.name || ''} {item.variant.attributes?.[0]?.value || ''}
-                            </span>
-                          </p>
-                        )}
-                        {item.color && (
-                          <p className="text-sm text-gray-400 mt-1">
-                            Color: <span className="text-yellow-400">{item.color}</span>
-                          </p>
-                        )}
-                        <div className="flex gap-4 mt-3 text-sm">
-                          <button 
-                            onClick={() => eliminarProducto(item.id)} 
-                            className="text-gray-400 hover:text-yellow-500 transition-colors"
+
+                      <div className="mt-4 flex justify-between items-center">
+                        <div className="flex items-center">
+                          <button
+                            onClick={() => updateQuantity(index, item.cantidad - 1)}
+                            className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded-l flex items-center justify-center"
+                            disabled={item.cantidad <= 1}
                           >
-                            Eliminar
+                            <FaMinus size={12} />
                           </button>
-                          <button className="text-gray-400 hover:text-yellow-500 transition-colors">
-                            Guardar para después
+                          <span className="bg-gray-800 text-white w-10 h-8 flex items-center justify-center">
+                            {item.cantidad}
+                          </span>
+                          <button
+                            onClick={() => updateQuantity(index, item.cantidad + 1)}
+                            className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded-r flex items-center justify-center"
+                            disabled={item.stock !== undefined && item.cantidad >= item.stock}
+                          >
+                            <FaPlus size={12} />
                           </button>
                         </div>
-                      </div>
-                    </div>
-
-                    <div className="text-right">
-                      <div className="flex items-center justify-end gap-3 mb-3">
-                        <button 
-                          onClick={() => disminuirCantidad(item.id)} 
-                          className={`border border-gray-700 px-2.5 py-0.5 rounded-lg ${item.cantidad <= 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-500/10 hover:border-yellow-500/50'}`}
-                          disabled={item.cantidad <= 1}
-                        >
-                          <span className="text-gray-300">−</span>
-                        </button>
-
-                        <span className="w-8 text-center text-gray-100">{item.cantidad}</span>
-
-                        <button 
-                          onClick={() => aumentarCantidad(item.id)} 
-                          className={`border border-gray-700 px-2.5 py-0.5 rounded-lg ${item.cantidad >= item.stock ? 'opacity-50 cursor-not-allowed' : 'hover:bg-yellow-500/10 hover:border-yellow-500/50'}`}
-                          disabled={item.cantidad >= item.stock}
-                        >
-                          <span className="text-gray-300">+</span>
-                        </button>
-                      </div>
-
-                      <div>
-                        {item.compare_price && (
-                          <div className="text-yellow-500 text-xs mb-1">
-                            <span className="line-through text-gray-500 mr-1">${item.compare_price}</span>
-                            <span className="font-bold">-{Math.round((1 - item.price / item.compare_price) * 100)}%</span>
-                          </div>
-                        )}
-                        <p className="text-xl font-bold text-yellow-400">
-                          ${(Number(item.price) * item.cantidad).toLocaleString()}
-                        </p>
+                        <span className="text-white font-medium">
+                          ${(item.price * item.cantidad).toLocaleString()}
+                        </span>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
 
-              {/* Sección de Envío */}
-              <div className="pt-6 mt-6 border-t border-gray-800">
-                <div className="flex justify-between items-center">
-                  <span className="text-gray-300 font-medium">Envío</span>
-                  
-                  <span className={`text-lg font-medium ${calcularEnvioTotal() === 0 ? 'text-yellow-400' : 'text-gray-300'}`}>
-                    {calcularEnvioTotal() === 0 ? '¡Gratis!' : `$${calcularEnvioTotal().toLocaleString()}`}
-                  </span>
+            {/* Cupón y envío */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                <h3 className="text-lg font-bold text-gold-500 mb-4">Cupón de descuento</h3>
+                <div className="flex">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value)}
+                    placeholder="Ingresa tu cupón"
+                    className="flex-1 bg-gray-800 border border-gray-700 rounded-l px-3 py-2 text-white"
+                  />
+                  <button
+                    onClick={applyCoupon}
+                    className="bg-gold-500 hover:bg-gold-600 text-black font-bold py-2 px-4 rounded-r"
+                  >
+                    Aplicar
+                  </button>
                 </div>
-                  
-                <div className="w-full bg-gray-800 h-2.5 rounded-full mt-3">
-                  <div 
-                    className="bg-gradient-to-r from-yellow-500 to-yellow-600 h-2.5 rounded-full" 
-                    style={{ width: '70%' }}
-                  ></div>
+                {couponDiscount > 0 && (
+                  <p className="text-green-500 mt-2 text-sm">
+                    Cupón aplicado: {couponDiscount * 100}% de descuento
+                  </p>
+                )}
+              </div>
+
+              <div className="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                <h3 className="text-lg font-bold text-gold-500 mb-4">Calcular envío</h3>
+                <div className="flex">
+                  <select
+                    value={selectedCity}
+                    onChange={(e) => calculateShipping(e.target.value)}
+                    className="flex-1 bg-gray-800 border border-gray-700 rounded-l px-3 py-2 text-white"
+                  >
+                    <option value="">Selecciona tu ciudad</option>
+                    <option value="Bogotá">Bogotá</option>
+                    <option value="Medellín">Medellín</option>
+                    <option value="Cali">Cali</option>
+                    <option value="Soacha">Soacha</option>
+                  </select>
+                  <button
+                    className="bg-gray-700 text-white font-bold py-2 px-4 rounded-r cursor-default"
+                    disabled
+                  >
+                    ${shippingCost.toLocaleString()}
+                  </button>
                 </div>
-                <p className="text-sm text-gray-400 mt-3">
-                  Agrega más productos para obtener envío gratis
-                  <Link href="#" className="text-yellow-400 hover:text-yellow-300 ml-2 transition-colors">
-                    Ver productos premium ›
-                  </Link>
-                </p>
               </div>
             </div>
           </div>
 
-          {/* Columna Resumen */}
-          <div>
-            <div className="bg-gray-900 border border-gray-800 rounded-xl p-6 shadow-lg sticky top-32">
-              <h3 className="font-bold text-xl mb-6 bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
-                Resumen del Pedido
-              </h3>
+          {/* Resumen del pedido */}
+          <div className="lg:w-1/3">
+            <div className="bg-gray-900 rounded-lg p-6 border border-gray-700 sticky top-4">
+              <h2 className="text-xl font-bold text-gold-500 mb-6">Resumen del pedido</h2>
 
-              <div className="space-y-4">
-                <div className="flex justify-between text-gray-300">
-                  <span>Productos ({carrito.reduce((acc, i) => acc + i.cantidad, 0)})</span>
-                  <span>${calcularSubtotal().toLocaleString()}</span>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between">
+                  <span className="text-gray-300">Subtotal ({cartItems.reduce((sum, item) => sum + item.cantidad, 0)} productos)</span>
+                  <span className="text-white">${calculateSubtotal().toLocaleString()}</span>
                 </div>
 
-                <div className="pt-4 border-t border-gray-800">
-                  <button className="text-yellow-400 hover:text-yellow-300 text-sm underline flex items-center transition-colors">
-                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.121 15.536c-1.171 1.952-3.07 1.952-4.242 0-1.172-1.953-1.172-5.119 0-7.072 1.171-1.952 3.07-1.952 4.242 0"/>
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-                    </svg>
-                    Aplicar código de descuento
-                  </button>
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-green-500">
+                    <span>Descuento</span>
+                    <span>-${(calculateSubtotal() * couponDiscount).toLocaleString()}</span>
+                  </div>
+                )}
+
+                <div className="flex justify-between">
+                  <span className="text-gray-300">Envío</span>
+                  <span className="text-white">
+                    {selectedCity ? `$${shippingCost.toLocaleString()}` : 'Selecciona ciudad'}
+                  </span>
+                </div>
+
+                <div className="flex justify-between text-lg font-bold text-gold-500 pt-2 mt-2 border-t border-gray-700">
+                  <span>Total</span>
+                  <span>${calculateTotal().toLocaleString()}</span>
                 </div>
               </div>
 
-              <div className="flex justify-between text-2xl font-bold mt-8 pt-6 border-t border-gray-800">
-                <span className="text-gray-300">Total</span>
-                <span className="text-yellow-400">${calcularTotalFinal().toLocaleString()}</span>
-              </div>
+              {error && (
+                <div className="mb-4 p-3 bg-red-900 text-white rounded-md text-center">
+                  {error}
+                </div>
+              )}
 
               <button
-                onClick={handleComprarAhora}
-                className="w-full bg-gradient-to-r from-yellow-600 to-yellow-700 text-black font-bold py-4 rounded-xl mt-8 hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-lg shadow-yellow-500/10 hover:shadow-yellow-500/20 flex items-center justify-center gap-2"
+                onClick={proceedToCheckout}
+                className="w-full bg-gold-500 hover:bg-gold-600 text-black font-bold py-3 px-4 rounded-lg"
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                </svg>
-                Finalizar Compra
+                Proceder al pago
+              </button>
+
+              <button
+                onClick={() => router.push('/')}
+                className="w-full mt-4 bg-transparent hover:bg-gray-800 text-gold-500 font-bold py-3 px-4 rounded-lg border border-gold-500"
+              >
+                Seguir comprando
               </button>
             </div>
           </div>
         </div>
       </div>
-    </>
-  )
-}
+    </div>
+  );
+};
+
+export default CartPage;

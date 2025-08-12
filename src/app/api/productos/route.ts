@@ -86,6 +86,12 @@ export async function GET() {
   const API_URL_BASE = `${process.env.API_TENANT_BASE_URL_V1}/products`;
   const API_KEY = process.env.API_KEY || '';
 
+  if (process.env.API_TENANT_BASE_URL_V1 || process.env.API_KEY) {
+    console.log("API_TENANT_BASE_URL_V1:", process.env.API_TENANT_BASE_URL_V1);
+    console.log("API_KEY:", process.env.API_KEY);
+  }
+
+
   try {
     const allProducts: Product[] = [];
     let currentPage = 1;

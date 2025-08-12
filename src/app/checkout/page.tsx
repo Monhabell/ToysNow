@@ -330,6 +330,119 @@ const CheckoutForm = () => {
     }
   };
 
+
+  // const handlePayment = async () => {
+  //   setLoading(true);
+  //   setError('');
+
+  //   try {
+  //     // Validaciones (se mantienen igual)
+  //     if (!order || order.items.length === 0) {
+  //       throw new Error('No hay items en el pedido');
+  //     }
+
+  //     if (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.phone) {
+  //       throw new Error('Por favor complete toda la información de envío');
+  //     }
+
+  //     const paymentMethod = document.querySelector<HTMLInputElement>(
+  //       'input[name="paymentMethod"]:checked'
+  //     )?.id;
+
+  //     // Preparar items para MercadoPago
+  //     const mercadoPagoItems = order.items.map(item => {
+  //       console.log("Variant completo de:", item.name, JSON.stringify(item.variant, null, 2));
+
+  //       return {
+  //         title: `${item.name}${
+  //           item.color && item.color !== 'N/A' ? ` - Color: ${item.color}` : ''
+  //         }${
+  //           item.variant?.attributes?.find(a => a.name.toLowerCase() === 'tamaño') 
+  //             ? ` - Tamaño: ${item.variant.attributes.find(a => a.name.toLowerCase() === 'tamaño')?.value}`
+  //             : ''
+  //         }`,
+  //         unit_price: item.price,
+  //         quantity: item.quantity,
+  //         picture_url: item.image || '/images/default.png',
+  //         description: 'Producto de alta calidad',
+  //         id: item.id.toString(),
+  //         variant_id: item.variant?.id?.toString(),
+  //         variant_attributes: item.variant
+
+  //       };
+  //     });
+
+      
+  //     // Lógica para pago contra entrega
+  //     if (paymentMethod === 'cashOnDelivery') {
+  //       const orderData = {
+  //         items: order.items.map(item => ({
+  //           id: item.id,
+  //           name: item.name,
+  //           price: item.price,
+  //           quantity: item.quantity,
+  //           variant: item.variant,
+  //           color: item.color,
+  //           compare_price: item.compare_price,
+  //           image: item.image
+  //         })),
+  //         total: calculateTotal(),
+  //         shipping: shippingCost,
+  //         delivery_info: deliveryInfo,
+  //         user: {
+  //           email: session?.user?.email,
+  //           userId: session?.userId,
+  //           token: token,
+  //         },
+  //         coupon: couponDiscount > 0 ? couponCode : null,
+  //         discount: couponDiscount
+  //       };
+
+  //       console.log("Datos de la orden:", JSON.stringify(orderData, null, 2));
+  //       // Aquí deberías hacer una llamada a tu API para guardar la orden
+  //       alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
+  //       return;
+  //     }
+
+  //     // Procesar pago con MercadoPago para múltiples productos
+  //     const res = await fetch('/api/create-preference', {
+  //       method: 'POST',
+  //       headers: { 'Content-Type': 'application/json' },
+  //       body: JSON.stringify({
+  //         items: mercadoPagoItems,
+  //         total: calculateTotal(),
+  //         shipping_cost: shippingCost,
+  //         delivery_info: deliveryInfo,
+  //         user: {
+  //           email: session?.user?.email,
+  //           userId: session?.userId,
+  //           token: token,
+  //         },
+  //         coupon: couponDiscount > 0 ? couponCode : null,
+  //         discount: couponDiscount
+  //       }),
+  //     });
+  
+  //     const data = await res.json();
+      
+  //     if (data.init_point) {
+  //       setPreferenceId(data);
+  //     } else {
+  //       throw new Error('No se pudo crear la preferencia de pago');
+  //     }
+
+  //   } catch (error) {
+  //     console.error('Payment error:', error);
+  //     setError(
+  //       error instanceof Error
+  //         ? error.message
+  //         : 'Error al procesar el pago. Inténtalo de nuevo.'
+  //     );
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   // Calculate total with shipping and discounts
   const calculateTotal = () => {
     if (!order) return 0;
