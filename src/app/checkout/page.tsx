@@ -24,6 +24,9 @@ interface OrderItem {
   price: number;
   quantity: number;
   variant?: ProductVariant;
+  color?: string;
+  compare_price?: number;
+  image?: string;
 }
 
 interface Order {
@@ -222,98 +225,99 @@ const CheckoutForm = () => {
   const handlePayment = async () => {
     setLoading(true);
     setError('');
-    //setPaymentStatus('pending');
 
     try {
-      // Validate order exists
+      // Validaciones (se mantienen igual)
       if (!order || order.items.length === 0) {
         throw new Error('No hay items en el pedido');
       }
 
-      // Validate delivery info
       if (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.phone) {
         throw new Error('Por favor complete toda la información de envío');
       }
 
-      // Get selected payment method
       const paymentMethod = document.querySelector<HTMLInputElement>(
         'input[name="paymentMethod"]:checked'
       )?.id;
 
-      // Prepare items for API
-      const items = order.items.map(item => ({
-        title: `${item.name}${item.variant?.color ? ` - Color: ${item.variant.color}` : ''
-          }${item.variant?.size ? ` - Tamaño: ${item.variant.size}` : ''
-          }`,
-        unit_price: item.price,
-        quantity: item.quantity,
-        id: item.id,
-        description: 'Producto de alta calidad',
-        id_user: session?.userId,
-        email: session?.user?.email,
-        delivery_info: deliveryInfo,
-        variants_id: item.variant?.id,
-        user_token: token,
-        variantes: item.variant?.attributes?.map(attr => ({
-          name: attr.name,
-          value: attr.value
-        }))
-      }));
+      // Preparar items para MercadoPago
+      const mercadoPagoItems = order.items.map(item => {
+        console.log("Variant completo de:", item.name, JSON.stringify(item.variant, null, 2));
 
-      const orderData = {
+        return {
+          title: `${item.name}${
+            item.color && item.color !== 'N/A' ? ` - Color: ${item.color}` : ''
+          }${
+            item.variant?.attributes?.find(a => a.name.toLowerCase() === 'tamaño') 
+              ? ` - Tamaño: ${item.variant.attributes.find(a => a.name.toLowerCase() === 'tamaño')?.value}`
+              : ''
+          }`,
+          unit_price: item.price,
+          quantity: item.quantity,
+          picture_url: item.image || '/images/default.png',
+          description: 'Producto de alta calidad',
+          id: item.id.toString(),
+          variant_id: item.variant?.id?.toString(),
+          variant_attributes: item.variant
+
+        };
+      });
+
+      
+      // Lógica para pago contra entrega
+      if (paymentMethod === 'cashOnDelivery') {
+        const orderData = {
+          items: order.items.map(item => ({
+            id: item.id,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            variant: item.variant,
+            color: item.color,
+            compare_price: item.compare_price,
+            image: item.image
+          })),
           total: calculateTotal(),
-          title: items[0].title,
-          unit_price: +items[0].unit_price,
-          quantity: items[0].quantity,
+          shipping: shippingCost,
           delivery_info: deliveryInfo,
-          id_product: items[0].id,
-          variants: items[0].variants_id,
-          variantes_producto: items[0].variantes,
-          coupon: couponDiscount > 0 ? couponCode : null,
-          discount: +items[0].unit_price * couponDiscount,
-          shipping_cost: shippingCost,
           user: {
             email: session?.user?.email,
             userId: session?.userId,
             token: token,
-          }
-      }
-      // Cash on delivery logic
-      if (paymentMethod === 'cashOnDelivery') {
-        console.log("Datos de la orden:", JSON.stringify(orderData, null, 2))
-        // aca para guardar los datos en la base de datos
+          },
+          coupon: couponDiscount > 0 ? couponCode : null,
+          discount: couponDiscount
+        };
+
+        console.log("Datos de la orden:", JSON.stringify(orderData, null, 2));
+        // Aquí deberías hacer una llamada a tu API para guardar la orden
         alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
         return;
       }
 
-      // Process payment with MercadoPago
+      // Procesar pago con MercadoPago para múltiples productos
       const res = await fetch('/api/create-preference', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: items[0].title,
-          unit_price: +items[0].unit_price,
-          totalCompra: calculateTotal(),
-          quantity: items[0].quantity,
-          id_user: session?.userId,
-          email: session?.user?.email,
-          delivery_info: deliveryInfo,
-          id_product: items[0].id,
-          variants: items[0].variants_id,
-          user_token: token,
-          variantes_producto: items[0].variantes,
-          coupon: couponDiscount > 0 ? couponCode : null,
-          discount: +items[0].unit_price * couponDiscount,
+          items: mercadoPagoItems,
+          total: calculateTotal(),
           shipping_cost: shippingCost,
+          delivery_info: deliveryInfo,
+          user: {
+            email: session?.user?.email,
+            userId: session?.userId,
+            token: token,
+          },
+          coupon: couponDiscount > 0 ? couponCode : null,
+          discount: couponDiscount
         }),
       });
-
+  
       const data = await res.json();
-      console.log(data)
+      
       if (data.init_point) {
-        
         setPreferenceId(data);
-
       } else {
         throw new Error('No se pudo crear la preferencia de pago');
       }
@@ -329,119 +333,6 @@ const CheckoutForm = () => {
       setLoading(false);
     }
   };
-
-
-  // const handlePayment = async () => {
-  //   setLoading(true);
-  //   setError('');
-
-  //   try {
-  //     // Validaciones (se mantienen igual)
-  //     if (!order || order.items.length === 0) {
-  //       throw new Error('No hay items en el pedido');
-  //     }
-
-  //     if (!deliveryInfo.address || !deliveryInfo.city || !deliveryInfo.phone) {
-  //       throw new Error('Por favor complete toda la información de envío');
-  //     }
-
-  //     const paymentMethod = document.querySelector<HTMLInputElement>(
-  //       'input[name="paymentMethod"]:checked'
-  //     )?.id;
-
-  //     // Preparar items para MercadoPago
-  //     const mercadoPagoItems = order.items.map(item => {
-  //       console.log("Variant completo de:", item.name, JSON.stringify(item.variant, null, 2));
-
-  //       return {
-  //         title: `${item.name}${
-  //           item.color && item.color !== 'N/A' ? ` - Color: ${item.color}` : ''
-  //         }${
-  //           item.variant?.attributes?.find(a => a.name.toLowerCase() === 'tamaño') 
-  //             ? ` - Tamaño: ${item.variant.attributes.find(a => a.name.toLowerCase() === 'tamaño')?.value}`
-  //             : ''
-  //         }`,
-  //         unit_price: item.price,
-  //         quantity: item.quantity,
-  //         picture_url: item.image || '/images/default.png',
-  //         description: 'Producto de alta calidad',
-  //         id: item.id.toString(),
-  //         variant_id: item.variant?.id?.toString(),
-  //         variant_attributes: item.variant
-
-  //       };
-  //     });
-
-      
-  //     // Lógica para pago contra entrega
-  //     if (paymentMethod === 'cashOnDelivery') {
-  //       const orderData = {
-  //         items: order.items.map(item => ({
-  //           id: item.id,
-  //           name: item.name,
-  //           price: item.price,
-  //           quantity: item.quantity,
-  //           variant: item.variant,
-  //           color: item.color,
-  //           compare_price: item.compare_price,
-  //           image: item.image
-  //         })),
-  //         total: calculateTotal(),
-  //         shipping: shippingCost,
-  //         delivery_info: deliveryInfo,
-  //         user: {
-  //           email: session?.user?.email,
-  //           userId: session?.userId,
-  //           token: token,
-  //         },
-  //         coupon: couponDiscount > 0 ? couponCode : null,
-  //         discount: couponDiscount
-  //       };
-
-  //       console.log("Datos de la orden:", JSON.stringify(orderData, null, 2));
-  //       // Aquí deberías hacer una llamada a tu API para guardar la orden
-  //       alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
-  //       return;
-  //     }
-
-  //     // Procesar pago con MercadoPago para múltiples productos
-  //     const res = await fetch('/api/create-preference', {
-  //       method: 'POST',
-  //       headers: { 'Content-Type': 'application/json' },
-  //       body: JSON.stringify({
-  //         items: mercadoPagoItems,
-  //         total: calculateTotal(),
-  //         shipping_cost: shippingCost,
-  //         delivery_info: deliveryInfo,
-  //         user: {
-  //           email: session?.user?.email,
-  //           userId: session?.userId,
-  //           token: token,
-  //         },
-  //         coupon: couponDiscount > 0 ? couponCode : null,
-  //         discount: couponDiscount
-  //       }),
-  //     });
-  
-  //     const data = await res.json();
-      
-  //     if (data.init_point) {
-  //       setPreferenceId(data);
-  //     } else {
-  //       throw new Error('No se pudo crear la preferencia de pago');
-  //     }
-
-  //   } catch (error) {
-  //     console.error('Payment error:', error);
-  //     setError(
-  //       error instanceof Error
-  //         ? error.message
-  //         : 'Error al procesar el pago. Inténtalo de nuevo.'
-  //     );
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
 
   // Calculate total with shipping and discounts
   const calculateTotal = () => {

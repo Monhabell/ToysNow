@@ -32,7 +32,6 @@ export default function AuthPage() {
     const [loading, setLoading] = useState(false)
     const router = useRouter()
 
-
     const handleConfirmation = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
         if (name === 'password_confirmation') {
@@ -153,6 +152,8 @@ export default function AuthPage() {
             router.push(result?.url || '/');
         }
     };
+
+
 
 
     return (

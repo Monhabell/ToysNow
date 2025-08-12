@@ -1,14 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useSession } from 'next-auth/react';
+
+interface Pedido {
+    id: string;
+    total: string; // Viene como string desde la API
+    status: string;
+    notes?: string;
+    shipping_city: string;
+    delivery_info: string;
+    items: Array<{
+        product: {
+            id: number;
+            name: string;
+            price: string;
+        };
+        quantity: number;
+        unit_price: string;
+    }>;
+}
 
 const UserProfile = () => {
     const { data: session } = useSession();
     const nombre = session?.user?.name || 'Usuario';
     const token = session?.apiToken || '';
-
-    // consulta a la API para obtener los datos del usuario
 
     const [userData, setUserData] = useState({
         name: nombre,
@@ -22,6 +38,8 @@ const UserProfile = () => {
 
     const [activeTab, setActiveTab] = useState('personal');
     const [isEditing, setIsEditing] = useState(false);
+    const [pedidos, setPedidos] = useState<Pedido[]>([]); // Aquí guardamos los pedidos
+    const [loadingPedidos, setLoadingPedidos] = useState(true);
 
     const handleInputChange = (e: any) => {
         const { name, value } = e.target;
@@ -33,6 +51,46 @@ const UserProfile = () => {
         console.log('Datos actualizados:', userData);
         setIsEditing(false);
     };
+
+    const mispedidos = async () => {
+        const response = await fetch('/api/pedidos', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            }
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || 'Error al obtener los pedidos');
+        }
+
+        return await response.json();
+    };
+
+    // Ejecutamos la consulta cuando el componente esté listo
+    useEffect(() => {
+        if (!token) return;
+        
+        const cargarPedidos = async () => {
+            try {
+                setLoadingPedidos(true);
+                const data = await mispedidos();
+                // Asegúrate de que siempre sea un array
+                const pedidosArray = data.data || [];
+
+                console.log("Pedidos procesados:", pedidosArray);
+                
+                setPedidos(pedidosArray);
+            } catch (err) {
+                console.error("Error cargando pedidos:", err);
+            } finally {
+                setLoadingPedidos(false);
+            }
+        };
+
+        cargarPedidos();
+    }, [token]);
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-100">
@@ -267,80 +325,70 @@ const UserProfile = () => {
                         )}
 
                         {activeTab === 'orders' && (
-                            <div>
-                                <h2 className="text-2xl font-semibold text-amber-500 mb-6 flex items-center">
-                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                    </svg>
-                                    Mis Pedidos
-                                </h2>
-                                <div className="overflow-x-auto">
-                                    <table className="w-full text-left">
-                                        <thead className="bg-gray-700 text-amber-500">
-                                            <tr>
-                                                <th className="px-4 py-3">N° Pedido</th>
-                                                <th className="px-4 py-3">Fecha</th>
-                                                <th className="px-4 py-3">Total</th>
-                                                <th className="px-4 py-3">Pago</th>
-                                                <th className="px-4 py-3">Estado</th>
-                                                <th className="px-4 py-3">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr className="border-b border-gray-700 hover:bg-gray-700/50 transition">
-                                                <td className="px-4 py-3 font-medium">#SC-12345</td>
-                                                <td className="px-4 py-3">15/05/2023</td>
-                                                <td className="px-4 py-3 text-amber-500">$249.99</td>
-
-                                                <td className="px-4 py-3">
-                                                   <span className="bg-green-900/50 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
-                                                        Exitoso                                              </span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="bg-green-900/50 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
-                                                        Entregado
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <button className="text-amber-500 hover:text-amber-400 transition flex items-center text-sm">
-                                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
-                                                        Detalles
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            <tr className="border-b border-gray-700 hover:bg-gray-700/50 transition">
-                                                <td className="px-4 py-3 font-medium">#SC-12344</td>
-                                                <td className="px-4 py-3">10/05/2023</td>
-                                                <td className="px-4 py-3 text-amber-500">$129.99</td>
-                                                <td className="px-4 py-3">
-                                                    <span className="bg-green-900/50 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
-                                                        Exitoso
-                                                    </span>
-                                                </td>
-
-                                                <td className="px-4 py-3">
-                                                    <span className="bg-yellow-900/50 text-yellow-400 px-3 py-1 rounded-full text-xs font-medium">
-                                                        En camino
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <button className="text-amber-500 hover:text-amber-400 transition flex items-center text-sm">
-                                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                        </svg>
-                                                        Detalles
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        )}
+    <div>
+        <h2 className="text-2xl font-semibold text-amber-500 mb-6 flex items-center">
+            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            Mis Pedidos
+        </h2>
+        <div className="overflow-x-auto">
+            <table className="w-full text-left">
+                <thead className="bg-gray-700 text-amber-500">
+                    <tr>
+                        <th className="px-4 py-3">N° Pedido</th>
+                        <th className="px-4 py-3">Total</th>
+                        <th className="px-4 py-3">Estado</th>
+                        <th className="px-4 py-3">Ciudad</th>
+                        <th className="px-4 py-3">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {loadingPedidos ? (
+                        <tr>
+                            <td colSpan={5} className="text-center py-4 text-gray-400">Cargando pedidos...</td>
+                        </tr>
+                    ) : pedidos.length === 0 ? (
+                        <tr>
+                            <td colSpan={5} className="text-center py-4 text-gray-400">No tienes pedidos aún.</td>
+                        </tr>
+                    ) : (
+                        pedidos.map((pedido) => (
+                            <tr key={pedido.id} className="border-b border-gray-700 hover:bg-gray-700 transition">
+                                <td className="px-4 py-3">{pedido.items.map((item, index) => (
+                                    <div key={index}>{item.product.name}</div>
+                                ))}</td>
+                                <td className="px-4 py-3">${Number(pedido.total).toFixed(0)}</td>
+                                <td className="px-4 py-3">
+                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                        pedido.status === 'pending' 
+                                            ? 'bg-yellow-100 text-yellow-800' 
+                                            : 'bg-green-100 text-green-800'
+                                    }`}>
+                                        {pedido.status === 'pending' ? 'Pendiente' : 'Completado'}
+                                    </span>
+                                </td>
+                                <td className="px-4 py-3">{pedido.shipping_city}</td>
+                                <td className="px-4 py-3">
+                                    <button 
+                                        className="text-amber-500 hover:text-amber-400 transition flex items-center"
+                                        onClick={() => console.log('Mostrar detalles', pedido)}
+                                    >
+                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        Detalles
+                                    </button>
+                                </td>
+                            </tr>
+                        ))
+                    )}
+                </tbody>
+            </table>
+        </div>
+    </div>
+)}
 
                         {activeTab === 'wishlist' && (
                             <div>

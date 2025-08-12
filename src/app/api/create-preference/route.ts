@@ -10,9 +10,14 @@ interface MercadoPagoItem {
   quantity: number;
   currency_id: string;
   unit_price: number;
+  picture_url?: string;
+  description?: string;
+  variant_id?: string | number;
+  variant_attributes?: any[]; // Puedes definir un tipo más específico si lo conoces
 }
 
 interface CheckoutRequestBody {
+  items: MercadoPagoItem[];
   shipping_cost?: number | string;
   variantes_producto?: any[];
   discount?: number | string;
@@ -27,6 +32,11 @@ interface CheckoutRequestBody {
   id_product?: string;
   user_token: string;
   totalCompra?: number | string;
+  user?: {
+    userId: string;
+    email: string;
+    token: string;
+  };
 }
 
 interface Product {
@@ -66,54 +76,29 @@ const client = new MercadoPagoConfig({ accessToken });
 export async function POST(request: Request) {
   try {
     const body = await request.json() as CheckoutRequestBody;
-    console.log('📦 Datos recibidos:', body);
+    //console.log('📦 Datos recibidos:', body);
 
-
-    // Validación de datos requeridos
-    const {
-      title,
-      quantity,
-      unit_price,
-      id_user,
-      email,
-      user_token,
-      id_product,
-      variants,
-      variantes_producto,
-      delivery_info,
-      discount = 0,
-      shipping_cost = 0
-    } = body;
-
-    if (!title || !quantity || !unit_price || !id_user || !email || !user_token) {
-      return NextResponse.json(
-        { error: 'Faltan datos obligatorios: title, quantity, unit_price, id_user, email o user_token' },
-        { status: 400 }
-      );
-    }
-
-    // Crear preferencia en Mercado Pago
+    // Crear preferencia en Mercado Pago con varios productos
     const preferenceData = {
-      items: [
-        {
-          id: id_product || 'default-id',
-          title,
-          quantity: Number(quantity),
-          currency_id: 'COP',
-          unit_price: Number(unit_price) - Number(discount),
-        },
-      ],
+      items: body.items.map((item) => ({
+        id: item.id || 'default-id',
+        title: item.title,
+        quantity: Number(item.quantity),
+        currency_id: 'COP',
+        unit_price: Number(item.unit_price) - Number(body.discount || 0),
+        picture_url: item.picture_url || undefined,
+        description: item.description || ''
+      })),
       shipments: {
-        cost: Number(shipping_cost),
+        cost: Number(body.shipping_cost || 0),
         mode: 'not_specified',
       },
       metadata: {
-        id_user,
-        email,
-        token_id_user: user_token,
-        varaintes_id: variants,
-        variantesProducto: JSON.stringify(variantes_producto || []),
-        ...(typeof delivery_info === 'string' ? { delivery_info } : delivery_info)
+        id_user: body.id_user || body.user?.userId,
+        email: body.email || body.user?.email,
+        token_id_user: body.user_token || body.user?.token,
+        variantesProducto: JSON.stringify(body.variantes_producto || []),
+        ...(typeof body.delivery_info === 'string' ? { delivery_info: body.delivery_info } : body.delivery_info)
       },
       back_urls: {
         success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
@@ -124,7 +109,7 @@ export async function POST(request: Request) {
 
     const preference = new Preference(client);
     const response = await preference.create({ body: preferenceData }) as MercadoPagoResponse;
-    console.log('✅ Preferencia creada:', response);
+    //console.log('✅ Preferencia creada:', response);
 
     const preference_id = response?.id;
 
@@ -133,26 +118,34 @@ export async function POST(request: Request) {
     }
 
     // Preparar datos para la orden
-    const products: Product[] = [{
-      product_id: id_product || 'default-id',
-      unit_price: Number(body.totalCompra),
-      quantity: Number(quantity),
+    // Preparar datos para la orden con todos los productos
+    const products: Product[] = body.items.map((item) => ({
+      product_id: item.id || 'default-id',
+      unit_price: Number(item.unit_price),
+      quantity: Number(item.quantity),
       currency: 'COP',
-      ...(variants && { variante_id: Number(variants) }),
-      variantesProducto: JSON.stringify(variantes_producto || [])
-    }];
+      ...(item.variant_id && { variante_id: Number(item.variant_id) }),
+      variantesProducto: JSON.stringify(item.variant_attributes || [])
+    }));
 
-    // Procesar delivery_info
-    let deliveryInfoObj: DeliveryInfo;
-    try {
-      deliveryInfoObj = typeof delivery_info === 'string' ?
-        JSON.parse(delivery_info) :
-        (delivery_info as DeliveryInfo) || {};
-    } catch (e) {
-      deliveryInfoObj = {
-        deliveryNotes: typeof delivery_info === 'string' ? delivery_info : 'No hay notas adicionales'
-      };
+
+    // Procesar información de envío
+    let deliveryInfoObj: DeliveryInfo = {};
+
+    if (body.delivery_info) {
+      if (typeof body.delivery_info === 'string') {
+        try {
+          deliveryInfoObj = JSON.parse(body.delivery_info);
+        } catch {
+          deliveryInfoObj = { deliveryNotes: body.delivery_info };
+        }
+      } else {
+        deliveryInfoObj = body.delivery_info as DeliveryInfo;
+      }
+    } else {
+      deliveryInfoObj = { deliveryNotes: 'No hay notas adicionales' };
     }
+
 
     // Estructura final para la orden
     const orderRequestBody = {
@@ -163,7 +156,7 @@ export async function POST(request: Request) {
         address: deliveryInfoObj.address || '',
         apartment: deliveryInfoObj.department || '',
         city: deliveryInfoObj.city || '',
-        province: deliveryInfoObj.department || '',
+        province: deliveryInfoObj.city || '',
         postalCode: deliveryInfoObj.postalCode || '',
         phone: deliveryInfoObj.phone || '',
         deliveryType: deliveryInfoObj.deliveryType || 'casa',
@@ -172,14 +165,13 @@ export async function POST(request: Request) {
     };
 
     console.log('📤 Enviando orden:', JSON.stringify(orderRequestBody, null, 2));
-
     // Crear orden en el sistema
     try {
       const orderRes = await fetch(`${process.env.API_TENANT_BASE_URL_V1}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${user_token}`,
+          'Authorization': `Bearer ${body.user?.token}`,
           'X-API-Key': process.env.API_KEY || '',
         },
         body: JSON.stringify(orderRequestBody),
@@ -201,7 +193,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       init_point: response.init_point,
       orderId: preference_id,
-      token_id: user_token
+      token_id: body.user?.token
     });
 
   } catch (error: unknown) {

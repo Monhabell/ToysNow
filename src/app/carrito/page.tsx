@@ -34,10 +34,8 @@ interface CartItem {
 const CartPage = () => {
   const router = useRouter();
   const { data: session } = useSession();
-  const token = session?.apiToken || '';
 
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [couponCode, setCouponCode] = useState('');
   const [couponDiscount, setCouponDiscount] = useState(0);
@@ -123,6 +121,12 @@ const CartPage = () => {
 
   // Proceder al checkout
   const proceedToCheckout = () => {
+
+    if (!session) {
+      router.push('/login');
+      return;
+    }
+
     if (cartItems.length === 0) {
       setError('No hay productos en el carrito');
       return;
@@ -159,7 +163,7 @@ const CartPage = () => {
             <p className="text-gray-500 mb-8">Agrega productos para continuar con tu compra</p>
             <button
               onClick={() => router.push('/')}
-              className="bg-gold-500 hover:bg-gold-600 text-black font-bold py-3 px-6 rounded-lg"
+              className="bg-gold-500 hover:bg-gold-600 text-black font-bold py-3 px-6 rounded-lg cursor-pointer"
             >
               Seguir comprando
             </button>
@@ -172,10 +176,8 @@ const CartPage = () => {
   return (
     <div className="bg-black min-h-screen text-white">
       <Navbar />
-
-      <div className="container mx-auto py-8 px-4 mt-42 xs:mt-32">
+      <div className="container mx-auto py-8 px-4 mt-32 xs:mt-32">
         <h1 className="text-3xl font-bold mb-8 text-gold-500 text-center">Tu Carrito</h1>
-
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Lista de productos */}
           <div className="lg:w-2/3">
@@ -187,7 +189,7 @@ const CartPage = () => {
                   <div key={index} className="flex flex-col sm:flex-row gap-4 py-4 border-b border-gray-700">
                     <div className="sm:w-1/4">
                       <Image
-                        src={item.image}
+                        src={`https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images${item.image}`}
                         alt={item.name}
                         width={200}
                         height={200}
@@ -220,17 +222,17 @@ const CartPage = () => {
                         </div>
                         <button
                           onClick={() => removeItem(index)}
-                          className="text-gray-500 hover:text-red-500"
+                          className="text-gray-500 hover:text-red-500 cursor-pointer"
                         >
                           <FaTrash />
                         </button>
                       </div>
 
                       <div className="mt-4 flex justify-between items-center">
-                        <div className="flex items-center">
+                        <div className="flex items-center cursor-pointer">
                           <button
                             onClick={() => updateQuantity(index, item.cantidad - 1)}
-                            className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded-l flex items-center justify-center"
+                            className="bg-gray-700 cursor-pointer hover:bg-gray-600 text-white w-8 h-8 rounded-l flex items-center justify-center"
                             disabled={item.cantidad <= 1}
                           >
                             <FaMinus size={12} />
@@ -240,7 +242,7 @@ const CartPage = () => {
                           </span>
                           <button
                             onClick={() => updateQuantity(index, item.cantidad + 1)}
-                            className="bg-gray-700 hover:bg-gray-600 text-white w-8 h-8 rounded-r flex items-center justify-center"
+                            className="bg-gray-700 cursor-pointer hover:bg-gray-600 text-white w-8 h-8 rounded-r flex items-center justify-center"
                             disabled={item.stock !== undefined && item.cantidad >= item.stock}
                           >
                             <FaPlus size={12} />
