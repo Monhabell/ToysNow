@@ -145,9 +145,7 @@ export default function Navbar() {
             <Link href="/carrito" className="relative group">
               <div className="relative p-2 rounded-full transition-all duration-300 group-hover:bg-red-100/30">
                 <ShoppingCart className="w-6 h-6 text-white-600 group-hover:text-red-700 transition-colors" />
-                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center group-hover:bg-white-700 transition-all duration-300 shadow-[0_2px_5px_rgba(219,39,119,0.3)]">
-                  0
-                </span>
+                
                 <span className="absolute inset-0 rounded-full bg-pink-400/20 animate-ping opacity-0 group-hover:opacity-100"></span>
               </div>
               <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 px-2 py-1 bg-red-600 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
