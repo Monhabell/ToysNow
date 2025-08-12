@@ -1,26 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { useState } from 'react';
 import Head from 'next/head';
-import { useSession } from 'next-auth/react'
-
+import { useSession } from 'next-auth/react';
 
 const UserProfile = () => {
-
-
-    const { data: session } = useSession()
-
-    console.log(session?.user?.name)
-
+    const { data: session } = useSession();
     const nombre = session?.user?.name || 'Usuario';
+    const token = session?.apiToken || '';
 
-    const token = session?.apiToken|| '';
+    // consulta a la API para obtener los datos del usuario
 
     const [userData, setUserData] = useState({
         name: nombre,
-        email: 'juan.perez@example.com',
-        phone: '+1 234 567 890',
-        address: 'Calle Falsa 123, Ciudad',
+        email: session?.user?.email || 'juan.perez@example.com',
+        phone: '',
+        address: '',
         password: '',
         newPassword: '',
         confirmPassword: '',
@@ -36,83 +30,102 @@ const UserProfile = () => {
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        // Aquí iría la lógica para actualizar los datos del usuario
         console.log('Datos actualizados:', userData);
         setIsEditing(false);
     };
 
-
-
     return (
-        <div className="min-h-screen bg-black text-gray-100">
+        <div className="min-h-screen bg-gray-900 text-gray-100">
             <Head>
-                <title>Mi Perfil - Ecommerce</title>
+                <title>Mi Perfil - SexChop</title>
+                <meta name="description" content="Gestión de tu perfil en SexChop" />
             </Head>
 
             <div className="container mx-auto px-4 py-8">
-                <h1 className="text-3xl font-bold mb-8 text-gold-500 border-b-2 border-gold-500 pb-2">
-                    Mi Perfil
+                <h1 className="text-3xl font-bold mb-8 text-amber-500 border-b-2 border-amber-500 pb-2">
+                    MI PERFIL
                 </h1>
 
                 <div className="flex flex-col md:flex-row gap-8">
                     {/* Sidebar */}
-                    <div className="w-full md:w-1/4 bg-gray-800 rounded-lg p-4">
-                        <div className="flex flex-col items-center py-4">
-                            <div className="w-24 h-24 rounded-full bg-gray-700 mb-4 flex items-center justify-center text-2xl font-bold text-gold-500">
-                                JP
+                    <div className="w-full md:w-1/4 bg-gray-800 rounded-lg p-4 border border-gray-700 shadow-lg">
+                        <div className="flex flex-col items-center py-4 border-b border-gray-700 pb-6">
+                            <div className="w-24 h-24 rounded-full bg-gray-700 mb-4 flex items-center justify-center text-2xl font-bold text-amber-500 border-2 border-amber-500">
+                                {userData.name.split(' ').map(n => n[0]).join('').toUpperCase()}
                             </div>
                             <h2 className="text-xl font-semibold">{userData.name}</h2>
-                            <p className="text-gray-400">{userData.email}</p>
-                            <p className="text-gray-400">{token}</p>
-
+                            <p className="text-gray-400 text-sm">{userData.email}</p>
                         </div>
 
-                        <nav className="mt-6">
+                        <nav className="mt-6 space-y-2">
                             <button
                                 onClick={() => setActiveTab('personal')}
-                                className={`w-full text-left px-4 py-2 rounded-md mb-2 ${activeTab === 'personal' ? 'bg-gold-500 text-gold-600 font-medium' : 'text-gray-300 hover:bg-gray-800'}`}
+                                className={`w-full text-left cursor-pointer px-4 py-3 rounded-md flex items-center transition-all ${activeTab === 'personal' ? 'bg-amber-500/10 text-amber-500 font-medium border-l-4 border-amber-500' : 'text-gray-300 hover:bg-gray-700 hover:text-amber-400'}`}
                             >
+                                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
                                 Información Personal
                             </button>
                             <button
                                 onClick={() => setActiveTab('security')}
-                                className={`w-full text-left px-4 py-2 rounded-md mb-2 ${activeTab === 'security' ? 'bg-gold-00 text-gold-600 font-medium' : 'text-gray-300 hover:bg-gray-800'}`}
+                                className={`w-full text-left cursor-pointer px-4 py-3 rounded-md flex items-center transition-all ${activeTab === 'security' ? 'bg-amber-500/10 text-amber-500 font-medium border-l-4 border-amber-500' : 'text-gray-300 hover:bg-gray-700 hover:text-amber-400'}`}
                             >
+                                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
                                 Seguridad
                             </button>
                             <button
                                 onClick={() => setActiveTab('orders')}
-                                className={`w-full text-left px-4 py-2 rounded-md mb-2 ${activeTab === 'orders' ? 'bg-gold-500 text-gold-600 font-medium' : 'text-gray-300 hover:bg-gray-800'}`}
+                                className={`w-full text-left cursor-pointer px-4 py-3 rounded-md flex items-center transition-all ${activeTab === 'orders' ? 'bg-amber-500/10 text-amber-500 font-medium border-l-4 border-amber-500' : 'text-gray-300 hover:bg-gray-700 hover:text-amber-400'}`}
                             >
+                                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
                                 Mis Pedidos
                             </button>
                             <button
                                 onClick={() => setActiveTab('wishlist')}
-                                className={`w-full text-left px-4 py-2 rounded-md ${activeTab === 'wishlist' ? 'bg-gold-500 text-gold-600 font-medium' : 'text-gray-300 hover:bg-gray-800'}`}
+                                className={`w-full text-left cursor-pointer px-4 py-3 rounded-md flex items-center transition-all ${activeTab === 'wishlist' ? 'bg-amber-500/10 text-amber-500 font-medium border-l-4 border-amber-500' : 'text-gray-300 hover:bg-gray-700 hover:text-amber-400'}`}
                             >
+                                <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
                                 Lista de Deseos
                             </button>
                         </nav>
                     </div>
 
                     {/* Main Content */}
-                    <div className="w-full md:w-3/4 bg-gray-800 rounded-lg p-6">
+                    <div className="w-full md:w-3/4 bg-gray-800 rounded-lg p-6 border border-gray-700 shadow-lg">
                         {activeTab === 'personal' && (
                             <div>
                                 <div className="flex justify-between items-center mb-6">
-                                    <h2 className="text-2xl font-semibold text-gold-600">Información Personal</h2>
+                                    <h2 className="text-2xl font-semibold text-amber-500 flex items-center">
+                                        <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        Información Personal
+                                    </h2>
                                     {!isEditing ? (
                                         <button
                                             onClick={() => setIsEditing(true)}
-                                            className="bg-gold-500 text-gold-600 px-4 py-2 rounded-md hover:bg-gold-600 transition"
+                                            className="bg-amber-500 hover:bg-amber-600 text-gray-900 px-4 py-2 rounded-md font-medium transition flex items-center"
                                         >
+                                            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                            </svg>
                                             Editar Perfil
                                         </button>
                                     ) : (
                                         <button
                                             onClick={() => setIsEditing(false)}
-                                            className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-600 transition"
+                                            className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md font-medium transition flex items-center"
                                         >
+                                            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                            </svg>
                                             Cancelar
                                         </button>
                                     )}
@@ -128,7 +141,7 @@ const UserProfile = () => {
                                                     name="name"
                                                     value={userData.name}
                                                     onChange={handleInputChange}
-                                                    className="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-gold-500"
+                                                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                                 />
                                             </div>
                                             <div>
@@ -138,7 +151,7 @@ const UserProfile = () => {
                                                     name="email"
                                                     value={userData.email}
                                                     onChange={handleInputChange}
-                                                    className="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-gold-500"
+                                                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                                 />
                                             </div>
                                             <div>
@@ -148,7 +161,7 @@ const UserProfile = () => {
                                                     name="phone"
                                                     value={userData.phone}
                                                     onChange={handleInputChange}
-                                                    className="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-gold-500"
+                                                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                                 />
                                             </div>
                                             <div>
@@ -158,36 +171,39 @@ const UserProfile = () => {
                                                     name="address"
                                                     value={userData.address}
                                                     onChange={handleInputChange}
-                                                    className="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-gold-500"
+                                                    className="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                                 />
                                             </div>
                                         </div>
                                         <div className="mt-8">
                                             <button
                                                 type="submit"
-                                                className="bg-gold-500 text-black px-6 py-2 rounded-md hover:bg-gold-600 transition"
+                                                className="bg-amber-500 hover:bg-amber-600 text-gray-900 px-6 py-2 rounded-md font-medium transition flex items-center"
                                             >
+                                                <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
                                                 Guardar Cambios
                                             </button>
                                         </div>
                                     </form>
                                 ) : (
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        <div>
-                                            <h3 className="text-gray-400 mb-1">Nombre completo</h3>
-                                            <p className="text-lg">{userData.name}</p>
+                                        <div className="bg-gray-700 p-4 rounded-lg">
+                                            <h3 className="text-gray-400 mb-1 text-sm">Nombre completo</h3>
+                                            <p className="text-lg font-medium">{userData.name}</p>
                                         </div>
-                                        <div>
-                                            <h3 className="text-gray-400 mb-1">Correo electrónico</h3>
-                                            <p className="text-lg">{userData.email}</p>
+                                        <div className="bg-gray-700 p-4 rounded-lg">
+                                            <h3 className="text-gray-400 mb-1 text-sm">Correo electrónico</h3>
+                                            <p className="text-lg font-medium">{userData.email}</p>
                                         </div>
-                                        <div>
-                                            <h3 className="text-gray-400 mb-1">Teléfono</h3>
-                                            <p className="text-lg">{userData.phone}</p>
+                                        <div className="bg-gray-700 p-4 rounded-lg">
+                                            <h3 className="text-gray-400 mb-1 text-sm">Teléfono</h3>
+                                            <p className="text-lg font-medium">{userData.phone}</p>
                                         </div>
-                                        <div>
-                                            <h3 className="text-gray-400 mb-1">Dirección</h3>
-                                            <p className="text-lg">{userData.address}</p>
+                                        <div className="bg-gray-700 p-4 rounded-lg">
+                                            <h3 className="text-gray-400 mb-1 text-sm">Dirección</h3>
+                                            <p className="text-lg font-medium">{userData.address}</p>
                                         </div>
                                     </div>
                                 )}
@@ -196,7 +212,12 @@ const UserProfile = () => {
 
                         {activeTab === 'security' && (
                             <div>
-                                <h2 className="text-2xl font-semibold text-gold-500 mb-6">Seguridad</h2>
+                                <h2 className="text-2xl font-semibold text-amber-500 mb-6 flex items-center">
+                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                    Seguridad
+                                </h2>
                                 <form onSubmit={handleSubmit} className="max-w-lg">
                                     <div className="mb-6">
                                         <label className="block text-gray-400 mb-2">Contraseña actual</label>
@@ -205,7 +226,7 @@ const UserProfile = () => {
                                             name="password"
                                             value={userData.password}
                                             onChange={handleInputChange}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-gold-500"
+                                            className="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                             required
                                         />
                                     </div>
@@ -216,9 +237,10 @@ const UserProfile = () => {
                                             name="newPassword"
                                             value={userData.newPassword}
                                             onChange={handleInputChange}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-gold-500"
+                                            className="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                             required
                                         />
+                                        <p className="text-xs text-gray-500 mt-1">Mínimo 8 caracteres, incluyendo mayúsculas, números y símbolos</p>
                                     </div>
                                     <div className="mb-8">
                                         <label className="block text-gray-400 mb-2">Confirmar nueva contraseña</label>
@@ -227,14 +249,17 @@ const UserProfile = () => {
                                             name="confirmPassword"
                                             value={userData.confirmPassword}
                                             onChange={handleInputChange}
-                                            className="w-full bg-gray-800 border border-gray-700 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-gold-500"
+                                            className="w-full bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent"
                                             required
                                         />
                                     </div>
                                     <button
                                         type="submit"
-                                        className="bg-gold-500 text-gold-600 px-6 py-2 rounded-md hover:bg-gold-600  transition cursor-pointer"
+                                        className="bg-amber-500 hover:bg-amber-600 text-gray-900 px-6 py-2 rounded-md font-medium transition flex items-center"
                                     >
+                                        <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                        </svg>
                                         Cambiar Contraseña
                                     </button>
                                 </form>
@@ -243,43 +268,72 @@ const UserProfile = () => {
 
                         {activeTab === 'orders' && (
                             <div>
-                                <h2 className="text-2xl font-semibold text-gold-500 mb-6">Mis Pedidos</h2>
+                                <h2 className="text-2xl font-semibold text-amber-500 mb-6 flex items-center">
+                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    Mis Pedidos
+                                </h2>
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-left">
-                                        <thead className="bg-gray-800 text-gold-500">
+                                        <thead className="bg-gray-700 text-amber-500">
                                             <tr>
                                                 <th className="px-4 py-3">N° Pedido</th>
                                                 <th className="px-4 py-3">Fecha</th>
                                                 <th className="px-4 py-3">Total</th>
+                                                <th className="px-4 py-3">Pago</th>
                                                 <th className="px-4 py-3">Estado</th>
                                                 <th className="px-4 py-3">Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr className="border-b border-gray-800 hover:bg-gray-800">
-                                                <td className="px-4 py-3">#12345</td>
+                                            <tr className="border-b border-gray-700 hover:bg-gray-700/50 transition">
+                                                <td className="px-4 py-3 font-medium">#SC-12345</td>
                                                 <td className="px-4 py-3">15/05/2023</td>
-                                                <td className="px-4 py-3">$249.99</td>
+                                                <td className="px-4 py-3 text-amber-500">$249.99</td>
+
                                                 <td className="px-4 py-3">
-                                                    <span className="bg-green-900 text-green-300 px-2 py-1 rounded-full text-xs">
+                                                   <span className="bg-green-900/50 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
+                                                        Exitoso                                              </span>
+                                                </td>
+                                                <td className="px-4 py-3">
+                                                    <span className="bg-green-900/50 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
                                                         Entregado
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    <button className="text-gold-500 hover:underline">Ver Detalles</button>
+                                                    <button className="text-amber-500 hover:text-amber-400 transition flex items-center text-sm">
+                                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        Detalles
+                                                    </button>
                                                 </td>
                                             </tr>
-                                            <tr className="border-b border-gray-800 hover:bg-gray-800">
-                                                <td className="px-4 py-3">#12344</td>
+                                            <tr className="border-b border-gray-700 hover:bg-gray-700/50 transition">
+                                                <td className="px-4 py-3 font-medium">#SC-12344</td>
                                                 <td className="px-4 py-3">10/05/2023</td>
-                                                <td className="px-4 py-3">$129.99</td>
+                                                <td className="px-4 py-3 text-amber-500">$129.99</td>
                                                 <td className="px-4 py-3">
-                                                    <span className="bg-yellow-900 text-yellow-300 px-2 py-1 rounded-full text-xs">
+                                                    <span className="bg-green-900/50 text-green-400 px-3 py-1 rounded-full text-xs font-medium">
+                                                        Exitoso
+                                                    </span>
+                                                </td>
+
+                                                <td className="px-4 py-3">
+                                                    <span className="bg-yellow-900/50 text-yellow-400 px-3 py-1 rounded-full text-xs font-medium">
                                                         En camino
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    <button className="text-gold-500 hover:underline">Ver Detalles</button>
+                                                    <button className="text-amber-500 hover:text-amber-400 transition flex items-center text-sm">
+                                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                        </svg>
+                                                        Detalles
+                                                    </button>
                                                 </td>
                                             </tr>
                                         </tbody>
@@ -290,23 +344,38 @@ const UserProfile = () => {
 
                         {activeTab === 'wishlist' && (
                             <div>
-                                <h2 className="text-2xl font-semibold text-gold-500 mb-6">Lista de Deseos</h2>
+                                <h2 className="text-2xl font-semibold text-amber-500 mb-6 flex items-center">
+                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                    Lista de Deseos
+                                </h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <div className="bg-gray-800 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-gold-500/20 transition">
-                                        <div className="h-48 bg-gray-700 flex items-center justify-center">
-                                            <span className="text-gray-500">Imagen del producto</span>
+                                    <div className="bg-gray-700 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/10 transition border border-gray-600">
+                                        <div className="h-48 bg-gray-600 flex items-center justify-center relative">
+                                            <span className="text-gray-400">Imagen del producto</span>
+                                            <button className="absolute top-2 right-2 text-red-500 hover:text-red-400 transition">
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </button>
                                         </div>
                                         <div className="p-4">
-                                            <h3 className="text-lg font-medium mb-2">Producto Ejemplo 1</h3>
-                                            <p className="text-gold-500 font-semibold mb-3">$99.99</p>
+                                            <h3 className="text-lg font-medium mb-2">Juguete Erótico Premium</h3>
+                                            <p className="text-amber-500 font-semibold mb-3">$99.99</p>
                                             <div className="flex justify-between">
-                                                <button className="cursor-pointer bg-gold-500 text-gold-600 px-3 py-1 rounded-md text-sm hover:bg-gold-600 transition">
-                                                    Añadir al carrito
-                                                </button>
-                                                <button className="text-gray-400 hover:text-red-500 transition">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                                        <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                <button className="bg-amber-500 hover:bg-amber-600 text-gray-900 px-3 py-1 rounded-md text-sm font-medium transition flex items-center">
+                                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
                                                     </svg>
+                                                    Añadir
+                                                </button>
+                                                <button className="text-gray-400 hover:text-amber-500 transition flex items-center text-sm">
+                                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                    </svg>
+                                                    Detalles
                                                 </button>
                                             </div>
                                         </div>
