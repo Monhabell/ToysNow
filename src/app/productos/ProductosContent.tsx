@@ -27,27 +27,6 @@ interface Category {
   name: string;
 }
 
-// interface Producto {
-//   id: number;
-//   name: string;
-//   price: number;
-//   compare_price: number;
-//   slug: string;
-//   description: string;
-//   brand: string;
-//   stock: number;
-//   shipment: number;
-//   is_available: boolean;
-//   is_feature: boolean;
-//   features: Feature[];
-//   img: string[];
-//   categories: Category[];
-//   subcategories: Category[];
-//   qualification: Qualification;
-//   questions: Question[];
-//   created_at: string;
-// }
-
 export default function ProductosContent() {
 
   const [allProductos, setAllProductos] = useState<Producto[]>([]);
