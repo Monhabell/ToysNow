@@ -18,11 +18,11 @@ export const metadata = {
   openGraph: {
     title: 'ToysNow - Tienda Erótica Premium',
     description: 'Explora nuestra colección de productos eróticos diseñados para potenciar tu intimidad. Envío discreto y garantía de satisfacción.',
-    url: 'https://www.toysnow.com.co', // Cambiar por tu dominio real
+    url: 'https://www.toysnow.com.co',
     siteName: 'ToysNow',
     images: [
       {
-        url: '/images/og-image.jpg', // Ruta a tu imagen para redes sociales
+        url: '/images/og-image.jpg',
         width: 1200,
         height: 630,
       },
@@ -34,8 +34,11 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'ToysNow - Tienda Erótica Premium',
     description: 'Descubre productos que transformarán tu vida íntima. Envío discreto y garantía de calidad.',
-    images: ['/images/twitter-image.jpg'], // Ruta a tu imagen para Twitter
+    images: ['/images/twitter-image.jpg'],
   },
+  verification: {
+    google: 'X_T0lOIJ4i2qyF4yYUStziUnAYuC9u1r7snzmUuDb9Q' 
+  }
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
