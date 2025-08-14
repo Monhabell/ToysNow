@@ -14,7 +14,9 @@ import Link from 'next/link';
 import type { Producto } from '@/types/productos'
 
 type ProductoDestacadoType = {
+
   id: string | number
+  slug?: string
   name: string
   price: number | string
   description: string
@@ -29,17 +31,15 @@ const CACHE_LIFETIME = 5 * 60 * 1000;
 // Función para normalizar productos
 const normalizeProduct = (product: any): ProductoDestacadoType => {
   if (!product) return null;
-
   const getImageUrl = (url: string) => {
-    console.log(url, 'URL de la imagen del producto destacado');
     if (!url) return 'https://www.jcprola.com/data/sinfoto.png';
     if (url.startsWith('http')) return url;
-
     return `${url.startsWith('/') ? url : `${url}`}`;
   };
 
   return {
     id: product.id || 0,
+    slug: product.slug || '',
     name: product.name || 'Producto sin nombre',
     price: product.price || 0,
     description: product.description || '',
@@ -331,7 +331,7 @@ export default function Home() {
                   img={productoDestacado.images[0]?.url || '/images/default.webp'}
                   name={productoDestacado.name}
                   price={productoDestacado.price.toString()}
-                  id={productoDestacado.id}
+                  slug={productoDestacado.slug}
                 />
               )}
             </div>
@@ -374,7 +374,7 @@ export default function Home() {
                   <h2 className="text-2xl sm:text-4xl font-bold text-white my-2 sm:my-4">{productoDestacado2.name}</h2>
 
                   <Link
-                    href={`/detalle/${productoDestacado2.id}`}
+                    href={`/detalle/${productoDestacado2.slug}`}
                     className="bg-magenta-600 hover:bg-gold-500 text-white font-bold py-2 px-6 sm:py-3 sm:px-8 rounded-full text-sm sm:text-lg transition-all duration-300 flex items-center group"
                   >
                     DESCUBRIR

@@ -3,19 +3,19 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 interface ProductoDestacadoProps {
-  id: string | number;
+  slug?: string;
   img: string;
   name: string;
   price?: string;
 }
 
-const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price, id }) => {
+const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price, slug }) => {
   const router = useRouter();
 
   // separar por "/" img
   const imgParts = img.split('/');
   const lastPart = "https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/products/"+imgParts[imgParts.length - 1];
-  console.log(lastPart, 'huy');
+
 
   const getImageUrl = (url: string) => {
     if (!url) return '/images/default.webp';
@@ -40,7 +40,7 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price,
             target.onerror = null;
             target.src = '/images/default.webp';
           }}
-          onClick={() => router.push(`/detalle/${id}`)}
+          onClick={() => router.push(`/productos/${slug}`)}
           className="border-amber-600/30 object-cover w-full transition-transform duration-300 group-hover:scale-105 cursor-pointer"
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           unoptimized={!imageUrl.startsWith('/')} // Desactiva optimización para imágenes externas
