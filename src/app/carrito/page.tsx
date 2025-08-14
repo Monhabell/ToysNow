@@ -156,14 +156,14 @@ const CartPage = () => {
     return (
       <div className="bg-black min-h-screen text-white">
         <Navbar />
-        <div className="container mx-auto py-16 px-4 text-center">
+        <div className="container mx-auto py-16 px-4 text-center mt-60">
           <div className="max-w-md mx-auto">
-            <FaShoppingCart className="mx-auto text-6xl text-gray-600 mb-6" />
+            <FaShoppingCart className="mx-auto text-6xl text-gold-600 mb-6" />
             <h2 className="text-2xl font-bold text-gray-300 mb-4">Tu carrito está vacío</h2>
             <p className="text-gray-500 mb-8">Agrega productos para continuar con tu compra</p>
             <button
-              onClick={() => router.push('/')}
-              className="bg-gold-500 hover:bg-gold-600 text-black font-bold py-3 px-6 rounded-lg cursor-pointer"
+              onClick={() => router.push('/productos')}
+              className="bg-gray-600 hover:bg-white hover:text-red text-gold-600 font-bold py-3 px-6 rounded-lg cursor-pointer"
             >
               Seguir comprando
             </button>
