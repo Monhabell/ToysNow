@@ -56,11 +56,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="es">
       <head>
         <link rel="preconnect" href="https://www.toysnow.com.co" />
-        <link
-          rel="preload"
-          href="https://www.toysnow.com.co/images/logos/icono_toysnow.jpg"
-          as="image"
-        />
+        
         <link
           rel="icon"
           href="https://www.toysnow.com.co/images/logos/icono_toysnow.jpg"
