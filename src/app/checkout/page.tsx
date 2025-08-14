@@ -114,20 +114,7 @@ const CheckoutForm = () => {
   // Handle preferenceId change to open MercadoPago payment
   useEffect(() => {
     if (preferenceId && preferenceId.init_point) {
-      console.log("Preference Object:", preferenceId);
-      console.log("Order ID:", preferenceId.orderId); // ✅ Esto imprimirá el orderId
-
-      const popup = window.open(
-        preferenceId.init_point, // ✅ Corregido: ahora es la URL real
-        'PagoMercadoPago',
-        'width=1000,height=600,scrollbars=yes,resizable=yes'
-      );
-      
-
-      if (!popup || popup.closed || typeof popup.closed === 'undefined') {
-        setError("Bloqueado por el navegador: habilita los pop-ups");
-        return;
-      }
+      window.location.href = preferenceId.init_point;
     }
   }, [preferenceId]);
 
