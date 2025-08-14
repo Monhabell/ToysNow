@@ -357,7 +357,7 @@ export default function ProductosContent() {
               <h2 className='text-lg text-gold-600'>Filtros</h2>
               <button
                 onClick={limpiarFiltros}
-                className="text-xs text-blue-500 hover:underline cursor-pointer"
+                className="text-s text-red-500 hover:underline cursor-pointer"
               >
                 Limpiar todo
               </button>
@@ -365,22 +365,24 @@ export default function ProductosContent() {
 
             {/* Filtro por Categoría */}
             <div className="mb-6 mt-6">
-              <h3 className="font-semibold text-gold-600 mb-2">Categorías</h3>
-              <div className="space-y-2">
+              <h3 className="font-semibold text-gold-600 mb-3">Categorías</h3>
+              <div className="flex flex-wrap gap-2">
                 {categorias.map(cat => (
-                  <div key={cat.id} className="flex items-center input-radio-Category">
-                    <input
-                      type="radio"
-                      id={`cat-${cat.id}`}
-                      name="categoria"
-                      checked={normalizarTexto(categoriaSeleccionada) === normalizarTexto(cat.name)}
-                      onChange={() => setCategoriaSeleccionada(cat.name)}
-                      className="mr-2 cursor-pointer"
-                    />
-                    <label htmlFor={`cat-${cat.id}`} className="flex-1">
-                      {cat.name} <span className="text-gray-500 text-sm">({contadorPorCategoria[cat.name] || 0})</span>
-                    </label>
-                  </div>
+                  <button
+                    key={cat.id}
+                    onClick={() => setCategoriaSeleccionada(cat.name)}
+                    className={`px-3 py-0.3 rounded-full text-sm cursor-pointer transition-colors truncate max-w-[150px] ${
+                      normalizarTexto(categoriaSeleccionada) === normalizarTexto(cat.name)
+                        ? 'bg-gold-100 border border-gold-500 text-gold-600'
+                        : 'border-gray-300 text-gray-500 hover:bg-gold-600 hover:text-white'
+                    }`}
+                    title={cat.name} // Mostrar tooltip con el texto completo
+                  >
+                    <span className="truncate inline-block max-w-full">
+                      {cat.name} 
+                      <span className="ml-1 text-gray-500">({contadorPorCategoria[cat.name] || 0})</span>
+                    </span>
+                  </button>
                 ))}
               </div>
             </div>

@@ -100,7 +100,7 @@ export default function Home() {
         const destacadoData = await destacadoRes.json()
 
         // Procesar promociones
-        const filtrados = productosData.data.filter((p: any) => p.compare_price > 0)
+        const filtrados = productosData.data.filter((p: any) => p.compare_price != p.price)
         setPromociones(filtrados)
 
         // Mostrar 10 productos al azar
@@ -388,7 +388,7 @@ export default function Home() {
             <div className="mt-2 sm:mt-8 content relative">
               <button
                 onClick={() => scrollLeft('slider2')}
-                className="absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
+                className="cursor-pointer hover:bg-black absolute left-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronLeft size={20} className="sm:w-6 sm:h-6" />
               </button>
@@ -408,7 +408,7 @@ export default function Home() {
 
               <button
                 onClick={() => scrollRight('slider2')}
-                className="absolute right-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
+                className="cursor-pointer hover:bg-black absolute right-5 top-1/2 -translate-y-1/2 z-10 bg-black/80 hover:bg-gold-600 text-white hover:text-white rounded-full p-2 sm:p-3 shadow-lg transition-all"
               >
                 <GoChevronRight size={20} className="sm:w-6 sm:h-6" />
               </button>

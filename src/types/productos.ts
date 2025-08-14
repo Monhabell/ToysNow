@@ -82,17 +82,6 @@ interface Feature {
 }
 
 
-
-
-
-// interface Question {
-//   user_id: number;
-//   question: string;
-//   answer: string;
-//   is_approved: boolean;
-//   created_at: string;
-// }
-
 export type ApiResponse = {
   data: Producto
 }
