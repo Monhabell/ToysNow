@@ -21,7 +21,7 @@ export const metadata = {
     'ToysNow'
   ],
   icons: {
-    icon: 'https://www.toysnow.com.co/images/logos/icon/favicon.ico'
+    icon: 'https://www.toysnow.com.co/images/logos/icono-logo-toys.ico'
   },
   openGraph: {
     title: 'ToysNow - Tienda Erótica Premium',
