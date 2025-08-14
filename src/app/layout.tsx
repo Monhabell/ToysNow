@@ -6,7 +6,6 @@ import SessionProviderWrapper from '@/components/SessionProviderWrapper'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata = {
-  metadataBase: new URL("https://www.toysnow.com.co"),
   title: {
     default: 'ToysNow - Tienda Erótica Premium',
     template: '%s | ToysNow'
