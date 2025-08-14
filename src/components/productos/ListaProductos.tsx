@@ -107,7 +107,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                 alt={p.name}
                 fill
                 className="object-cover"
-                onClick={() => router.push(`/detalle/${p.id}`)}
+                onClick={() => router.push(`/productos/${p.slug}`)}
                 priority={false}
                 unoptimized={true}
               />

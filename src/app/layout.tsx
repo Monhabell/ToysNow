@@ -10,7 +10,7 @@ export const metadata = {
     default: 'ToysNow - Tienda Erótica Premium',
     template: '%s | ToysNow'
   },
-  description: 'Descubre en ToysNow una amplia selección de productos eróticos de alta calidad. Juguetes sexuales, lencería y mucho más para explorar tu sexualidad. Envíos discretos y precios competitivos.',
+  description: 'ToysNow es una tienda virtual que ofrece productos para adultos con fines de bienestar y placer sexual. Operamos desde Colombia, con atención personalizada a través de nuestras plataformas digitales',
   keywords: ['juguetes eróticos', 'tienda sexual', 'productos para adultos', 'lencería sexy', 'vibradores', 'ToysNow'],
   icons: {
     icon: '/images/logos/icono-logo-toys.ico',
@@ -22,7 +22,7 @@ export const metadata = {
     siteName: 'ToysNow',
     images: [
       {
-        url: '/images/og-image.jpg',
+        url: '/images/logos/icono_toysnow.jpg',
         width: 1200,
         height: 630,
       },

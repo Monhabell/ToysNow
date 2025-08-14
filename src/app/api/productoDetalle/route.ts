@@ -4,9 +4,10 @@ import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
-  const id = searchParams.get('id');
+  const slug = searchParams.get('slug');
+  
 
-  if (!id) {
+  if (!slug) {
     return NextResponse.json(
       { error: 'Se requiere el parámetro ID' },
       { status: 400 }
@@ -14,7 +15,7 @@ export async function GET(request: Request) {
   }
 
   try {
-    const API_URL = `${process.env.API_TENANT_BASE_URL_V1}/products/${id}`;
+    const API_URL = `${process.env.API_TENANT_BASE_URL_V1}/products/${slug}`;
 
     const res = await fetch(API_URL, {
       method: 'GET',

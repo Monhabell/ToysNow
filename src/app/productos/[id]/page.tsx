@@ -64,7 +64,7 @@ export default function ProductoDetalle({ params }: Props) {
     const obtenerProducto = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/productoDetalle?id=${id}`);
+        const response = await fetch(`/api/productoDetalle?slug=${id}`);
 
         if (!response.ok) {
           throw new Error(`Error HTTP: ${response.status}`);
