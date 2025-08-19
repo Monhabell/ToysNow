@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 'use client'
-import Head from 'next/head'; 
+
 import { useEffect, useState, use } from 'react';
 import { useCart } from '@/context/CartContext';
 import ListaProductos from '@/components/productos/ListaProductos';
@@ -142,6 +142,18 @@ export default function ProductoDetalle({ params }: Props) {
   const { data: session } = useSession()
   const router = useRouter();
 
+  useEffect(() => {
+    if (producto) {
+      document.title = `${producto.name} | ToysNow`;
+      
+      // También puedes actualizar meta tags
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription && producto.description) {
+        metaDescription.setAttribute('content', producto.description.substring(0, 160) + '...');
+      }
+    }
+  }, [producto]);
+
   const calcularRatingPromedio = (producto: Producto) => {
     if (!producto.qualification?.count_users) return 0;
 
@@ -156,15 +168,6 @@ export default function ProductoDetalle({ params }: Props) {
 
     return sum / total;
   };
-
-  const pageTitle = producto 
-    ? `${producto.name} | ToysNow` 
-    : 'Cargando producto... | ToysNow';
-
-  const pageDescription = producto?.description 
-    ? producto.description.substring(0, 160) + '...'
-    : 'Descubre este producto exclusivo en ToysNow. Envío discreto y garantía de calidad.';
-
 
   useEffect(() => {
     const obtenerProducto = async () => {
@@ -491,28 +494,6 @@ export default function ProductoDetalle({ params }: Props) {
 
   return (
     <>
-      {/* Agregar el Head con metadata dinámica */}
-      <Head>
-        <title>{pageTitle}</title>
-        <meta name="description" content={pageDescription} />
-        
-        {/* Open Graph / Facebook */}
-        <meta property="og:title" content={pageTitle} />
-        <meta property="og:description" content={pageDescription} />
-        {producto && producto.images.length > 0 && (
-          <meta property="og:image" content={getImageUrl("https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[0].url)} />
-        )}
-        <meta property="og:url" content={typeof window !== 'undefined' ? window.location.href : ''} />
-        <meta property="og:type" content="product" />
-        
-        {/* Twitter */}
-        <meta name="twitter:title" content={pageTitle} />
-        <meta name="twitter:description" content={pageDescription} />
-        {producto && producto.images.length > 0 && (
-          <meta name="twitter:image" content={getImageUrl("https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[0].url)} />
-        )}
-        <meta name="twitter:card" content="summary_large_image" />
-      </Head>
       
       <div className="relative">
         <Navbar />
