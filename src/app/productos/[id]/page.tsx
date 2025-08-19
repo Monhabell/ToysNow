@@ -14,6 +14,12 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
 import Image from 'next/image';
+import { 
+  FaFacebook, 
+  FaWhatsapp, 
+  FaLink,
+  FaShareAlt
+} from "react-icons/fa";
 
 import type {
   Producto,
@@ -27,6 +33,99 @@ interface Props {
     [key: string]: any;
   }>;
 }
+
+const SocialShare = ({ 
+  productName, 
+  productUrl, 
+  productImage, 
+  productDescription 
+}: { 
+  productName: string; 
+  productUrl: string;
+  productImage: string;
+  productDescription: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
+
+  const shareText = `¡Mira este producto: ${productName}! ${productDescription.substring(0, 100)}...`;
+
+  const shareUrls = {
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${productUrl}`)}`,
+    instagram: `https://www.instagram.com/?url=${encodeURIComponent(productUrl)}`, 
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(productUrl)
+      .then(() => {
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      })
+      .catch(err => {
+        console.error('Error al copiar: ', err);
+      });
+  };
+
+  const openShareDialog = (platform: string) => {
+    const width = 600;
+    const height = 400;
+    const left = (window.innerWidth - width) / 2;
+    const top = (window.innerHeight - height) / 2;
+    
+    window.open(
+      shareUrls[platform as keyof typeof shareUrls],
+      'Compartir',
+      `width=${width},height=${height},left=${left},top=${top}`
+    );
+  };
+
+  return (
+    <div className="relative inline-block">
+      <button 
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-1 text-sm text-white hover:text-gold-500 transition-colors cursor-pointer p-2 rounded-md bg-gray-800 hover:bg-gray-700"
+        aria-label="Compartir producto"
+      >
+        <FaShareAlt size={20} />
+        <span>Compartir</span>
+      </button>
+      
+      {isOpen && (
+        <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
+          <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
+            Compartir producto
+          </div>
+          
+          <button
+            onClick={() => openShareDialog('facebook')}
+            className="cursor-pointer flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            <FaFacebook className="text-blue-600 mr-2" />
+            Facebook
+          </button>
+          
+          <button
+            onClick={() => openShareDialog('whatsapp')}
+            className="cursor-pointer flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            <FaWhatsapp className="text-green-500 mr-2" />
+            WhatsApp
+          </button>
+        
+
+          <button
+            onClick={copyToClipboard}
+            className="cursor-pointer flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            <FaLink className="text-gray-500 mr-2" />
+            {isCopied ? '¡Enlace copiado!' : 'Copiar enlace'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function ProductoDetalle({ params }: Props) {
   const resolvedParams = use(params);
@@ -436,9 +535,20 @@ export default function ProductoDetalle({ params }: Props) {
                   <div>
                     <h3 className='pb-5'>{textoNuevo}</h3>
                   </div>
-                  <div>
-                    <CiHeart size={25} className="cursor-pointer hover:text-gold-500" />
+
+
+                  <div className="flex items-center gap-3">
+                    <SocialShare 
+                      productName={producto.name}
+                      productUrl={window.location.href}
+                      productImage={getImageUrl("https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[0]?.url || '/images/default.png')}
+                      productDescription={producto.description || ''}
+                    />
                   </div>
+
+                  {/* <div>
+                    <CiHeart size={25} className="cursor-pointer hover:text-gold-500" />
+                  </div> */}
                 </div>
 
                 <h1 className='detail_text text-gold-600'>{producto.name}</h1>
