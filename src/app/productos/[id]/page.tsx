@@ -5,7 +5,6 @@
 
 import { useEffect, useState, use } from 'react';
 import { useCart } from '@/context/CartContext';
-import { CiHeart } from "react-icons/ci";
 import ListaProductos from '@/components/productos/ListaProductos';
 import Navbar from "@/components/Navbar";
 import '../../../styles/detalles.css';
@@ -37,7 +36,6 @@ interface Props {
 const SocialShare = ({ 
   productName, 
   productUrl, 
-  productImage, 
   productDescription 
 }: { 
   productName: string; 
