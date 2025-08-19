@@ -357,7 +357,7 @@ export default function ProductosContent() {
               <h2 className='text-lg text-gold-600'>Filtros</h2>
               <button
                 onClick={limpiarFiltros}
-                className="text-s text-red-500 hover:underline cursor-pointer"
+                className="text-xs text-red-500 hover:underline cursor-pointer"
               >
                 Limpiar todo
               </button>
@@ -516,8 +516,8 @@ export default function ProductosContent() {
                       <SelectGroup>
                         <SelectLabel>Criterios</SelectLabel>
                         <SelectItem value="relevancia">Relevancia</SelectItem>
-                        <SelectItem value="precio">Precio (Menor a Mayor)</SelectItem>
-                        <SelectItem value="calificacion">Calificación (Mayor a Menor)</SelectItem>
+                        <SelectItem value="precio">Menor Precio</SelectItem>
+                        <SelectItem value="calificacion">Mayor Precio</SelectItem>
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -529,12 +529,12 @@ export default function ProductosContent() {
               <div aria-live="assertive" role="alert" className="loader"></div>
               
             ) : productosFiltrados.length === 0 ? (
-              <div className="bg-white p-8 rounded shadow-md text-center">
-                <h3 className="text-lg font-semibold mb-2">No se encontraron productos</h3>
-                <p className="text-gray-600 mb-4">Intenta ajustar tus filtros de búsqueda</p>
+              <div className="p-8 rounded text-center">
+                <h3 className="text-gold-600 font-semibold mb-2">No se encontraron productos</h3>
+                <p className="text-white mb-4">Intenta ajustar tus filtros de búsqueda</p>
                 <button
                   onClick={limpiarFiltros}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
                 >
                   Limpiar todos los filtros
                 </button>
