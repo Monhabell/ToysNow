@@ -33,7 +33,8 @@ export const metadata = {
       {
         url: 'https://www.toysnow.com.co/images/logos/icon/apple-icon.jpg',
         width: 1200,
-        height: 630
+        height: 630,
+        alt: 'ToysNow Tienda Erótica Premium en Colombia'
       }
     ],
     locale: 'es_ES',
@@ -44,7 +45,7 @@ export const metadata = {
     title: 'ToysNow - Tienda Erótica Premium',
     description:
       'Descubre productos que transformarán tu vida íntima. Envío discreto y garantía de calidad.',
-    images: ['/images/twitter-image.jpg']
+    images: ['https://www.toysnow.com.co/images/twitter-image.jpg']
   },
   verification: {
     google: 'X_T0lOIJ4i2qyF4yYUStziUnAYuC9u1r7snzmUuDb9Q'
@@ -55,8 +56,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <head>
+        {/* Canonical URL */}
+        <link rel="canonical" href="https://www.toysnow.com.co/" />
+
+        {/* Robots meta tag */}
+        <meta name="robots" content="index, follow" />
+
+        {/* Author / Publisher */}
+        <meta name="author" content="ToysNow" />
+        <meta name="publisher" content="ToysNow" />
+
+        {/* Preconnect para mejorar performance */}
         <link rel="preconnect" href="https://www.toysnow.com.co" />
-        
+
         <link
           rel="icon"
           href="https://www.toysnow.com.co/images/logos/icono_toysnow.jpg"
