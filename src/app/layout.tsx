@@ -11,7 +11,7 @@ export const metadata = {
     template: '%s | ToysNow'
   },
   description:
-    'ToysNow es una tienda virtual que ofrece productos para adultos con fines de bienestar y placer sexual.',
+    'ToysNow es una tienda virtual que ofrece productos para adultos con fines de bienestar y placer sexual. Operamos desde Colombia.',
   keywords: [
     'juguetes eróticos',
     'tienda sexual',
