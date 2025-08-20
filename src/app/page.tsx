@@ -191,6 +191,7 @@ export default function Home() {
         </div>
 
         <div className="text-center space-y-3 max-w-md">
+          <h1 className='textr-white text-2xl'>Toysnow</h1>
           <h2 className="text-2xl md:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">
             <span className="animate-fadeIn">Cargando tu experiencia sensual...</span>
           </h2>
