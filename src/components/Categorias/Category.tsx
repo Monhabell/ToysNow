@@ -134,6 +134,7 @@ const CategoryMenu: React.FC = () => {
                 <Image 
                   src={category.image || '/images/icons/logoDefaulCategories.png'}
                   alt={category.name}
+                  title={category.name}
                   className="rounded-full" 
                   width={60}
                   height={60}

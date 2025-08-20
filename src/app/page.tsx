@@ -169,6 +169,7 @@ export default function Home() {
               <Image
                 src="/images/logos/icono-logo-toys.ico"
                 alt="ToysNow"
+                title='ToysNow - Tienda erótica premium'
                 fill
                 className="object-contain drop-shadow-lg"
                 priority
@@ -229,6 +230,7 @@ export default function Home() {
                 <Image
                   src="/images/logos/logo2.png"
                   alt="ToysNow - Tienda erótica premium"
+                  title='ToysNow - Tienda erótica premium'
                   fill
                   className="object-contain"
                   priority
@@ -371,6 +373,7 @@ export default function Home() {
                   }}
                   fill
                   alt={productoDestacado2.name}
+                  title={productoDestacado2.name}
                   className="w-full h-full object-cover"
                 />
                 <div className="absolute left-4 sm:left-10 top-1/2 -translate-y-1/2 z-2 max-w-xs sm:max-w-md px-2 sm:px-0">

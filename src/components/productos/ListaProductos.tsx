@@ -105,6 +105,7 @@ export default function ListaProductos({ productos, isSlider = false }: ListaPro
                   target.src = '/images/default.png';
                 }}
                 alt={p.name}
+                title={p.name}
                 fill
                 className="object-cover"
                 onClick={() => router.push(`/productos/${p.slug}`)}
