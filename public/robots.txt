@@ -3,3 +3,5 @@ Allow: /
 Sitemap: https://www.toysnow.com.co/sitemap.xml
 
 Disallow: /login/*
+Disallow: /carrito/*
+

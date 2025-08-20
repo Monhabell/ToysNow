@@ -406,6 +406,7 @@ export default function ProductoDetalle({ params }: Props) {
                   width={100}
                   height={100}
                   alt={producto.name}
+                  title={producto.name}
                   onClick={() => setImgSeleccionada(index)}
                   className={`cursor-pointer ${imgSeleccionada === index ? 'border-2 border-gold-500' : ''}`}
                 />
@@ -426,6 +427,7 @@ export default function ProductoDetalle({ params }: Props) {
                 width={500}
                 height={500}
                 alt={producto.name}
+                title={producto.name}
                 className="w-full h-full object-contain"
               />
             </div>
