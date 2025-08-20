@@ -32,6 +32,10 @@ jobs:
           API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
           API_KEY=${{ secrets.API_KEY }}
           NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+          NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
+
           EOF
           npm install
           npm run build
@@ -64,6 +68,9 @@ jobs:
             API_TENANT_BASE_URL_V1=${{ secrets.API_TENANT_BASE_URL_V1 }}
             API_KEY=${{ secrets.API_KEY }}
             NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
+            NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
 
             EOF
 
