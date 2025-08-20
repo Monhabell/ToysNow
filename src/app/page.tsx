@@ -9,6 +9,8 @@ import Banner from '@/components/Banner'
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import { FiArrowRight } from "react-icons/fi";
 import Image from 'next/image';
+import { Card, Skeleton } from "@heroui/react";
+import SkeletonProductos from '@/components/productos/SkeletonProductos';
 
 import Link from 'next/link';
 import type { Producto } from '@/types/productos'
@@ -58,13 +60,14 @@ export default function Home() {
   const [promocionesCant, setProductCant] = useState<Producto[]>([])
   const [productoDestacado, setProductoDestacado] = useState<ProductoDestacadoType>(null)
   const [productoDestacado2, setProductoDestacado2] = useState<ProductoDestacadoType>(null)
+  const [loading, setLoading] = useState(true); // Añade estado de carga
  
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-
+        setLoading(true);
 
         // Verificar si hay datos en cache y si aún son válidos
         const cachedData = localStorage.getItem('productosCache');
@@ -140,7 +143,7 @@ export default function Home() {
         console.error('Error:', err)
         setError('Error al cargar los datos. Por favor intenta nuevamente.')
       } finally {
-
+        setLoading(false); // Cambiar estado de carga a false al finalizar
       }
     }
 
@@ -253,13 +256,17 @@ export default function Home() {
                 id="slider"
                 className="overflow-x-auto py-4 sm:py-6 scroll-smooth scrollbar-hide space-x-4 sm:space-x-6"
               >
-                <ListaProductos
-                  productos={promocionesCant.map(p => ({
-                    ...p,
-                    images: p.images || [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
-                  }))}
-                  isSlider
-                />
+                {loading ? (
+                  <SkeletonProductos isSlider cantidad={5} />
+                ) : (
+                  <ListaProductos
+                    productos={promocionesCant.map(p => ({
+                      ...p,
+                      images: p.images || [{ url: 'https://www.jcprola.com/data/sinfoto.png' }]
+                    }))}
+                    isSlider
+                  />
+                )}
               </div>
 
               {/* Botón derecho - visible solo en desktop */}
@@ -272,14 +279,16 @@ export default function Home() {
             </div>
 
             <div className="producto_destacado">
-              {productoDestacado && (
+              {loading ? (
+                <SkeletonProductos isSlider cantidad={2} />
+              ) : productoDestacado ? (
                 <ProductoDestacado
                   img={productoDestacado.images[0]?.url || '/images/default.webp'}
                   name={productoDestacado.name}
                   price={productoDestacado.price.toString()}
                   slug={productoDestacado.slug}
                 />
-              )}
+              ) : null}
             </div>
           </div>
         </div>
@@ -411,7 +420,10 @@ export default function Home() {
               <div
                 id="slider2"
                 className="overflow-x-auto py-4 sm:py-6 scroll-smooth scrollbar-hide space-x-4 sm:space-x-6"
-              >
+              > 
+              {loading ? (
+                <SkeletonProductos isSlider cantidad={10} />
+              ) : productoDestacado ? (
                 <ListaProductos
                   productos={promociones.map(p => ({
                     ...p,
@@ -419,6 +431,7 @@ export default function Home() {
                   }))}
                   isSlider
                 />
+              ) : null}
               </div>
 
               <button
