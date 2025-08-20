@@ -1,7 +1,4 @@
-// components/productos/SkeletonProductos.jsx
-import { Card, Skeleton } from "@heroui/react";
 
-// components/productos/SkeletonProductos.jsx
 const SkeletonProductos = ({ isSlider = false, cantidad = 5 }) => {
   const skeletonCard = (
     <div className="w-[200px] space-y-9 p-4 bg-black rounded-lg shadow-md">

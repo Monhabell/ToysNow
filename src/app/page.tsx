@@ -9,7 +9,7 @@ import Banner from '@/components/Banner'
 import { GoChevronRight, GoChevronLeft } from "react-icons/go";
 import { FiArrowRight } from "react-icons/fi";
 import Image from 'next/image';
-import { Card, Skeleton } from "@heroui/react";
+
 import SkeletonProductos from '@/components/productos/SkeletonProductos';
 
 import Link from 'next/link';

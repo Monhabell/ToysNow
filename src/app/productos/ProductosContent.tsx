@@ -7,6 +7,7 @@ import { useSearchParams } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import ListaProductos from '@/components/productos/ListaProductos'
 import '../../styles/productos.css';
+import SkeletonProductos from '@/components/productos/SkeletonProductos';
 
 import Head from 'next/head'
 import {
@@ -46,6 +47,7 @@ export default function ProductosContent() {
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState(categoriaParam);
   const [marcasDisponibles, setMarcasDisponibles] = useState<string[]>([]);
   const [ratingMinimo, setRatingMinimo] = useState<number | ''>('');
+  
 
   // Estados para paginación
   const [currentPage, setCurrentPage] = useState(1);
@@ -526,7 +528,7 @@ export default function ProductosContent() {
             </div>
 
             {isLoading ? (
-              <div aria-live="assertive" role="alert" className="loader"></div>
+              <SkeletonProductos isSlider cantidad={4} />
               
             ) : productosFiltrados.length === 0 ? (
               <div className="p-8 rounded text-center">

@@ -458,12 +458,14 @@ scrollbar-width: none;     /* Firefox */
   animation: fade-in 0.4s ease-out forwards;
 }
 
+
+
 @keyframes shimmer {
   0% {
-    transform: translateX(-100%);
+    transform: translateX(-100%) skewX(-15deg);
   }
-  100% {
-    transform: translateX(100%);
+  50%, 100% {
+    transform: translateX(100%) skewX(-15deg);
   }
 }
 
@@ -472,15 +474,60 @@ scrollbar-width: none;     /* Firefox */
     opacity: 1;
   }
   50% {
-    opacity: 0.5;
+    opacity: 0.7;
   }
 }
 
 .animate-shimmer {
-  animation: shimmer 3s infinite;
+  animation: shimmer 2s ease-in-out infinite;
 }
 
 .animate-pulse {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
+/* Mejora adicional para un efecto más suave */
+.skeleton-shine {
+  position: relative;
+  overflow: hidden;
+  background-color: #e5e7eb; /* bg-gray-200 */
+}
+
+.skeleton-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0)
+  );
+  animation: shimmer 2s infinite;
+}
+
+/* Versión alternativa con gradiente animado */
+@keyframes shimmer-gradient {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-shimmer-gradient {
+  background: linear-gradient(
+    90deg,
+    #f0f0f0 0%,
+    #e0e0e0 50%,
+    #f0f0f0 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-gradient 1.5s ease-in-out infinite;
+}
