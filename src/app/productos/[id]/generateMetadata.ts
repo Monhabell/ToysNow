@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 
+
 interface Props {
   params: Promise<{
     id: string;
@@ -15,14 +16,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/api/productoDetalle?slug=${id}`,
-      { next: { revalidate: 60 } } // cache para SEO y rendimiento
+      { next: { revalidate: 60 } }
     );
 
     if (!response.ok) {
       return {
         title: "Producto no encontrado | ToysNow",
         description: "El producto que buscas no está disponible en ToysNow.",
-        robots: { index: false, follow: false }, // no indexar errores
+        robots: { index: false, follow: false },
       };
     }
 
@@ -57,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         "ToysNow",
         producto.category?.name,
         producto.name,
-        producto.brand?.name || "", // si hay marca la incluimos
+        producto.brand?.name || "",
       ].filter(Boolean),
       alternates: {
         canonical: `${siteUrl}/productos/${id}`,
@@ -90,6 +91,40 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         index: true,
         follow: true,
         nocache: false,
+      },
+      // 👇 Aquí añadimos el JSON-LD para Rich Snippets
+      other: {
+        "application/ld+json": JSON.stringify({
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          name: producto.name,
+          image: imageUrl,
+          description,
+          sku: producto.sku || id,
+          brand: {
+            "@type": "Brand",
+            name: producto.brand?.name || "ToysNow",
+          },
+          category: producto.category?.name || "Productos",
+          offers: {
+            "@type": "Offer",
+            url: `${siteUrl}/productos/${id}`,
+            priceCurrency: "COP",
+            price: producto.price || "0.00",
+            availability: producto.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            seller: {
+              "@type": "Organization",
+              name: "ToysNow",
+            },
+          },
+          aggregateRating: producto.rating
+            ? {
+                "@type": "AggregateRating",
+                ratingValue: producto.rating,
+                reviewCount: producto.reviews_count || 1,
+              }
+            : undefined,
+        }),
       },
     };
   } catch (error) {
