@@ -14,7 +14,6 @@ import Link from 'next/link';
 import type { Producto } from '@/types/productos'
 
 type ProductoDestacadoType = {
-
   id: string | number
   slug?: string
   name: string
@@ -58,7 +57,7 @@ export default function Home() {
   const [promocionesCant, setProductCant] = useState<Producto[]>([])
   const [productoDestacado, setProductoDestacado] = useState<ProductoDestacadoType>(null)
   const [productoDestacado2, setProductoDestacado2] = useState<ProductoDestacadoType>(null)
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(false) // Cambiado a false para no mostrar carga inicial
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -157,67 +156,8 @@ export default function Home() {
     slider?.scrollBy({ left: 500, behavior: 'smooth' })
   }
 
-  if (loading) {
-    return (
-      <div className="fixed inset-0 bg-gradient-to-b from-black to-purple-900/20 z-50 flex flex-col items-center justify-center space-y-8 p-6">
-        <div className="relative group">
-          <div className="absolute -inset-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-all duration-500 animate-pulse"></div>
-          <div className="relative w-32 h-32 flex items-center justify-center">
-            <div className="absolute inset-0 border-2 border-pink-500/30 rounded-full animate-[pulse_3s_ease-in-out_infinite]"></div>
-            <div className="absolute inset-4 border border-pink-400/50 rounded-full animate-[pulse_3s_ease-in-out_infinite] delay-100"></div>
-            <div className="relative z-10 w-20 h-20">
-              <Image
-                src="/images/logos/icono-logo-toys.ico"
-                alt="ToysNow"
-                title='ToysNow - Tienda erótica premium'
-                fill
-                className="object-contain drop-shadow-lg"
-                priority
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="w-full max-w-md">
-          <div className="h-1.5 bg-gray-800/50 rounded-full overflow-hidden backdrop-blur-sm">
-            <div
-              className="h-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full animate-progress"
-              style={{
-                backgroundSize: '200% 100%',
-                animation: 'progress 2s ease-in-out infinite',
-                boxShadow: '0 0 8px rgba(236, 72, 153, 0.6)'
-              }}
-            ></div>
-          </div>
-        </div>
-
-        <div className="text-center space-y-3 max-w-md">
-          <h1 className='textr-white text-2xl'>Toysnow</h1>
-          <h2 className="text-2xl md:text-3xl font-light text-transparent bg-clip-text bg-gradient-to-r from-pink-300 to-purple-200">
-            <span className="animate-fadeIn">Cargando tu experiencia sensual...</span>
-          </h2>
-          <p className="text-sm text-pink-200/80 font-light tracking-wider">
-            <span className="inline-block animate-typing overflow-hidden whitespace-nowrap border-r-2 border-pink-400/50 pr-1">
-              Seleccionando los productos más exclusivos para tu placer...
-            </span>
-          </p>
-        </div>
-
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center space-x-4">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="w-2 h-2 bg-pink-400/30 rounded-full animate-bounce"
-              style={{
-                animationDelay: `${i * 0.1}s`,
-                animationDuration: '1.5s'
-              }}
-            ></div>
-          ))}
-        </div>
-      </div>
-    )
-  }
+  // Eliminamos la comprobación de loading al inicio para que no muestre
+  // la pantalla de carga, pero mantenemos el manejo de errores
 
   if (error) {
     return (
@@ -390,8 +330,6 @@ export default function Home() {
                 </div>
               </section>
             )}
-
-            
 
             {/* Sección de contenido informativo */}
             <section className="mb-12 sm:mb-20 pt-8 sm:pt-12">
