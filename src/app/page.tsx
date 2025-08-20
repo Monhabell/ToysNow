@@ -14,6 +14,7 @@ import Link from 'next/link';
 import type { Producto } from '@/types/productos'
 
 type ProductoDestacadoType = {
+
   id: string | number
   slug?: string
   name: string
@@ -57,13 +58,13 @@ export default function Home() {
   const [promocionesCant, setProductCant] = useState<Producto[]>([])
   const [productoDestacado, setProductoDestacado] = useState<ProductoDestacadoType>(null)
   const [productoDestacado2, setProductoDestacado2] = useState<ProductoDestacadoType>(null)
-  const [loading, setLoading] = useState(false) // Cambiado a false para no mostrar carga inicial
+ 
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true)
+
 
         // Verificar si hay datos en cache y si aún son válidos
         const cachedData = localStorage.getItem('productosCache');
@@ -80,7 +81,7 @@ export default function Home() {
             setProductoDestacado(cachedDestacado);
             setProductoDestacado2(cachedDestacado2);
             setProductCant(cachedShuffled);
-            setLoading(false);
+
             return;
           }
         }
@@ -139,7 +140,7 @@ export default function Home() {
         console.error('Error:', err)
         setError('Error al cargar los datos. Por favor intenta nuevamente.')
       } finally {
-        setLoading(false)
+
       }
     }
 
@@ -156,8 +157,7 @@ export default function Home() {
     slider?.scrollBy({ left: 500, behavior: 'smooth' })
   }
 
-  // Eliminamos la comprobación de loading al inicio para que no muestre
-  // la pantalla de carga, pero mantenemos el manejo de errores
+  
 
   if (error) {
     return (
@@ -330,6 +330,8 @@ export default function Home() {
                 </div>
               </section>
             )}
+
+            
 
             {/* Sección de contenido informativo */}
             <section className="mb-12 sm:mb-20 pt-8 sm:pt-12">
