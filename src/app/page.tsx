@@ -226,7 +226,7 @@ export default function Home() {
     <>
       <Navbar />
 
-      <div className="relative bg-black min-h-screen mt-42 sm:mt-30">
+      <div className="relative min-h-screen mt-42 sm:mt-30">
         {/* Banner */}
         <div className="overflow-hidden">
           <Banner />
@@ -385,7 +385,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mt-8 bg-gray-900/50 rounded-xl p-6 border border-pink-500/20">
+              <div className="mt-8 bg-gray-900/50 rounded-xl p-6 border border-pink-500/20 sensual-content">
                 <h3 className="text-lg font-semibold text-pink-400 mb-4">Consejos para el uso responsable</h3>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-300">
                   <li className="flex items-start">
@@ -445,7 +445,7 @@ export default function Home() {
         </main>
 
         {/* Newsletter */}
-        <footer className="bg-gradient-to-r from-black to-red-900 text-white py-10 px-4 sm:px-6 lg:px-8">
+        <footer className="bg-gradient-to-r from-black to-gold-100 text-white py-10 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Sección de información general */}
             <div className="space-y-4">
@@ -501,6 +501,14 @@ export default function Home() {
             <p>© {new Date().getFullYear()} ToysNow. Todos los derechos reservados.</p>
           </div>
         </footer>
+
+        <div className="sensual-background">
+          <div className="sensual-shape shape-1"></div>
+          <div className="sensual-shape shape-2"></div>
+          <div className="sensual-shape shape-3"></div>
+          <div className="sensual-shape shape-4"></div>
+          <div className="sensual-shape shape-5"></div>
+        </div>
       </div>
     </>
   )

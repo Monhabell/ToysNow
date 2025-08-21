@@ -101,7 +101,7 @@
 }
 
 body {
-  background: #070707;
+  background: linear-gradient(135deg, #1a001a 0%, #330033 50%, #4d004d 100%);
   font-family: Arial, sans-serif;
   margin: 0;
   position: relative;
@@ -201,7 +201,6 @@ scrollbar-width: none;     /* Firefox */
 .content {
   display: flex;
   flex-direction: row; /* por defecto */
-  background-color: rgb(36, 36, 36);
   color: rgb(0, 0, 0);
   margin-top: 20px;
   height: 90%;
@@ -212,21 +211,25 @@ scrollbar-width: none;     /* Firefox */
 .content-detalle {
   display: flex;
   flex-direction: row; /* por defecto */
-  background-color: rgb(36, 36, 36);
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
   color: rgb(255, 255, 255);
   margin-top: 20px;
   height: 90%;
-  padding: 15px;
-  border-radius: 15px;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .content-producto {
   display: flex;
   flex-direction: row; /* por defecto */
-  background-color: rgb(36, 36, 36);
+  background: rgba(0, 0, 0, 0.089);
+  backdrop-filter: blur(10px);
   height: 90%;
   padding: 25px;
   border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 /* Para pantallas pequeñas (móviles) */
