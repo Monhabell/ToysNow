@@ -599,7 +599,7 @@ export default function ProductoDetalle({ params }: Props) {
         {relacionados.length > 0 && (
           <div className='productos-relacionados max-w-6xl mx-auto mt-32'>
             <div className='mt-5'>
-              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Recomendaciones para ti</h1>
+              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Recomendaciones para ti Tienda Erótica</h1>
               <div className="relative">
                 {mostrarBotones && (
                   <button

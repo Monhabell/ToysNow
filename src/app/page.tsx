@@ -346,14 +346,14 @@ export default function Home() {
             <section className="mb-12 sm:mb-20 pt-8 sm:pt-12">
               <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end pb-6 sm:pb-8 border-b-2 border-gold-500/30">
                 <div className="mb-4 sm:mb-0">
-                  <h2 className="text-2xl sm:text-3xl font-bold text-gold-600 mb-1 sm:mb-2">BIENESTAR Y PLACER SEXUAL</h2>
+                  <h2 className="text-2xl sm:text-3xl font-bold text-gold-600 mb-1 sm:mb-2">BIENESTAR Y PLACER SEXUAL Tienda Erótica</h2>
                   <h3 className="text-sm sm:text-base text-gold-500">Descubre la importancia del autocuidado íntimo</h3>
                 </div>
               </div>
 
               <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 text-white">
                 <div className="space-y-6">
-                  <h3 className="text-xl font-semibold text-pink-400">La importancia del bienestar sexual</h3>
+                  <h3 className="text-xl font-semibold text-pink-400">La importancia del bienestar sexual Tienda Erótica</h3>
                   <p className="text-gray-300 leading-relaxed">
                     El bienestar sexual es un componente fundamental de la salud integral que impacta positivamente
                     en nuestra calidad de vida. Los productos para adultos de calidad, como los que ofrecemos en
@@ -451,7 +451,7 @@ export default function Home() {
             <div className="space-y-4">
               <h3 className="text-xl font-bold text-red-400">ToysNow - Bienestar Integral</h3>
               <p className="text-gray-300">
-                Somos tu destino premium para productos de bienestar sexual en Colombia. 
+                Somos tu destino Tienda Erótica para productos de bienestar sexual en Colombia. 
                 Ofrecemos una cuidadosa selección de juguetes íntimos, lubricantes y accesorios 
                 diseñados para explorar el placer de manera segura y satisfactoria. Nuestro compromiso 
                 es brindarte productos de la más alta calidad, discreción absoluta en cada entrega 

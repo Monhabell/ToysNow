@@ -720,7 +720,7 @@ export default function ProductoDetalle({ params }: Props) {
         {relacionados.length > 0 && (
           <div className='productos-relacionados max-w-6xl mx-auto mt-32'>
             <div className='mt-5'>
-              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Recomendaciones para ti</h1>
+              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Recomendaciones para ti Tienda Erótica</h1>
               <div className="relative">
                 {mostrarBotones && (
                   <button
@@ -757,7 +757,7 @@ export default function ProductoDetalle({ params }: Props) {
 
         <div className='max-w-6xl mx-auto mt-10 px-4 bg-black '>
           <div className='mt-16 bg-black rounded-lg p-8 shadow-sm'>
-            <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas</h2>
+            <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas Tienda Erótica</h2>
 
             {preguntas.length > 0 && (
               <div className="space-y-6">
