@@ -4,9 +4,20 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from "@/components/Navbar";
 
+
 import { useSession } from 'next-auth/react';
 import { FaTrash, FaPlus, FaMinus, FaShoppingCart } from "react-icons/fa";
 import Image from 'next/image';
+
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Carrito | ToysNow',
+  robots: {
+    index: false,
+    follow: false
+  }
+}
 
 interface ProductAttribute {
   name: string;

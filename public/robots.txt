@@ -1,7 +1,10 @@
 User-agent: *
 Allow: /
-Sitemap: https://www.toysnow.com.co/sitemap.xml
+Disallow: /carrito
+Disallow: /login
+Disallow: /register
+Disallow: /checkout
+Disallow: /api/
 
-Disallow: /login/*
-Disallow: /carrito/*
+Sitemap: https://www.toysnow.com.co/sitemap.xml
 
