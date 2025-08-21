@@ -3,7 +3,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Navbar from "@/components/Navbar";
 import Perfil from "@/components/Perfil/Perfil";
-import type { Metadata } from 'next'
+
 
 import '../../styles/login.css';
 import { Mail, Lock, User, Eye, EyeOff, } from 'lucide-react'
@@ -18,13 +18,7 @@ type UserData = {
     password_confirmation?: string;
 };
 
-export const metadata: Metadata = {
-  title: 'Iniciar Sesión | ToysNow',
-  robots: {
-    index: false,   // ❌ No indexar
-    follow: false   // ❌ No seguir enlaces
-  }
-}
+
 
 export default function AuthPage() {
     const [isLogin, setIsLogin] = useState(true)
