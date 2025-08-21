@@ -1,10 +1,11 @@
-// pages/404.js
+'use client'; // ← Necesario para usar hooks
+
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation'; // ← Cambiado aquí
 
 export default function Custom404() {
-  const router = useRouter();
+  const router = useRouter(); // ← Ahora viene de next/navigation
 
   return (
     <>
