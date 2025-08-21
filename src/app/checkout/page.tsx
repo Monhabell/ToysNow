@@ -193,18 +193,45 @@ const CheckoutForm = () => {
     });
   };
 
-  // Apply coupon code
-  const applyCoupon = async () => {
-    if (!couponCode.trim()) return;
-    try {
-      const discount = couponCode.toUpperCase() === 'DESCUENTO10' ? 0.50 : 0;
-      setCouponDiscount(discount);
 
-      if (discount === 0) {
-        setError('Cupón no válido o expirado');
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) {
+      setError('Por favor ingresa un código de cupón');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      
+      const response = await fetch('/api/validate-coupon', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ couponCode: couponCode.toUpperCase() }),
+      });
+
+      // Verificar si la respuesta es OK
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (data.valid) {
+        setCouponDiscount(data.discount);
+        setError('');
+      } else {
+        setCouponDiscount(0);
+        setError(data.message || 'Cupón no válido o expirado');
       }
     } catch (err) {
-      setError('Error al validar el cupón' + err);
+      console.error('Error al validar el cupón:', err);
+      setError('Error al conectar con el servidor. Intenta nuevamente.');
+      setCouponDiscount(0);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -227,28 +254,45 @@ const CheckoutForm = () => {
         'input[name="paymentMethod"]:checked'
       )?.id;
 
+      // Calcular el descuento total
+      const discountAmount = order.total * couponDiscount;
+
       // Preparar items para MercadoPago
       const mercadoPagoItems = order.items.map(item => {
-        console.log("Variant completo de:", item.name, JSON.stringify(item.variant, null, 2));
+  // Calcular precio con descuento proporcional
+      const discountedPrice = item.price * (1 - couponDiscount);
+      
+      return {
+        title: `${item.name}${
+          item.color && item.color !== 'N/A' ? ` - Color: ${item.color}` : ''
+        }${
+          item.variant?.attributes?.find(a => a.name.toLowerCase() === 'tamaño') 
+            ? ` - Tamaño: ${item.variant.attributes.find(a => a.name.toLowerCase() === 'tamaño')?.value}`
+            : ''
+        }`,
+        unit_price: discountedPrice, // Precio con descuento ya aplicado
+        quantity: item.quantity,
+        picture_url: item.image || '/images/default.png',
+        description: 'Producto de alta calidad',
+        id: item.id.toString(),
+        variant_id: item.variant?.id?.toString(),
+        variant_attributes: item.variant
+      };
+    });
 
-        return {
-          title: `${item.name}${
-            item.color && item.color !== 'N/A' ? ` - Color: ${item.color}` : ''
-          }${
-            item.variant?.attributes?.find(a => a.name.toLowerCase() === 'tamaño') 
-              ? ` - Tamaño: ${item.variant.attributes.find(a => a.name.toLowerCase() === 'tamaño')?.value}`
-              : ''
-          }`,
-          unit_price: item.price,
-          quantity: item.quantity,
-          picture_url: item.image || '/images/default.png',
-          description: 'Producto de alta calidad',
-          id: item.id.toString(),
-          variant_id: item.variant?.id?.toString(),
-          variant_attributes: item.variant
-
-        };
-      });
+      // Si hay descuento, agregar un ítem que muestre el descuento
+      if (couponDiscount > 0) {
+        mercadoPagoItems.push({
+          title: `Descuento por cupón: ${couponCode}`,
+          unit_price: -discountAmount, // Valor negativo para representar descuento
+          quantity: 1,
+          picture_url: '',
+          description: 'Descuento aplicado',
+          id: 'discount',
+          variant_id: undefined,
+          variant_attributes: undefined
+        });
+      }
 
       
       // Lógica para pago contra entrega
@@ -332,7 +376,9 @@ const CheckoutForm = () => {
     );
 
     const discountedSubtotal = subtotal * (1 - couponDiscount);
-    return discountedSubtotal + shippingCost;
+    const total = discountedSubtotal + shippingCost;
+    
+    return Math.max(0, total); // Asegurar que no sea negativo
   };
 
   // Loading state

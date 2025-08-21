@@ -85,7 +85,7 @@ export async function POST(request: Request) {
         title: item.title,
         quantity: Number(item.quantity),
         currency_id: 'COP',
-        unit_price: Number(item.unit_price) - Number(body.discount || 0),
+        unit_price: Number(item.unit_price),
         picture_url: item.picture_url || undefined,
         description: item.description || ''
       })),
