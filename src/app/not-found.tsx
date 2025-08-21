@@ -1,60 +1,61 @@
-'use client'; // ← Necesario para usar hooks
+'use client';
 
 import Head from 'next/head';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation'; // ← Cambiado aquí
+import { useRouter } from 'next/navigation';
 
 export default function Custom404() {
-  const router = useRouter(); // ← Ahora viene de next/navigation
+  const router = useRouter();
 
   return (
     <>
       <Head>
-        <title>Página no encontrada | Toysnow</title>
+        <title>Página no encontrada | ToysNow</title>
         <meta name="description" content="Lo sentimos, la página que buscas no existe en nuestra tienda erótica" />
       </Head>
       
-      <div className="error-container">
-        <div className="error-content">
-          <div className="error-number">
-            <span className="gold-text">4</span>
-            <span className="gold-text">0</span>
-            <span className="gold-text">4</span>
+      <div className="sensual-container">
+        <div className="sensual-content">
+          <div className="sensual-number">
+            <span className="sensual-digit">4</span>
+            <div className="sensual-orb"></div>
+            <span className="sensual-digit">4</span>
           </div>
           
-          <h1 className="error-title">Página no encontrada</h1>
+          <h1 className="sensual-title">Algo excitante falta aquí...</h1>
           
-          <p className="error-message">
-            Lo sentimos, la página que estás buscando no existe o ha sido movida.
+          <p className="sensual-message">
+            La página que buscas se ha esfumado en la intimidad de la noche.
+            Pero no te preocupes, tenemos muchas otras cosas interesantes que explorar.
           </p>
           
-          <div className="error-actions">
+          <div className="sensual-actions">
             <button 
               onClick={() => router.back()} 
-              className="back-button"
+              className="sensual-button back"
             >
-              Volver atrás
+              ↶ Volver atrás
             </button>
             
-            <span className="divider">o</span>
-            
-            <Link href="/" className="home-link">
-              Ir a la página principal
+            <Link href="/productos" className="sensual-button primary">
+              Descubrir placeres
             </Link>
           </div>
         </div>
         
-        <div className="error-decoration">
-          <div className="decoration-item decoration-1"></div>
-          <div className="decoration-item decoration-2"></div>
-          <div className="decoration-item decoration-3"></div>
+        <div className="sensual-background">
+          <div className="sensual-shape shape-1"></div>
+          <div className="sensual-shape shape-2"></div>
+          <div className="sensual-shape shape-3"></div>
+          <div className="sensual-shape shape-4"></div>
+          <div className="sensual-shape shape-5"></div>
         </div>
       </div>
 
       <style jsx>{`
-        .error-container {
+        .sensual-container {
           min-height: 100vh;
-          background-color: #000;
+          background: linear-gradient(135deg, #1a001a 0%, #330033 50%, #4d004d 100%);
           color: #fff;
           display: flex;
           align-items: center;
@@ -62,159 +63,228 @@ export default function Custom404() {
           position: relative;
           overflow: hidden;
           padding: 20px;
+          font-family: 'Arial', sans-serif;
         }
         
-        .error-content {
+        .sensual-content {
           text-align: center;
-          z-index: 2;
+          z-index: 10;
           position: relative;
+          max-width: 600px;
+          padding: 40px;
+          background: rgba(0, 0, 0, 0.4);
+          backdrop-filter: blur(10px);
+          border-radius: 20px;
+          border: 1px solid rgba(255, 105, 180, 0.2);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         
-        .error-number {
-          font-size: 8rem;
-          font-weight: bold;
-          margin-bottom: 20px;
-          letter-spacing: 10px;
-        }
-        
-        .gold-text {
-          color: #D4AF37;
-          text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
-        
-        .error-title {
-          font-size: 1.8rem;
-          margin-bottom: 20px;
-          color: #D4AF37;
-          text-transform: uppercase;
-          letter-spacing: 2px;
-        }
-        
-        .error-message {
-          font-size: 1.1rem;
-          margin-bottom: 30px;
-          max-width: 500px;
-          line-height: 1.6;
-        }
-        
-        .error-actions {
+        .sensual-number {
           display: flex;
           align-items: center;
           justify-content: center;
+          margin-bottom: 30px;
+          position: relative;
+        }
+        
+        .sensual-digit {
+          font-size: 8rem;
+          font-weight: 800;
+          color: #ff69b4;
+          text-shadow: 0 0 20px rgba(255, 105, 180, 0.7);
+          position: relative;
+          z-index: 2;
+        }
+        
+        .sensual-orb {
+          width: 80px;
+          height: 80px;
+          background: linear-gradient(145deg, #ff69b4, #ff1493);
+          border-radius: 50%;
+          margin: 0 10px;
+          box-shadow: 0 0 30px rgba(255, 105, 180, 0.8);
+          animation: pulse 3s infinite ease-in-out;
+          position: relative;
+          z-index: 1;
+        }
+        
+        .sensual-title {
+          font-size: 2.2rem;
+          margin-bottom: 20px;
+          color: #ff69b4;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+          font-weight: 600;
+        }
+        
+        .sensual-message {
+          font-size: 1.2rem;
+          margin-bottom: 40px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.8);
+          font-style: italic;
+        }
+        
+        .sensual-actions {
+          display: flex;
+          justify-content: center;
+          gap: 20px;
           flex-wrap: wrap;
-          gap: 15px;
         }
         
-        .back-button {
-          background: transparent;
-          border: 1px solid #D4AF37;
-          color: #D4AF37;
-          padding: 12px 25px;
-          cursor: pointer;
+        .sensual-button {
+          padding: 15px 30px;
+          border: none;
+          border-radius: 30px;
           font-size: 1rem;
+          font-weight: 600;
+          cursor: pointer;
           transition: all 0.3s ease;
-          border-radius: 4px;
-        }
-        
-        .back-button:hover {
-          background: #D4AF37;
-          color: #000;
-        }
-        
-        .divider {
-          color: #D4AF37;
-        }
-        
-        .home-link {
-          color: #D4AF37;
           text-decoration: none;
-          border-bottom: 1px solid #D4AF37;
-          padding-bottom: 2px;
-          transition: all 0.3s ease;
+          display: inline-block;
         }
         
-        .home-link:hover {
-          color: #FFF;
-          border-bottom-color: #FFF;
+        .sensual-button.back {
+          background: transparent;
+          border: 2px solid #9370db;
+          color: #9370db;
         }
         
-        .error-decoration {
+        .sensual-button.back:hover {
+          background: rgba(147, 112, 219, 0.2);
+          transform: translateY(-3px);
+        }
+        
+        .sensual-button.primary {
+          background: linear-gradient(to right, #ff69b4, #ff1493);
+          color: white;
+          box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4);
+        }
+        
+        .sensual-button.primary:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 8px 20px rgba(255, 105, 180, 0.6);
+        }
+        
+        .sensual-background {
           position: absolute;
           top: 0;
           left: 0;
           width: 100%;
           height: 100%;
           pointer-events: none;
+          overflow: hidden;
         }
         
-        .decoration-item {
+        .sensual-shape {
           position: absolute;
-          background: rgba(212, 175, 55, 0.1);
-          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 50%;
+          opacity: 0.3;
+          filter: blur(15px);
         }
         
-        .decoration-1 {
+        .shape-1 {
+          width: 300px;
+          height: 300px;
+          background: linear-gradient(45deg, #ff69b4, #ff1493);
+          top: 10%;
+          left: 5%;
+          animation: float 15s infinite ease-in-out;
+        }
+        
+        .shape-2 {
+          width: 200px;
+          height: 200px;
+          background: linear-gradient(45deg, #9370db, #8a2be2);
+          bottom: 15%;
+          right: 10%;
+          animation: float 12s infinite ease-in-out reverse;
+        }
+        
+        .shape-3 {
           width: 150px;
           height: 150px;
-          top: 10%;
-          left: 10%;
-          border-radius: 50%;
-          animation: float 6s ease-in-out infinite;
+          background: linear-gradient(45deg, #ff69b4, #ff1493);
+          top: 40%;
+          right: 20%;
+          animation: pulse 8s infinite ease-in-out;
         }
         
-        .decoration-2 {
+        .shape-4 {
           width: 100px;
           height: 100px;
-          bottom: 15%;
-          right: 15%;
-          transform: rotate(45deg);
-          animation: pulse 4s ease-in-out infinite;
+          background: linear-gradient(45deg, #9370db, #8a2be2);
+          bottom: 30%;
+          left: 15%;
+          animation: pulse 10s infinite ease-in-out;
         }
         
-        .decoration-3 {
-          width: 80px;
-          height: 80px;
-          top: 50%;
-          right: 20%;
-          border-radius: 50%;
-          animation: float 5s ease-in-out infinite reverse;
+        .shape-5 {
+          width: 250px;
+          height: 250px;
+          background: linear-gradient(45deg, #ff69b4, #ff1493);
+          top: 60%;
+          left: 25%;
+          animation: float 18s infinite ease-in-out;
         }
         
         @keyframes float {
           0% {
-            transform: translateY(0) rotate(0deg);
+            transform: translate(0, 0) rotate(0deg);
           }
-          50% {
-            transform: translateY(-20px) rotate(10deg);
+          33% {
+            transform: translate(30px, -30px) rotate(60deg);
+          }
+          66% {
+            transform: translate(-20px, 20px) rotate(120deg);
           }
           100% {
-            transform: translateY(0) rotate(0deg);
+            transform: translate(0, 0) rotate(180deg);
           }
         }
         
         @keyframes pulse {
           0% {
+            transform: scale(1);
             opacity: 0.3;
           }
           50% {
-            opacity: 0.7;
+            transform: scale(1.1);
+            opacity: 0.5;
           }
           100% {
+            transform: scale(1);
             opacity: 0.3;
           }
         }
         
         @media (max-width: 768px) {
-          .error-number {
-            font-size: 6rem;
+          .sensual-digit {
+            font-size: 5rem;
           }
           
-          .error-title {
+          .sensual-orb {
+            width: 50px;
+            height: 50px;
+            margin: 0 5px;
+          }
+          
+          .sensual-title {
             font-size: 1.5rem;
           }
           
-          .error-actions {
+          .sensual-message {
+            font-size: 1rem;
+          }
+          
+          .sensual-actions {
             flex-direction: column;
+            align-items: center;
+          }
+          
+          .sensual-button {
+            width: 100%;
+            max-width: 250px;
           }
         }
       `}</style>
