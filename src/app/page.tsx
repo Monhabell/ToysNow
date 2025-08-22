@@ -62,7 +62,7 @@ export default function Home() {
   const [productoDestacado2, setProductoDestacado2] = useState<ProductoDestacadoType>(null)
   const [loading, setLoading] = useState(true); // Añade estado de carga
  
-  const [error, setError] = useState<string | null>(null)
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -141,7 +141,7 @@ export default function Home() {
 
       } catch (err) {
         console.error('Error:', err)
-        setError('Error al cargar los datos. Por favor intenta nuevamente.')
+        
       } finally {
         setLoading(false); // Cambiar estado de carga a false al finalizar
       }
@@ -162,65 +162,7 @@ export default function Home() {
 
   
 
-  if (error) {
-    return (
-      <div className="fixed inset-0 bg-black/95 z-50 flex flex-col items-center justify-center p-6">
-        <div className="relative mb-8 group">
-          <div className="absolute -inset-2 bg-gradient-to-r from-pink-600 to-purple-600 rounded-lg blur opacity-75 group-hover:opacity-100 transition-all duration-500 animate-tilt"></div>
-          <div className="relative flex items-center justify-center p-6 bg-black rounded-lg border border-pink-500/30">
-            <div className="text-center mb-8">
-              <div className="relative w-full max-w-xs h-20 mx-auto">
-                <Image
-                  src="/images/logos/logo2.png"
-                  alt="ToysNow - Tienda erótica premium"
-                  title='ToysNow - Tienda erótica premium'
-                  fill
-                  className="object-contain"
-                  priority
-                />
-              </div>
-              <p className="text-xs text-pink-300 mt-1 tracking-widest opacity-80">
-                LUXURY ADULT COLLECTION
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center max-w-md">
-          <div className="mb-6 flex justify-center">
-            <div className="animate-pulse">
-              <svg className="w-16 h-16 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-          </div>
-
-          <h2 className="text-2xl font-bold text-pink-400 mb-3">¡Ups! Algo salió mal</h2>
-          <p className="text-gray-300 mb-8">{error}</p>
-
-          <button
-            onClick={() => window.location.reload()}
-            className="relative overflow-hidden group bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 shadow-lg"
-          >
-            <span className="relative z-10 flex items-center">
-              Reintentar
-              <svg className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-            </span>
-            <span className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-          </button>
-
-          <p className="text-sm text-gray-500 mt-6">
-            Si el problema persiste, contáctanos en{' '}
-            <a href="mailto:soporte@toysnow.com" className="text-pink-400 hover:underline">
-              soporte@toysnow.com
-            </a>
-          </p>
-        </div>
-      </div>
-    )
-  }
+  
 
   return (
     <>
