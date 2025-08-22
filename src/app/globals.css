@@ -534,3 +534,65 @@ scrollbar-width: none;     /* Firefox */
   background-size: 200% 100%;
   animation: shimmer-gradient 1.5s ease-in-out infinite;
 }
+
+
+
+
+.holographic-card {
+  background-color: #0000003f;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10%;
+  transition: all 0.5s ease;
+}
+
+.holographic-card h2 {
+  color: rgb(225, 0, 255);
+  font-size: 2rem;
+  position: relative;
+  z-index: 2;
+}
+
+.holographic-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    0deg, 
+    transparent, 
+    transparent 30%, 
+    rgba(225, 0, 255, 0.3)
+  );
+  transform: rotate(-45deg);
+  transition: all 0.5s ease;
+  opacity: 0;
+}
+
+.holographic-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 234, 0.5);
+}
+
+.holographic-card:hover::before {
+  opacity: 1;
+  transform: rotate(-45deg) translateY(100%);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0; /* equivale a top:0; right:0; bottom:0; left:0; */
+  background-image: linear-gradient(
+    to right,
+    #2b002b,
+    #2b002bb9,
+    rgba(0,0,0,0)
+  );
+  z-index: 1; /* z-1 */
+}

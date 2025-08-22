@@ -160,9 +160,7 @@ export default function Home() {
     slider?.scrollBy({ left: 500, behavior: 'smooth' })
   }
 
-  
 
-  
 
   return (
     <>
@@ -239,7 +237,7 @@ export default function Home() {
         <main className="z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
           {/* Sección Ofertas */}
           <section className="mb-12 sm:mb-20 pt-4 sm:pt-0">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end pb-6 sm:pb-8 border-b-2 border-gold-500/30">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end pb-6 sm:pb-8 border-gold-500/30">
               <div className="mb-4 sm:mb-0">
                 <h2 className="text-2xl sm:text-3xl font-bold text-gold-600 mb-1 sm:mb-2">Ofertas Especiales</h2>
                 <h3 className="text-sm sm:text-base text-gold-500">Productos que despertarán tus sentidos</h3>
@@ -254,7 +252,7 @@ export default function Home() {
             {productoDestacado2 && (
               <section className="relative rounded-xl sm:rounded-2xl overflow-hidden mb-12 sm:mb-20 h-[350px] sm:h-[500px]">
                 <div>{productoDestacado2.images[0]?.url}</div>
-                <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-transparent z-1"></div>
+                <div className="overlay"></div>
                 <Image
                   src={"https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
                   onError={(e) => {

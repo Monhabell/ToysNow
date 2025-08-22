@@ -2,8 +2,7 @@
   display: flex;
   justify-content: center;      /* Centra horizontalmente los ítems */
   text-align: center;           /* Centra el texto */
-  overflow-x: auto;             /* Scroll horizontal si hay muchos ítems */
-  padding-bottom: 1rem;         /* pb-4 = 16px */
+  overflow-x: auto;             /* Scroll horizontal si hay muchos ítems */        /* pb-4 = 16px */
   gap: 2rem;                    /* space-x-8 = 32px entre ítems */
   scrollbar-width: none;       /* Firefox: oculta scrollbar */
   -ms-overflow-style: none;    /* IE 10+ oculta scrollbar */

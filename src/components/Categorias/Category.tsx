@@ -113,34 +113,21 @@ const CategoryMenu: React.FC = () => {
   }
 
   return (
-    <div className="bg-black text-white py-2 px-4 mt-2">
+    <div className="mt-8 bg-gray-900/50 rounded-xl p-6 border border-pink-500/20 sensual-content">
       <div className="max-w-7xl mx-auto">
-        <div className="category-menu flex flex-wrap justify-center gap-6 mb-1 pt-1">
+        <div className="category-menu flex flex-wrap justify-center gap-6  pt-1">
           {categories.map((category) => (
             <button
               key={category.slug}
               onClick={() => handleCategoryClick(category)}
-              className={`cursor-pointer flex flex-col items-center min-w-[120px] text-center group transition-all duration-300 ${
+              className={`  cursor-pointer flex flex-col items-center min-w-[20px] text-center group transition-all duration-300 ${
                 selectedCategory?.slug === category.slug 
                   ? "text-gold-600 transform scale-110" 
                   : "text-gray-300 hover:text-gold-600"
               }`}
             >
-              <div className={`w-20 h-20 mb-3 flex items-center justify-center rounded-full transition-all duration-300 ${
-                selectedCategory?.slug === category.slug
-                  ? "bg-gold-600 border-2 border-red-600"
-                  : "bg-gray-800 border-2 border-gray-700 group-hover:border-gold-500 group-hover:bg-gold-600"
-              }`}>
-                <Image 
-                  src={category.image || '/images/icons/logoDefaulCategories.png'}
-                  alt={category.name}
-                  title={category.name}
-                  className="rounded-full" 
-                  width={60}
-                  height={60}
-                />
-              </div>
-              <span className="text-lg font-medium">{category.name}</span>
+              
+              <span className=" holographic-card text-lg font-medium">{category.name}</span>
             </button>
           ))}
         </div>
@@ -157,9 +144,9 @@ const CategoryMenu: React.FC = () => {
                 <li
                   key={sub.slug}
                   onClick={() => handleSubcategoryClick(sub, selectedCategory)}
-                  className="bg-gray-900 hover:bg-gold-500 transition-all duration-300 ml-5 p-4 rounded-lg text-center border border-gray-800 hover:border-gold-500 cursor-pointer transform hover:scale-105"
+                  className="holographic-card "
                 >
-                  <span className="text-gray-200 hover:text-gold-400 font-medium">
+                  <span className="text-gray-200 hover:text-gold-400 font-medium holographic-card">
                     {sub.name}
                   </span>
                 </li>

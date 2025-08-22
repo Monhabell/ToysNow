@@ -40,7 +40,7 @@
 
 .filter {
     width: 100%; /* 100% en móviles */
-    
+    background: rgba(0, 0, 0, 0.4);
     color: white;
     padding: 1rem;
     border-radius: 0.40rem;
