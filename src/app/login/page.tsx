@@ -166,7 +166,7 @@ export default function AuthPage() {
                 
             </div>
 
-            <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+            <main className="flex-grow flex items-center justify-center py-12 px-4 mt-28 sm:px-8 lg:px-8">
                 {session?.user ? (
                     <div className="flex items-center space-x-2 text-xs md:text-sm">
                         <Perfil />

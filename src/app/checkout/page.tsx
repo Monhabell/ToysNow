@@ -7,6 +7,7 @@ import '../../styles/checkout.css';
 import { useSession } from 'next-auth/react';
 import { FaCheckDouble } from "react-icons/fa";
 import Image from 'next/image';
+import { Cat } from 'lucide-react';
 
 interface ProductVariant {
   id?: number;
@@ -200,6 +201,19 @@ const CheckoutForm = () => {
       return;
     }
 
+    // traer info de los productos
+    const productData = order?.items.map(item => ({
+      productId: item.id,          // ID del producto
+      quantity: item.quantity      // Cantidad
+    })) || [];
+
+    const user = session?.apiToken;
+
+    console.log(productData)
+
+    const dataCupon = {user, productData, couponCode: couponCode.toUpperCase() };
+
+
     try {
       setLoading(true);
       setError('');
@@ -209,7 +223,7 @@ const CheckoutForm = () => {
         headers: { 
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ couponCode: couponCode.toUpperCase() }),
+        body: JSON.stringify(dataCupon),
       });
 
       // Verificar si la respuesta es OK

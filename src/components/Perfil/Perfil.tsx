@@ -93,13 +93,13 @@ const UserProfile = () => {
     }, [token]);
 
     return (
-        <div className="min-h-screen bg-gray-900 text-gray-100">
+        <div className="min-h-screen perfil-container text-gray-100">
             <Head>
                 <title>Mi Perfil - SexChop</title>
                 <meta name="description" content="Gestión de tu perfil en SexChop" />
             </Head>
 
-            <div className="container mx-auto px-4 py-8">
+            <div className="sensual-content mx-auto px-4 py-8">
                 <h1 className="text-3xl font-bold mb-8 text-amber-500 border-b-2 border-amber-500 pb-2">
                     MI PERFIL
                 </h1>

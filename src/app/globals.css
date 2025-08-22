@@ -596,3 +596,8 @@ scrollbar-width: none;     /* Firefox */
   );
   z-index: 1; /* z-1 */
 }
+
+.perfil-container{
+  background-color: #0000003f;
+  border-radius: 5%;
+}

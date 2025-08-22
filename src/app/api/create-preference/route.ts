@@ -76,7 +76,7 @@ const client = new MercadoPagoConfig({ accessToken });
 export async function POST(request: Request) {
   try {
     const body = await request.json() as CheckoutRequestBody;
-    //console.log('📦 Datos recibidos:', body);
+    console.log('📦 Datos recibidos:', body);
 
     // Crear preferencia en Mercado Pago con varios productos
     const preferenceData = {
@@ -117,7 +117,6 @@ export async function POST(request: Request) {
       throw new Error('No se pudo obtener el ID de preferencia de Mercado Pago');
     }
 
-    // Preparar datos para la orden
     // Preparar datos para la orden con todos los productos
     const products: Product[] = body.items.map((item) => ({
       product_id: item.id || 'default-id',
