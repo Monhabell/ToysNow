@@ -7,7 +7,6 @@ import '../../styles/checkout.css';
 import { useSession } from 'next-auth/react';
 import { FaCheckDouble } from "react-icons/fa";
 import Image from 'next/image';
-import { Cat } from 'lucide-react';
 
 interface ProductVariant {
   id?: number;
