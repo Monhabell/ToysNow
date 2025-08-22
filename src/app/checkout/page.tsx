@@ -202,8 +202,8 @@ const CheckoutForm = () => {
 
     // traer info de los productos
     const productData = order?.items.map(item => ({
-      productId: item.id,          // ID del producto
-      quantity: item.quantity      // Cantidad
+      id: item.id,          // ID del producto
+      cantidad: item.quantity      // Cantidad
     })) || [];
 
     const user = session?.apiToken;

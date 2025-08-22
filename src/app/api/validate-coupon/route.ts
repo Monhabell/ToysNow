@@ -10,8 +10,10 @@ export async function POST(request: NextRequest) {
 
     // crear data para order
     const orderRequestBody = {
-      items: productData,
+      products: productData,
     };
+
+    console.log(orderRequestBody);
 
     const orderRes = await fetch(`${process.env.API_TENANT_BASE_URL_V1}/coupons/${couponCode}`, {
       method: 'POST',
@@ -23,14 +25,9 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify(orderRequestBody),
     });
 
-    if (!orderRes.ok) {
-      const errorData = await orderRes.json();
-      console.error('❌ Error en la respuesta al validar cupón:', errorData);
-      return NextResponse.json(
-        { valid: false, message: errorData.message || 'Error al validar el cupón' },
-        { status: 400 }
-      );
-    }
+    console.log(orderRes);
+
+    
 
     const couponData = await orderRes.json();
     console.log('✅ Cupón validado exitosamente:', couponData);
@@ -38,6 +35,8 @@ export async function POST(request: NextRequest) {
       { valid: true, message: 'Cupón válido', data: couponData },
       { status: 200 }
     );
+
+
 
     
   } catch (error) {
