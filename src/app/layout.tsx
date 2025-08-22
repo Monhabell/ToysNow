@@ -84,10 +84,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               '@type': 'Organization',
               name: 'ToysNow',
               url: 'https://www.toysnow.com.co',
-              logo: 'https://www.toysnow.com.co/images/logos/icono_toysnow.jpg',
+              logo: 'https://www.toysnow.com.co/images/logos/icon/apple-icon.png',
+              "contactPoint": {
+                "@type": "ContactPoint",
+                "telephone": "+57-311-447-9743",
+                "contactType": "customer service",
+                "areaServed": "CO",
+                "availableLanguage": ["es"]
+              },
               sameAs: [
-                'https://www.facebook.com/ToysNowCol',
-                'https://www.instagram.com/toysnow_col'
+                'https://www.facebook.com/ToysNow',
+                'https://www.instagram.com/toysnow'
               ]
             })
           }}
