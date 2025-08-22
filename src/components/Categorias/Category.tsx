@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
 import '../../styles/Category.css';
-import Image from 'next/image';
+
 
 interface Subcategory {
   name: string;

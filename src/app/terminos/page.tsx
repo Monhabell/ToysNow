@@ -3,7 +3,7 @@
 import Head from 'next/head';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import Navbar from "@/components/Navbar"
+
 
 
 export default function TermsAndConditions() {
