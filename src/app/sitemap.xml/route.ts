@@ -26,8 +26,6 @@ export async function GET() {
     const staticPages = [
         { loc: `${BASE_URL}`, changefreq: "daily", priority: 1.0, lastmod: undefined },
         { loc: `${BASE_URL}/productos`, changefreq: "daily", priority: 0.9, lastmod: undefined },
-        { loc: `${BASE_URL}/carrito`, changefreq: "weekly", priority: 0.5, lastmod: undefined },
-        { loc: `${BASE_URL}/checkout`, changefreq: "weekly", priority: 0.5, lastmod: undefined },
     ];
 
     // Convertir productos en URLs del sitemap
