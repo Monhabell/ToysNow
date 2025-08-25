@@ -39,14 +39,7 @@ interface CheckoutRequestBody {
   };
 }
 
-interface Product {
-  product_id: string;
-  unit_price: number;
-  quantity: number;
-  currency: string;
-  variante_id?: number;
-  variantesProducto: string;
-}
+
 
 interface DeliveryInfo {
   address?: string;
@@ -64,6 +57,8 @@ interface MercadoPagoResponse {
   init_point?: string;
   items?: MercadoPagoItem[];
 }
+
+
 
 const accessToken = process.env.MERCADO_PAGO_ACCESS_TOKEN;
 
