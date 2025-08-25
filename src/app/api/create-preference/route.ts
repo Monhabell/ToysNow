@@ -73,8 +73,14 @@ export async function POST(request: Request) {
     const body = await request.json() as CheckoutRequestBody;
     console.log('📦 Datos recibidos:', body);
 
-    // Crear preferencia en Mercado Pago con varios productos
-    // Crear preferencia en Mercado Pago con varios productos (excluyendo descuento)
+    console.log('📦 Datos user:', body.user?.token);
+
+    // validar que body.user_token no sea null o vacio
+
+    if (!body.user?.token) {
+      throw new Error('⚠️ Usuario no autenticado');
+    }
+
     const preferenceData = {
       items: body.items
         .filter((item) => item.id !== 'discount') // 👈 filtramos los descuentos
@@ -105,7 +111,6 @@ export async function POST(request: Request) {
         failure: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/failure`,
         pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
       },
-      auto_return: 'all', // 👈 Agregar esto
     };
 
 
