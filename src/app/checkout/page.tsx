@@ -210,28 +210,30 @@ const CheckoutForm = () => {
 
     console.log(productData)
 
-    const dataCupon = {user, productData, couponCode: couponCode.toUpperCase() };
+    const dataCupon = { user, productData, couponCode: couponCode.toUpperCase() };
 
 
     try {
       setLoading(true);
       setError('');
-      
+
       const response = await fetch('/api/validate-coupon', {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(dataCupon),
       });
 
+      const data = await response.json();
+
+      console.log("Respuesta del servidor:", data);
+
       // Verificar si la respuesta es OK
       if (!response.ok) {
-        throw new Error(`Error HTTP: ${response.status}`);
+        throw new Error(`Error HTTP: ${data.message}`);
       }
 
-      const data = await response.json();
-      
       if (data.valid) {
         setCouponDiscount(data.discount);
         setError('');
@@ -241,7 +243,7 @@ const CheckoutForm = () => {
       }
     } catch (err) {
       console.error('Error al validar el cupón:', err);
-      setError('Error al conectar con el servidor. Intenta nuevamente.');
+      setError('Cupón no válido. Inténtalo de nuevo.');
       setCouponDiscount(0);
     } finally {
       setLoading(false);
@@ -272,26 +274,24 @@ const CheckoutForm = () => {
 
       // Preparar items para MercadoPago
       const mercadoPagoItems = order.items.map(item => {
-  // Calcular precio con descuento proporcional
-      const discountedPrice = item.price * (1 - couponDiscount);
-      
-      return {
-        title: `${item.name}${
-          item.color && item.color !== 'N/A' ? ` - Color: ${item.color}` : ''
-        }${
-          item.variant?.attributes?.find(a => a.name.toLowerCase() === 'tamaño') 
-            ? ` - Tamaño: ${item.variant.attributes.find(a => a.name.toLowerCase() === 'tamaño')?.value}`
-            : ''
-        }`,
-        unit_price: discountedPrice, // Precio con descuento ya aplicado
-        quantity: item.quantity,
-        picture_url: item.image || '/images/default.png',
-        description: 'Producto de alta calidad',
-        id: item.id.toString(),
-        variant_id: item.variant?.id?.toString(),
-        variant_attributes: item.variant
-      };
-    });
+        // Calcular precio con descuento proporcional
+        const discountedPrice = item.price * (1 - couponDiscount);
+
+        return {
+          title: `${item.name}${item.color && item.color !== 'N/A' ? ` - Color: ${item.color}` : ''
+            }${item.variant?.attributes?.find(a => a.name.toLowerCase() === 'tamaño')
+              ? ` - Tamaño: ${item.variant.attributes.find(a => a.name.toLowerCase() === 'tamaño')?.value}`
+              : ''
+            }`,
+          unit_price: discountedPrice, // Precio con descuento ya aplicado
+          quantity: item.quantity,
+          picture_url: item.image || '/images/default.png',
+          description: 'Producto de alta calidad',
+          id: item.id.toString(),
+          variant_id: item.variant?.id?.toString(),
+          variant_attributes: item.variant
+        };
+      });
 
       // Si hay descuento, agregar un ítem que muestre el descuento
       if (couponDiscount > 0) {
@@ -307,7 +307,7 @@ const CheckoutForm = () => {
         });
       }
 
-      
+
       // Lógica para pago contra entrega
       if (paymentMethod === 'cashOnDelivery') {
         const orderData = {
@@ -357,9 +357,9 @@ const CheckoutForm = () => {
           discount: couponDiscount
         }),
       });
-  
+
       const data = await res.json();
-      
+
       if (data.init_point) {
         setPreferenceId(data);
       } else {
@@ -390,7 +390,7 @@ const CheckoutForm = () => {
 
     const discountedSubtotal = subtotal * (1 - couponDiscount);
     const total = discountedSubtotal + shippingCost;
-    
+
     return Math.max(0, total); // Asegurar que no sea negativo
   };
 
@@ -575,7 +575,7 @@ const CheckoutForm = () => {
             <div className="flex flex-col md:flex-row gap-6">
               {/* Order details */}
               <div className="fw-full md:w-1/2 bg-gray-900 rounded-lg p-6 mb-6  border border-gray-700 ">
-               
+
 
                 {deliveryMessage && (
                   <div className=" p-4 rounded-lg border-l-4 border-yellow-500 bg-gradient-to-r from-yellow-900 via-yellow-800 to-yellow-700 shadow-lg animate-fade-in">

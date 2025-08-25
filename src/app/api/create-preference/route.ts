@@ -79,16 +79,19 @@ export async function POST(request: Request) {
     console.log('📦 Datos recibidos:', body);
 
     // Crear preferencia en Mercado Pago con varios productos
+    // Crear preferencia en Mercado Pago con varios productos (excluyendo descuento)
     const preferenceData = {
-      items: body.items.map((item) => ({
-        id: item.id || 'default-id',
-        title: item.title,
-        quantity: Number(item.quantity),
-        currency_id: 'COP',
-        unit_price: Number(item.unit_price),
-        picture_url: item.picture_url || undefined,
-        description: item.description || ''
-      })),
+      items: body.items
+        .filter((item) => item.id !== 'discount') // 👈 filtramos los descuentos
+        .map((item) => ({
+          id: item.id || 'default-id',
+          title: item.title,
+          quantity: Number(item.quantity),
+          currency_id: 'COP',
+          unit_price: Number(item.unit_price),
+          picture_url: item.picture_url || undefined,
+          description: item.description || ''
+        })),
       shipments: {
         cost: Number(body.shipping_cost || 0),
         mode: 'not_specified',
@@ -98,7 +101,9 @@ export async function POST(request: Request) {
         email: body.email || body.user?.email,
         token_id_user: body.user_token || body.user?.token,
         variantesProducto: JSON.stringify(body.variantes_producto || []),
-        ...(typeof body.delivery_info === 'string' ? { delivery_info: body.delivery_info } : body.delivery_info)
+        ...(typeof body.delivery_info === 'string'
+          ? { delivery_info: body.delivery_info }
+          : body.delivery_info)
       },
       back_urls: {
         success: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success`,
@@ -106,6 +111,7 @@ export async function POST(request: Request) {
         pending: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/pending`,
       },
     };
+
 
     const preference = new Preference(client);
     const response = await preference.create({ body: preferenceData }) as MercadoPagoResponse;
@@ -146,10 +152,19 @@ export async function POST(request: Request) {
     }
 
 
-    // Estructura final para la orden
+
     const orderRequestBody = {
       preference_id,
-      products,
+      products: body.items
+        .filter((item) => item.id !== 'discount') // 👈 igual aquí excluimos el descuento
+        .map((item) => ({
+          product_id: item.id || 'default-id',
+          unit_price: Number(item.unit_price),
+          quantity: Number(item.quantity),
+          currency: 'COP',
+          ...(item.variant_id && { variante_id: Number(item.variant_id) }),
+          variantesProducto: JSON.stringify(item.variant_attributes || [])
+        })),
       status: 'pending',
       delivery_info: {
         address: deliveryInfoObj.address || '',
@@ -159,9 +174,11 @@ export async function POST(request: Request) {
         postalCode: deliveryInfoObj.postalCode || '',
         phone: deliveryInfoObj.phone || '',
         deliveryType: deliveryInfoObj.deliveryType || 'casa',
-        deliveryNotes: deliveryInfoObj.deliveryNotes || 'No hay notas adicionales'
+        deliveryNotes: deliveryInfoObj.deliveryNotes || 'No hay notas adicionales',
+        ...(body.discount ? { discount: body.discount } : {}), // 👈 aquí va el descuento
       }
     };
+
 
     console.log('📤 Enviando orden:', JSON.stringify(orderRequestBody, null, 2));
     // Crear orden en el sistema

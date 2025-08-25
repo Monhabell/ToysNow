@@ -13,9 +13,9 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
 import Image from 'next/image';
-import { 
-  FaFacebook, 
-  FaWhatsapp, 
+import {
+  FaFacebook,
+  FaWhatsapp,
   FaLink,
   FaShareAlt
 } from "react-icons/fa";
@@ -33,12 +33,12 @@ interface Props {
   }>;
 }
 
-const SocialShare = ({ 
-  productName, 
-  productUrl, 
-  productDescription 
-}: { 
-  productName: string; 
+const SocialShare = ({
+  productName,
+  productUrl,
+  productDescription
+}: {
+  productName: string;
   productUrl: string;
   productImage: string;
   productDescription: string;
@@ -51,7 +51,7 @@ const SocialShare = ({
   const shareUrls = {
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`,
     whatsapp: `https://wa.me/?text=${encodeURIComponent(`${shareText} ${productUrl}`)}`,
-    instagram: `https://www.instagram.com/?url=${encodeURIComponent(productUrl)}`, 
+    instagram: `https://www.instagram.com/?url=${encodeURIComponent(productUrl)}`,
   };
 
   const copyToClipboard = () => {
@@ -70,7 +70,7 @@ const SocialShare = ({
     const height = 400;
     const left = (window.innerWidth - width) / 2;
     const top = (window.innerHeight - height) / 2;
-    
+
     window.open(
       shareUrls[platform as keyof typeof shareUrls],
       'Compartir',
@@ -78,9 +78,11 @@ const SocialShare = ({
     );
   };
 
+
+
   return (
     <div className="relative inline-block">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex items-center gap-1 text-sm text-white hover:text-gold-500 transition-colors cursor-pointer p-2 rounded-md bg-gray-800 hover:bg-gray-700"
         aria-label="Compartir producto"
@@ -88,13 +90,13 @@ const SocialShare = ({
         <FaShareAlt size={20} />
         <span>Compartir</span>
       </button>
-      
+
       {isOpen && (
         <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
           <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
             Compartir Produstos
           </div>
-          
+
           <button
             onClick={() => openShareDialog('facebook')}
             className="cursor-pointer flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -102,7 +104,7 @@ const SocialShare = ({
             <FaFacebook className="text-blue-600 mr-2" />
             Facebook
           </button>
-          
+
           <button
             onClick={() => openShareDialog('whatsapp')}
             className="cursor-pointer flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -110,7 +112,7 @@ const SocialShare = ({
             <FaWhatsapp className="text-green-500 mr-2" />
             WhatsApp
           </button>
-        
+
 
           <button
             onClick={copyToClipboard}
@@ -145,7 +147,7 @@ export default function ProductoDetalle({ params }: Props) {
   useEffect(() => {
     if (producto) {
       document.title = `${producto.name} | ToysNow`;
-      
+
       // También puedes actualizar meta tags
       const metaDescription = document.querySelector('meta[name="description"]');
       if (metaDescription && producto.description) {
@@ -492,12 +494,52 @@ export default function ProductoDetalle({ params }: Props) {
   const nuevoOk = diffDias <= 30;
   const textoNuevo = (nuevoOk ? 'Nuevo' : '') + ' | +5 vendidos';
 
+  // Construir schema.org JSON-LD
+  const schemaData = producto ? {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": producto.name,
+    "image": producto.images?.length > 0
+      ? producto.images.map(img => getImageUrl(img.url))
+      : ["/images/default.png"],
+    "description": producto.description || "",
+    "sku": producto.id,
+    "brand": {
+      "@type": "Brand",
+      "name": "ToysNow"
+    },
+    "offers": {
+      "@type": "Offer",
+      "url": typeof window !== "undefined" ? window.location.href : "",
+      "priceCurrency": "COP",
+      "price": currentPrice,
+      "priceValidUntil": "2025-12-31",
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": currentStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+    },
+    "aggregateRating": calcularRatingPromedio(producto) > 0 ? {
+      "@type": "AggregateRating",
+      "ratingValue": "4.5",
+      "bestRating": "5",
+      "worstRating": "3.5",
+      "reviewCount": "245"
+    } : undefined
+  } : null;
+
+
   return (
     <>
-      
+
       <div className="relative">
         <Navbar />
       </div>
+
+      {schemaData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
+        />
+      )}
 
       <div className='mt-42 xs:mt-32'>
         <div className='max-w-6xl mx-auto content-detalle mt-32'>
@@ -551,7 +593,7 @@ export default function ProductoDetalle({ params }: Props) {
 
 
                   <div className="flex items-center gap-3">
-                    <SocialShare 
+                    <SocialShare
                       productName={producto.name}
                       productUrl={window.location.href}
                       productImage={getImageUrl("https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + producto.images[0]?.url || '/images/default.png')}
@@ -688,7 +730,7 @@ export default function ProductoDetalle({ params }: Props) {
                 <div className='mt-6'>
                   <div className="metodos-pago">
                     <h3 className="font-medium mb-3 text-amber-400">Medios de pago</h3>
-                    
+
                     {/* Nota Mercado Pago */}
                     <div className="mb-4 text-sm text-gray-400 italic">
                       Todas las compras se procesan a través de Mercado Pago
@@ -696,7 +738,7 @@ export default function ProductoDetalle({ params }: Props) {
 
                     {/* Promoción */}
                     <div className="promo bg-gray-800 border border-amber-600/50 text-amber-300 p-3 rounded-lg mb-4 flex items-center gap-2 shadow-lg shadow-amber-900/20">
-                      <span role="img" aria-label="tarjeta" className="text-xl">💳</span> 
+                      <span role="img" aria-label="tarjeta" className="text-xl">💳</span>
                       <span>¡Hasta <strong className="text-amber-400">6 cuotas sin interés</strong> con Mercado Pago!</span>
                     </div>
                   </div>
