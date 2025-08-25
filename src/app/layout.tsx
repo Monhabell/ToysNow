@@ -49,6 +49,9 @@ export const metadata = {
   },
   verification: {
     google: 'X_T0lOIJ4i2qyF4yYUStziUnAYuC9u1r7snzmUuDb9Q'
+  },
+  alternates: {
+    canonical: 'https://www.toysnow.com.co/'
   }
 }
 
@@ -56,8 +59,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es">
       <head>
-        {/* Canonical URL */}
-        <link rel="canonical" href="https://www.toysnow.com.co/" />
+
 
         {/* Robots meta tag */}
         <meta name="robots" content="index, follow" />
