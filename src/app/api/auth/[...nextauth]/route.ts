@@ -126,6 +126,8 @@ const handler = NextAuth({
     error: "/auth/error", // 👈 página de error personalizada
   },
 
+
+
   session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // 1 día
