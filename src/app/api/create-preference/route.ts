@@ -123,15 +123,7 @@ export async function POST(request: Request) {
       throw new Error('No se pudo obtener el ID de preferencia de Mercado Pago');
     }
 
-    // Preparar datos para la orden con todos los productos
-    const products: Product[] = body.items.map((item) => ({
-      product_id: item.id || 'default-id',
-      unit_price: Number(item.unit_price),
-      quantity: Number(item.quantity),
-      currency: 'COP',
-      ...(item.variant_id && { variante_id: Number(item.variant_id) }),
-      variantesProducto: JSON.stringify(item.variant_attributes || [])
-    }));
+
 
 
     // Procesar información de envío
