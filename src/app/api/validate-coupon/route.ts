@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function POST(request: NextRequest) {
   try {
 
-    console.log(request.json)
     const { couponCode, productData, user } = await request.json();
 
     const orderRequestBody = {

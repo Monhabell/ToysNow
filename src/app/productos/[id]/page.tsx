@@ -207,7 +207,7 @@ export default function ProductoDetalle({ params }: Props) {
     };
 
     obtenerProducto();
-  }, [id]);
+  }, [id ]);
 
   useEffect(() => {
     const obtenerRelacionados = async () => {
@@ -264,6 +264,26 @@ export default function ProductoDetalle({ params }: Props) {
 
   const enviarPregunta = () => {
     if (nuevaPregunta.trim() === '') return;
+
+    const apiUrl = '/api/preguntas'; // Reemplaza con la URL de tu API
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token: session || 'invitado',
+        productoId: producto?.id,
+        pregunta: nuevaPregunta,
+      }),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Pregunta enviada:', data);
+      })
+      .catch(error => {
+        console.error('Error al enviar la pregunta:', error);
+      });
 
     const nueva = {
       pregunta: nuevaPregunta,
@@ -801,24 +821,17 @@ export default function ProductoDetalle({ params }: Props) {
           <div className='mt-16 bg-black rounded-lg p-8 shadow-sm'>
             <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas Tienda Erótica</h2>
 
-            {preguntas.length > 0 && (
+
+            {producto.reviews.length > 0 && (
               <div className="space-y-6">
-                {preguntas.map((item, index) => (
+                {producto.reviews.map((item, index) => (
                   <div key={index} className="bg-gray-50 p-5 rounded-lg shadow-sm">
                     <div className="flex items-start gap-4">
                       <div className="bg-gold-500 text-white p-2 rounded-full flex-shrink-0">
-                        <span>❓</span>
+                        <span>👤</span>
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-800">{item.pregunta}</p>
-                        {item.respuesta && (
-                          <div className="flex items-start mt-4 gap-4">
-                            <div className="bg-gray-100 text-gold-500 p-2 rounded-full flex-shrink-0">
-                              <span>💬</span>
-                            </div>
-                            <p className="text-gray-600">{item.respuesta}</p>
-                          </div>
-                        )}
+                        <p className="font-medium text-gray-800">{item.comment}</p>
                       </div>
                     </div>
                   </div>

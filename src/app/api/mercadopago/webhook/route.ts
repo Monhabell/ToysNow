@@ -54,7 +54,7 @@ async function saveToDatabase(data: DatabasePayload): Promise<void> {
   const datasave = {
     transaction_id: data.paymentId,
     status: data.paymentData?.status,
-    order_id: data.orderData?.preference_id,
+    preference_id: data.orderData?.preference_id,
     amount: data.paymentData?.net_amount,
     payment_method: "Mercado pago",
   }
