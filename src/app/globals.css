@@ -210,7 +210,7 @@ scrollbar-width: none;     /* Firefox */
 
 .content-detalle {
   display: flex;
-  flex-direction: row; /* por defecto */
+  flex-direction: column; /* por defecto */
   background: rgba(0, 0, 0, 0.4);
   backdrop-filter: blur(10px);
   color: rgb(255, 255, 255);

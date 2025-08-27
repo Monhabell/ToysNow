@@ -13,6 +13,16 @@ import { useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation';
 import StarRating from '@/components/StarRating'
 import Image from 'next/image';
+
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
 import {
   FaFacebook,
   FaWhatsapp,
@@ -98,7 +108,7 @@ const SocialShare = ({
       {isOpen && (
         <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 border border-gray-200">
           <div className="px-4 py-2 text-xs text-gray-500 border-b border-gray-100">
-            Compartir Produstos
+            Compartir Productos
           </div>
 
           <button
@@ -211,7 +221,7 @@ export default function ProductoDetalle({ params }: Props) {
     };
 
     obtenerProducto();
-  }, [id ]);
+  }, [id]);
 
   useEffect(() => {
     const obtenerRelacionados = async () => {
@@ -513,10 +523,11 @@ export default function ProductoDetalle({ params }: Props) {
   const currentStock = selectedVariant?.stock || producto.stock;
 
   const fechaCreacion = new Date(producto.created_at);
+  console.log(fechaCreacion);
   const hoy = new Date();
   const diffDias = Math.ceil((hoy.getTime() - fechaCreacion.getTime()) / (1000 * 60 * 60 * 24));
-  const nuevoOk = diffDias <= 30;
-  const textoNuevo = (nuevoOk ? 'Nuevo' : '') + ' | +5 vendidos';
+  const nuevoOk = diffDias <= 15;
+  const textoNuevo = (nuevoOk ? 'Nuevo' : '');
 
   // Construir schema.org JSON-LD
   const schemaData = producto ? {
@@ -565,11 +576,42 @@ export default function ProductoDetalle({ params }: Props) {
         />
       )}
 
-      <div className='mt-42 xs:mt-32'>
-        <div className='max-w-6xl mx-auto content-detalle mt-32'>
-          <div className='grid-container'>
 
+      <div className='mt-42 xs:mt-32'>
+        
+        <div className='max-w-6xl mx-auto content-detalle mt-32'>
+
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink className='hover:text-white' href="/">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink className='hover:text-white' href="/productos">Productos</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink className='hover:text-white'
+                  href={`/productos?buscar=${encodeURIComponent(producto.categories[0].name)}`}
+                >
+                  {producto.categories[0].name}
+                </BreadcrumbLink>
+
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage className='text-gold-600'>{producto.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
+
+          
+          <div className='grid-container mt-4'>
+            
+                    
             <div className='itemgrupImg'>
+              
               {producto.images.map((img, index) => (
                 <Image
                   key={img.id}
@@ -610,7 +652,7 @@ export default function ProductoDetalle({ params }: Props) {
 
             <div className='itemData'>
               <div className='border-Black'>
-                <div className='seccion_top'>
+                <div className='seccion_top mb-3'>
                   <div>
                     <h3 className='pb-5'>{textoNuevo}</h3>
                   </div>
@@ -625,9 +667,6 @@ export default function ProductoDetalle({ params }: Props) {
                     />
                   </div>
 
-                  {/* <div>
-                    <CiHeart size={25} className="cursor-pointer hover:text-gold-500" />
-                  </div> */}
                 </div>
 
                 <h1 className='detail_text text-gold-600'>{producto.name}</h1>
@@ -753,10 +792,10 @@ export default function ProductoDetalle({ params }: Props) {
 
                 <div className='mt-6'>
                   <div className="metodos-pago">
-                    <h3 className="font-medium mb-3 text-amber-400">Medios de pago</h3>
+                    <h3 className="font-medium mb-3">Medios de pago</h3>
 
                     {/* Nota Mercado Pago */}
-                    <div className="mb-4 text-sm text-gray-400 italic">
+                    <div className="mb-4 text-sm text-white italic">
                       Todas las compras se procesan a través de Mercado Pago
                     </div>
 
@@ -786,7 +825,7 @@ export default function ProductoDetalle({ params }: Props) {
         {relacionados.length > 0 && (
           <div className='productos-relacionados max-w-6xl mx-auto mt-32'>
             <div className='mt-5'>
-              <h1 className='text-gold-600 text-2xl font-bold mb-4'>Recomendaciones para ti Tienda Erótica</h1>
+              <h1 className='text-gold-600 text-2xl font-bold mb-2'>Recomendaciones para ti Tienda Erótica ToysNow</h1>
               <div className="relative">
                 {mostrarBotones && (
                   <button
@@ -821,55 +860,111 @@ export default function ProductoDetalle({ params }: Props) {
         )}
 
 
-        <div className='max-w-6xl mx-auto mt-10 px-4 bg-black '>
-          <div className='mt-16 bg-black rounded-lg p-8 shadow-sm'>
-            <h2 className="text-2xl font-bold mb-6 text-gold-500">Preguntas y respuestas Tienda Erótica</h2>
+        <div className='max-w-6xl mx-auto mt-5 px-4 '>
+          <div className='mt-1 bg-gray-900 rounded-lg p-8 shadow-lg border border-amber-900/50'>
+            <h2 className="text-2xl font-bold mb-6 text-amber-400 border-b border-amber-700 pb-3">
+              💬 Experiencias y Opiniones
+            </h2>
 
-
-            {producto.reviews.length > 0 && (
+            {producto.reviews.length > 0 ? (
               <div className="space-y-6">
                 {producto.reviews.map((item, index) => (
-                  <div key={index} className="bg-gray-50 p-5 rounded-lg shadow-sm">
+                  <div key={index} className="bg-gray-800 p-5 rounded-lg border border-amber-800/30 shadow-md transition-all hover:border-amber-600/40">
                     <div className="flex items-start gap-4">
-                      <div className="bg-gold-500 text-white p-2 rounded-full flex-shrink-0">
-                        <span>👤</span>
+                      <div className="bg-gradient-to-br from-amber-600 to-amber-800 text-white p-3 rounded-full flex-shrink-0 shadow-md">
+                        <span className="text-lg">👤</span>
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-800">{item.comment}</p>
+                        <div className="flex items-center mb-2">
+                          <div className="flex text-amber-400">
+                            {[...Array(5)].map((_, i) => (
+                              <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                                <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                              </svg>
+                            ))}
+                          </div>
+                          <span className="ml-2 text-sm text-gray-400">Hace 2 días</span>
+                        </div>
+                        <p className="font-medium text-gray-200">{item.comment}</p>
+                        <div className="mt-3 flex items-center text-sm text-gray-400">
+                          <span className="flex items-center mr-4">
+                            <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z" />
+                            </svg>
+                            12
+                          </span>
+                          <button className="flex items-center text-amber-500 hover:text-amber-400 transition-colors">
+                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                            </svg>
+                            Responder
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+            ) : (
+              <div className="text-center py-12 bg-gray-800/50 rounded-lg mt-6 border border-dashed border-amber-700/30">
+                <div className="text-5xl mb-4">🔒</div>
+                <p className="text-gray-400 text-lg mb-2">Este producto aún no tiene experiencias compartidas</p>
+                <p className="text-gray-500 text-sm">Sé el primero en compartir tu experiencia con este producto</p>
+              </div>
             )}
 
-            <div className="mt-8">
-              <h3 className="text-lg font-semibold mb-4 text-gold-500">¿Tienes alguna pregunta?</h3>
+            <div className="mt-10 pt-6 border-t border-amber-800/30">
+              <h3 className="text-xl font-semibold mb-4 text-amber-400 flex items-center">
+                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z" />
+                </svg>
+                Comparte tu experiencia
+              </h3>
+
+              <div className="mb-4">
+                <div className="flex items-center mb-2">
+                  <span className="text-sm text-gray-400 mr-3">Tu valoración:</span>
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        className="text-2xl text-gray-600 hover:text-amber-400 focus:outline-none"
+                        aria-label={`Calificar con ${star} estrellas`}
+                      >
+                        ★
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
               <div className="flex gap-3">
                 <input
                   type="text"
-                  className="cuestions"
-                  placeholder="Escribe tu pregunta aquí..."
+                  className="flex-1 bg-gray-800 border border-amber-800/50 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50 transition-all"
+                  placeholder="¿Qué te pareció este producto? Comparte tu experiencia..."
                   value={nuevaPregunta}
                   onChange={(e) => setNuevaPregunta(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && enviarPregunta()}
                 />
                 <button
-                  className="send_cuestions"
+                  className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center"
                   onClick={enviarPregunta}
                 >
+                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                  </svg>
                   Enviar
                 </button>
               </div>
-              <p className="text-sm text-gray-500 mt-2">Por favor, realiza preguntas relacionadas con el producto</p>
-            </div>
 
-            {preguntas.length === 0 && (
-              <div className="text-center py-8 bg-white rounded-lg mt-6 shadow-sm">
-                <p className="text-gray-500">Aún no hay preguntas sobre este producto.</p>
-                <p className="text-gray-400 text-sm mt-2">Sé el primero en preguntar</p>
-              </div>
-            )}
+              <p className="text-sm text-gray-500 mt-3 flex items-center">
+                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
+                </svg>
+                Tu comentario será moderado antes de publicarse para proteger la privacidad de todos
+              </p>
+            </div>
           </div>
         </div>
       </div>

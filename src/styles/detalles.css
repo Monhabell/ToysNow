@@ -153,15 +153,17 @@
 }
 
 .metodos-pago {
-  background: #f8f9fa;
+  background: #f8f9fa36;
+
   padding: 20px;
   border-radius: 12px;
   max-width: 600px;
   margin: auto;
 }
 
+
 .metodos-pago h3 {
-  color: #333;
+  color: var(--gold-500);
   font-size: 1.5em;
   margin-bottom: 10px;
 }
@@ -219,7 +221,6 @@
 }
 
 .productos-relacionados{
-  background-color: rgb(36, 36, 36);
   color: rgb(255, 255, 255);
   margin-top: 20px;
   height: 90%;
