@@ -48,12 +48,11 @@ export const generateProductListSchema = (metaTitle, metaDescription, canonicalU
                 },
                 "aggregateRating": producto.qualification ? {
                   "@type": "AggregateRating",
-                  "ratingValue": calcularRatingPromedio(producto).toFixed(1),
-                  "reviewCount": Object.values(producto.qualification.count_users).reduce((a, b) => a + b, 0)
+                   "ratingValue": producto.qualification.toFixed(1), // ← CAMBIO AQUÍ
+                    "reviewCount": 1
                 } : undefined
               }
             }))
-          
     }
   };
 };

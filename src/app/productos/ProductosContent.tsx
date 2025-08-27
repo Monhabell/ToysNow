@@ -103,18 +103,7 @@ export default function ProductosContent() {
       .toLowerCase();
   };
 
-  // Calcular rating promedio para un producto
-  const calcularRatingPromedio = (producto: Producto) => {
-    const qualificationCounts = producto.qualification?.count_users || {};
-    const totalRatings = Object.values(qualificationCounts).reduce((a, b) => a + b, 0);
-    if (totalRatings === 0) return 0;
-
-    const weightedSum = Object.entries(qualificationCounts).reduce((sum, [stars, count]) => {
-      return sum + (parseInt(stars) * count);
-    }, 0);
-
-    return weightedSum / totalRatings;
-  };
+  
 
   // Filtrar productos
   const productosFiltrados = useMemo(() => {
@@ -205,7 +194,7 @@ export default function ProductosContent() {
     // Filtro por rating mínimo
     if (ratingMinimo !== '') {
       filtrados = filtrados.filter(producto =>
-        calcularRatingPromedio(producto) >= ratingMinimo
+        (typeof producto.qualification === 'number' ? producto.qualification : 0) >= ratingMinimo // ← Usa qualification directamente
       );
     }
 
@@ -292,8 +281,8 @@ export default function ProductosContent() {
 
       case 'calificacion':
         productosOrdenados.sort((a, b) => {
-          const ratingA = calcularRatingPromedio(a);
-          const ratingB = calcularRatingPromedio(b);
+          const ratingA = typeof a.qualification === 'number' ? a.qualification : 0;
+          const ratingB = typeof b.qualification === 'number' ? b.qualification : 0;
           return ratingB - ratingA;
         });
         break;

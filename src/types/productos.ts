@@ -57,15 +57,25 @@ export type Producto = {
   variants: Variant[]
   images: Image[]
   categories: Category[] // Usa el tipo Category definido arriba
-  reviews: unknown[]
+
   reviews_count: number
   created_at: string
   updated_at: string
   seo: SEO
   features: Feature[];
   shipment: number
+  reviews: Review[];
 
 }
+
+interface Review {
+  id: number;
+  comment: string;
+  rating?: number;
+  user_name?: string;
+  created_at?: string;
+}
+
 
 export type Qualification = {
   count_users: {
