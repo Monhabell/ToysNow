@@ -147,12 +147,13 @@ export async function POST(request: Request) {
 
 
     const orderRequestBody = {
+      payment_type: "mercado_pago",
       preference_id,
       products: body.items
         .filter((item) => item.id !== 'discount') // 👈 igual aquí excluimos el descuento
         .map((item) => ({
           product_id: item.id || 'default-id',
-          unit_price: Number(item.unit_price),
+          unit_price: Number(item.unit_price) + Number(body.shipping_cost),
           quantity: Number(item.quantity),
           currency: 'COP',
           ...(item.variant_id && { variante_id: Number(item.variant_id) }),

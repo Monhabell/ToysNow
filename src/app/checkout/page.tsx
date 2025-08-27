@@ -7,6 +7,7 @@ import '../../styles/checkout.css';
 import { useSession } from 'next-auth/react';
 import { FaCheckDouble } from "react-icons/fa";
 import Image from 'next/image';
+import { v4 as uuidv4 } from "uuid";
 
 interface ProductVariant {
   id?: number;
@@ -311,6 +312,8 @@ const CheckoutForm = () => {
       // Lógica para pago contra entrega
       if (paymentMethod === 'cashOnDelivery') {
         const orderData = {
+          payment_type: "contra_entrega",
+          preference_id: generarDatoUnico(),// generar un codigo automatico
           items: order.items.map(item => ({
             id: item.id,
             name: item.name,
@@ -321,6 +324,7 @@ const CheckoutForm = () => {
             compare_price: item.compare_price,
             image: item.image
           })),
+          status: 'pending',
           total: calculateTotal(),
           shipping: shippingCost,
           delivery_info: deliveryInfo,
@@ -335,8 +339,32 @@ const CheckoutForm = () => {
 
         console.log("Datos de la orden:", JSON.stringify(orderData, null, 2));
         // Aquí deberías hacer una llamada a tu API para guardar la orden
+
+        const response = await fetch('/api/create-contra-entrega', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderData),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || 'Error al crear la orden contra entrega');
+        }
+
+        
         alert('Pedido registrado para entrega. Nos contactaremos contigo pronto.');
         return;
+      }
+
+      function generarDatoUnico() {
+        // Generar un número aleatorio de 10 dígitos
+        const numero = Math.floor(1000000000 + Math.random() * 9000000000);
+
+        // Generar un UUID único
+        const uuid = uuidv4();
+
+        // Concatenar ambos
+        return `${numero}-${uuid}`;
       }
 
       // Procesar pago con MercadoPago para múltiples productos
