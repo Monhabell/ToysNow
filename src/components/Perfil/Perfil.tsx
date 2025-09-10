@@ -2,6 +2,10 @@
 import { useState, useEffect } from 'react';
 import Head from 'next/head';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import Link from 'next/link';
+
+
 
 interface Pedido {
     id: string;
@@ -15,6 +19,7 @@ interface Pedido {
             id: number;
             name: string;
             price: string;
+            slug: string; // Agregado para evitar el error de compilación
         };
         quantity: number;
         unit_price: string;
@@ -71,7 +76,7 @@ const UserProfile = () => {
     // Ejecutamos la consulta cuando el componente esté listo
     useEffect(() => {
         if (!token) return;
-        
+
         const cargarPedidos = async () => {
             try {
                 setLoadingPedidos(true);
@@ -80,7 +85,7 @@ const UserProfile = () => {
                 const pedidosArray = data.data || [];
 
                 console.log("Pedidos procesados:", pedidosArray);
-                
+
                 setPedidos(pedidosArray);
             } catch (err) {
                 console.error("Error cargando pedidos:", err);
@@ -325,70 +330,70 @@ const UserProfile = () => {
                         )}
 
                         {activeTab === 'orders' && (
-    <div>
-        <h2 className="text-2xl font-semibold text-amber-500 mb-6 flex items-center">
-            <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            Mis Pedidos
-        </h2>
-        <div className="overflow-x-auto">
-            <table className="w-full text-left">
-                <thead className="bg-gray-700 text-amber-500">
-                    <tr>
-                        <th className="px-4 py-3">N° Pedido</th>
-                        <th className="px-4 py-3">Total</th>
-                        <th className="px-4 py-3">Estado</th>
-                        <th className="px-4 py-3">Ciudad</th>
-                        <th className="px-4 py-3">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {loadingPedidos ? (
-                        <tr>
-                            <td colSpan={5} className="text-center py-4 text-gray-400">Cargando pedidos...</td>
-                        </tr>
-                    ) : pedidos.length === 0 ? (
-                        <tr>
-                            <td colSpan={5} className="text-center py-4 text-gray-400">No tienes pedidos aún.</td>
-                        </tr>
-                    ) : (
-                        pedidos.map((pedido) => (
-                            <tr key={pedido.id} className="border-b border-gray-700 hover:bg-gray-700 transition">
-                                <td className="px-4 py-3">{pedido.items.map((item, index) => (
-                                    <div key={index}>{item.product.name}</div>
-                                ))}</td>
-                                <td className="px-4 py-3">${Number(pedido.total).toFixed(0)}</td>
-                                <td className="px-4 py-3">
-                                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                        pedido.status === 'pending' 
-                                            ? 'bg-yellow-100 text-yellow-800' 
-                                            : 'bg-green-100 text-green-800'
-                                    }`}>
-                                        {pedido.status === 'pending' ? 'Pendiente' : 'Completado'}
-                                    </span>
-                                </td>
-                                <td className="px-4 py-3">{pedido.shipping_city}</td>
-                                <td className="px-4 py-3">
-                                    <button 
-                                        className="text-amber-500 hover:text-amber-400 transition flex items-center"
-                                        onClick={() => console.log('Mostrar detalles', pedido)}
-                                    >
-                                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        Detalles
-                                    </button>
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-            </table>
-        </div>
-    </div>
-)}
+                            <div>
+                                <h2 className="text-2xl font-semibold text-amber-500 mb-6 flex items-center">
+                                    <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                    </svg>
+                                    Mis Pedidos
+                                </h2>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left">
+                                        <thead className="bg-gray-700 text-amber-500">
+                                            <tr>
+                                                <th className="px-4 py-3">N° Pedido</th>
+                                                <th className="px-4 py-3">Total</th>
+                                                <th className="px-4 py-3">Estado</th>
+                                                <th className="px-4 py-3">Ciudad</th>
+                                                <th className="px-4 py-3">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {loadingPedidos ? (
+                                                <tr>
+                                                    <td colSpan={5} className="text-center py-4 text-gray-400">Cargando pedidos...</td>
+                                                </tr>
+                                            ) : pedidos.length === 0 ? (
+                                                <tr>
+                                                    <td colSpan={5} className="text-center py-4 text-gray-400">No tienes pedidos aún.</td>
+                                                </tr>
+                                            ) : (
+                                                pedidos.filter(pedido => pedido.status !== 'pending').map((pedido) => (
+
+                                                    <tr key={pedido.id} className="border-b border-gray-700 hover:bg-gray-700 transition">
+                                                        <td className="px-4 py-3">{pedido.items.map((item, index) => (
+                                                            <div key={index}>{item.product.name}</div>
+                                                        ))}</td>
+                                                        <td className="px-4 py-3">${Number(pedido.total).toFixed(0)}</td>
+                                                        <td className="px-4 py-3">
+                                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${pedido.status === 'pending'
+                                                                ? 'bg-yellow-100 text-yellow-800'
+                                                                : 'bg-green-100 text-green-800'
+                                                                }`}>
+                                                                {pedido.status === 'pending' ? 'Pendiente' : 'Completado'}
+                                                            </span>
+                                                        </td>
+                                                        <td className="px-4 py-3">{pedido.shipping_city}</td>
+                                                        <td className="px-4 py-3">
+                                                            <button
+                                                                className="text-amber-500 hover:text-amber-400 transition flex items-center"
+                                                                onClick={() => console.log('Mostrar detalles', pedido)}
+                                                            >
+                                                                <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                                </svg>
+                                                                Detalles
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))
+                                            )}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
 
                         {activeTab === 'wishlist' && (
                             <div>
@@ -399,36 +404,76 @@ const UserProfile = () => {
                                     Lista de Deseos
                                 </h2>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    <div className="bg-gray-700 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/10 transition border border-gray-600">
-                                        <div className="h-48 bg-gray-600 flex items-center justify-center relative">
-                                            <span className="text-gray-400">Imagen del producto</span>
-                                            <button className="absolute top-2 right-2 text-red-500 hover:text-red-400 transition">
-                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="text-lg font-medium mb-2">Juguete Erótico Premium</h3>
-                                            <p className="text-amber-500 font-semibold mb-3">$99.99</p>
-                                            <div className="flex justify-between">
-                                                <button className="bg-amber-500 hover:bg-amber-600 text-gray-900 px-3 py-1 rounded-md text-sm font-medium transition flex items-center">
-                                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                                    </svg>
-                                                    Añadir
-                                                </button>
-                                                <button className="text-gray-400 hover:text-amber-500 transition flex items-center text-sm">
-                                                    <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                                    </svg>
-                                                    Detalles
-                                                </button>
+                                    {(() => {
+                                        // Crear un Set para IDs únicos
+                                        const uniqueIds = new Set();
+                                        const uniqueProducts = [];
+
+                                        // Filtrar pedidos pendientes
+                                        const pendingOrders = pedidos.filter(pedido => pedido.status === 'pending');
+
+                                        // Recorrer todos los items de pedidos pendientes
+                                        for (const pedido of pendingOrders) {
+                                            for (const item of pedido.items) {
+                                                // Si el ID no ha sido procesado, agregarlo al array único
+                                                if (!uniqueIds.has(item.product.id)) {
+                                                    uniqueIds.add(item.product.id);
+                                                    uniqueProducts.push(item);
+                                                }
+                                            }
+                                        }
+
+                                        // Renderizar productos únicos
+                                        return uniqueProducts.map((item, index) => (
+                                            <div key={index} className="bg-gray-700 rounded-lg overflow-hidden hover:shadow-lg hover:shadow-amber-500/10 transition border border-gray-600">
+                                                <div className="h-48 bg-gray-600 flex items-center justify-center relative">
+                                                    <span className="text-gray-400">Imagen del producto</span>
+                                                    <Image
+                                                        src={"/images/default.webp"}
+                                                        onError={(e) => {
+                                                        const target = e.target as HTMLImageElement;
+                                                        target.onerror = null;
+                                                        target.src = '/images/default.webp';
+                                                        }}
+                                                        fill
+                                                        alt={item.product.name}
+                                                        title={item.product.name}
+                                                        className="w-full h-full object-cover"
+                                                    />
+                                                    
+                                                    <button className="absolute top-2 right-2 text-red-500 hover:text-red-400 transition">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                <div className="p-4">
+                                                    <h3 className="text-lg font-medium mb-2">{item.product.name}</h3>
+                                                    <p className="text-amber-500 font-semibold mb-3">{item.product.price}</p>
+                                                    <div className="flex justify-between">
+
+                                                        
+
+                                                                                                                                                                    
+                                                        <Link
+                                                            href={`/productos/${item.product.slug}`}
+                                                            className="text-gray-400 hover:text-amber-500 transition flex items-center text-sm cursor-pointer"
+                                                        >
+                                                            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                                            </svg>
+                                                            Detalles
+                                                            
+                                                        </Link>
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
+                                        ));
+                                    })()}
                                 </div>
+
+
                             </div>
                         )}
                     </div>
