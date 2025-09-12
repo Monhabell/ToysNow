@@ -24,7 +24,7 @@ export default function Banner() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [api, setApi] = useState<CarouselApi>() // Estado para la API del carrusel
-  const [current, setCurrent] = useState(0) // Estado para el slide actual
+ 
 
   // Cargar datos del banner
   useEffect(() => {
