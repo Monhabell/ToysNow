@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import {
@@ -24,7 +24,7 @@ export default function Banner() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [api, setApi] = useState<CarouselApi>() // Estado para la API del carrusel
- 
+
 
   // Cargar datos del banner
   useEffect(() => {
@@ -47,21 +47,7 @@ export default function Banner() {
   }, [])
 
   // Configurar el carrusel cuando la API esté disponible
-  useEffect(() => {
-    if (!api) return
-
-    // Suscribirse a los cambios del carrusel
-    const onSelect = () => {
-      setCurrent(api.selectedScrollSnap())
-    }
-    
-    api.on('select', onSelect)
-    
-    // Limpiar suscripción
-    return () => {
-      api.off('select', onSelect)
-    }
-  }, [api])
+  
 
   // Efecto para el cambio automático de slides
   useEffect(() => {
