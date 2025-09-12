@@ -15,7 +15,8 @@ interface Product {
 
 export async function GET() {
   const BASE_URL = "https://www.toysnow.com.co";
-  const NEXT_PUBLIC_BACKEND_URL = "https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images";
+  const NEXT_PUBLIC_BACKEND_URL =
+    "https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images";
 
   const res = await fetch(`${BASE_URL}/api/productos`, {
     next: { revalidate: 3600 },
@@ -37,12 +38,12 @@ export async function GET() {
     ${productos
       .filter((p) => p.slug)
       .map((p) => {
-        // Imagen principal y adicionales
-        const images = p.images?.map((img) => `${NEXT_PUBLIC_BACKEND_URL}/${img.url}`) || [];
+        const images =
+          p.images?.map(
+            (img) => `${NEXT_PUBLIC_BACKEND_URL}/${img.url}`
+          ) || [];
         const mainImage = images[0] || "";
         const additionalImages = images.slice(1);
-
-        // Marca
         const brand = p.brand?.name || "Genérica";
 
         return `
@@ -53,12 +54,15 @@ export async function GET() {
         <g:link>${BASE_URL}/productos/${p.slug}</g:link>
         <g:image_link>${mainImage}</g:image_link>
         ${additionalImages
-          .map((img) => `<g:additional_image_link>${img}</g:additional_image_link>`)
+          .map(
+            (img) => `<g:additional_image_link>${img}</g:additional_image_link>`
+          )
           .join("\n")}
         <g:availability>${p.is_available ? "in stock" : "out of stock"}</g:availability>
         <g:price>${parseFloat(p.price).toFixed(2)} COP</g:price>
         <g:condition>new</g:condition>
         <g:brand><![CDATA[${brand}]]></g:brand>
+        <g:adult>yes</g:adult>
         <g:shipping>
           <g:country>CO</g:country>
           <g:service>Estándar</g:service>
