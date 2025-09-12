@@ -1,8 +1,6 @@
 import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
-    console.log("🔍 Procesando solicitud de preguntas frecuentes");
-
     // Leer JSON del body
     const { token, productoId, pregunta } = await request.json();
     console.log(token.apiToken, productoId, pregunta);
@@ -13,12 +11,8 @@ export async function POST(request: NextRequest) {
         request.headers.get("x-real-ip") || // algunos proxys lo usan
         "IP no disponible";
 
-    console.log("🌍 IP del cliente:", ip);
-
     try {
         const apiUrl = `${process.env.API_TENANT_BASE_URL_V1}/reviews`;
-        console.log("🌐 URL de la API:", apiUrl);
-
         const response = await fetch(apiUrl, {
             method: 'POST',
             headers: {

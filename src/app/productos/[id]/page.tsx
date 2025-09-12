@@ -277,8 +277,14 @@ export default function ProductoDetalle({ params }: Props) {
   };
 
   const enviarPregunta = () => {
-    if (nuevaPregunta.trim() === '') return;
 
+    if (!session) {
+      router.push('/login');
+      return;
+    }
+    
+    if (nuevaPregunta.trim() === '') return;
+    
     const apiUrl = '/api/preguntas'; // Reemplaza con la URL de tu API
     fetch(apiUrl, {
       method: 'POST',
@@ -913,58 +919,63 @@ export default function ProductoDetalle({ params }: Props) {
               </div>
             )}
 
-            <div className="mt-10 pt-6 border-t border-amber-800/30">
-              <h3 className="text-xl font-semibold mb-4 text-amber-400 flex items-center">
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z" />
-                </svg>
-                Comparte tu experiencia
-              </h3>
+           
 
-              <div className="mb-4">
-                <div className="flex items-center mb-2">
-                  <span className="text-sm text-gray-400 mr-3">Tu valoración:</span>
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        className="text-2xl text-gray-600 hover:text-amber-400 focus:outline-none"
-                        aria-label={`Calificar con ${star} estrellas`}
-                      >
-                        ★
-                      </button>
-                    ))}
+              <div className="mt-10 pt-6 border-t border-amber-800/30">
+                <h3 className="text-xl font-semibold mb-4 text-amber-400 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7 9h-2V5h2v6zm0 4h-2v-2h2v2z" />
+                  </svg>
+                  Comparte tu experiencia
+                </h3>
+
+                <div className="mb-4">
+                  <div className="flex items-center mb-2">
+                    <span className="text-sm text-gray-400 mr-3">Tu valoración:</span>
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <button
+                          key={star}
+                          className="text-2xl text-gray-600 hover:text-amber-400 focus:outline-none"
+                          aria-label={`Calificar con ${star} estrellas`}
+                        >
+                          ★
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  className="flex-1 bg-gray-800 border border-amber-800/50 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50 transition-all"
-                  placeholder="¿Qué te pareció este producto? Comparte tu experiencia..."
-                  value={nuevaPregunta}
-                  onChange={(e) => setNuevaPregunta(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && enviarPregunta()}
-                />
-                <button
-                  className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center"
-                  onClick={enviarPregunta}
-                >
-                  <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    className="flex-1 bg-gray-800 border border-amber-800/50 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-amber-600/50 focus:border-amber-600/50 transition-all"
+                    placeholder="¿Qué te pareció este producto? Comparte tu experiencia..."
+                    value={nuevaPregunta}
+                    onChange={(e) => setNuevaPregunta(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && enviarPregunta()}
+                  />
+
+                    <button
+                      className="cursor-pointer bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-medium py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 flex items-center"
+                      onClick={enviarPregunta}
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 5l7 7-7 7M5 5l7 7-7 7" />
+                      </svg>
+                      Enviar
+                    </button>
+                  
+                </div>
+
+                <p className="text-sm text-gray-500 mt-3 flex items-center">
+                  <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
                   </svg>
-                  Enviar
-                </button>
+                  Tu comentario será moderado antes de publicarse para proteger la privacidad de todos
+                </p>
               </div>
-
-              <p className="text-sm text-gray-500 mt-3 flex items-center">
-                <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
-                </svg>
-                Tu comentario será moderado antes de publicarse para proteger la privacidad de todos
-              </p>
-            </div>
+            
           </div>
         </div>
       </div>
