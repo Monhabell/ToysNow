@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import {
@@ -8,6 +8,7 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
+  type CarouselApi, // Importar el tipo CarouselApi
 } from '@/components/ui/carousel'
 import '../styles/banner.css'
 
@@ -22,6 +23,8 @@ export default function Banner() {
   const [bannerData, setBannerData] = useState<BannerItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [api, setApi] = useState<CarouselApi>() // Estado para la API del carrusel
+  const [current, setCurrent] = useState(0) // Estado para el slide actual
 
   // Cargar datos del banner
   useEffect(() => {
@@ -42,6 +45,34 @@ export default function Banner() {
 
     fetchBannerData()
   }, [])
+
+  // Configurar el carrusel cuando la API esté disponible
+  useEffect(() => {
+    if (!api) return
+
+    // Suscribirse a los cambios del carrusel
+    const onSelect = () => {
+      setCurrent(api.selectedScrollSnap())
+    }
+    
+    api.on('select', onSelect)
+    
+    // Limpiar suscripción
+    return () => {
+      api.off('select', onSelect)
+    }
+  }, [api])
+
+  // Efecto para el cambio automático de slides
+  useEffect(() => {
+    if (!api || bannerData.length <= 1) return
+
+    const interval = setInterval(() => {
+      api.scrollNext() // Cambiar al siguiente slide
+    }, 3000) // Cambiar cada 5 segundos (ajusta este valor según necesites)
+
+    return () => clearInterval(interval) // Limpiar intervalo al desmontar
+  }, [api, bannerData.length])
 
   // Manejar clic en el banner
   const handleClick = (item: BannerItem) => {
@@ -72,6 +103,7 @@ export default function Banner() {
   return (
     <div className="banner_publicitario w-full">
       <Carousel 
+        setApi={setApi} // Pasar la API al carrusel
         opts={{
           loop: true,
           align: 'start',
