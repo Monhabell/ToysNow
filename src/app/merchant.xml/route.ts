@@ -59,6 +59,7 @@ export async function GET() {
         <g:price>${parseFloat(p.price).toFixed(2)} COP</g:price>
         <g:condition>new</g:condition>
         <g:brand><![CDATA[${brand}]]></g:brand>
+        <g:adult>yes</g:adult>
         <g:shipping>
           <g:country>CO</g:country>
           <g:service>Estándar</g:service>
