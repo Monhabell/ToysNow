@@ -192,7 +192,7 @@ const CartPage = () => {
                   <div key={index} className="flex flex-col sm:flex-row gap-4 py-4 border-b border-gray-700">
                     <div className="sm:w-1/4">
                       <Image
-                        src={`https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images${item.image}`}
+                        src={`https://www.softgenix.space/storage/tenants/f2d79397-a55f-45fb-b957-1a69d77e6115/images${item.image}`}
                         alt={item.name}
                         width={200}
                         height={200}

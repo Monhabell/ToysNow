@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const imageUrl =
       producto.images?.length > 0
-        ? `https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${producto.images[0].url}`
+        ? `https://www.softgenix.space/storage/tenants/f2d79397-a55f-45fb-b957-1a69d77e6115/images/${producto.images[0].url}`
         : `${siteUrl}/images/default.jpg`;
 
     const description = producto.description

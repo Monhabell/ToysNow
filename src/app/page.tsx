@@ -254,7 +254,7 @@ export default function Home() {
                 <div>{productoDestacado2.images[0]?.url}</div>
                 <div className="overlay"></div>
                 <Image
-                  src={"https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
+                  src={"https://www.softgenix.space/storage/tenants/f2d79397-a55f-45fb-b957-1a69d77e6115/images/" + productoDestacado2.images[0]?.url || '/images/default.webp'}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
                     target.onerror = null;

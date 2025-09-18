@@ -15,7 +15,7 @@ interface Product {
 
 export async function GET() {
   const BASE_URL = "https://www.toysnow.com.co";
-  const NEXT_PUBLIC_BACKEND_URL = "https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images";
+  const NEXT_PUBLIC_BACKEND_URL = "https://www.softgenix.space/storage/tenants/f2d79397-a55f-45fb-b957-1a69d77e6115/images";
 
   const res = await fetch(`${BASE_URL}/api/productos`, {
     next: { revalidate: 3600 },

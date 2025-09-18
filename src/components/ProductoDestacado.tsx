@@ -14,13 +14,13 @@ const ProductoDestacado: React.FC<ProductoDestacadoProps> = ({ img, name, price,
 
   // separar por "/" img
   const imgParts = img.split('/');
-  const lastPart = "https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/products/"+imgParts[imgParts.length - 1];
+  const lastPart = "https://www.softgenix.space/storage/tenants/f2d79397-a55f-45fb-b957-1a69d77e6115/images/products/"+imgParts[imgParts.length - 1];
 
 
   const getImageUrl = (url: string) => {
     if (!url) return '/images/default.webp';
     if (url.startsWith('http')) return url;
-    if (url.startsWith('/images')) return `https://www.softgenix.space/storage/tenants/2b85d6a6-1059-4929-a8bb-5f3d7ca5c732/images/${url}`;
+    if (url.startsWith('/images')) return `https://www.softgenix.space/storage/tenants/f2d79397-a55f-45fb-b957-1a69d77e6115/images/${url}`;
     return `/images/${url}`;
   };
 
