@@ -2,15 +2,21 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
-
 // Extiende tipos personalizados
 declare module "next-auth" {
   interface Session {
     apiToken?: string;
     userId?: string | number;
+    total_purchases?: number; // 👈 Nueva propiedad
   }
+  
   interface User {
     apiToken?: string;
+    total_purchases?: number; // 👈 Nueva propiedad
+  }
+  
+  interface JWT {
+    total_purchases?: number; // 👈 Nueva propiedad
   }
 }
 
@@ -53,6 +59,7 @@ const handler = NextAuth({
             email: data.user.email,
             image: data.user.image || null,
             apiToken: data.token,
+            total_purchases: data.user.total_purchases || 0, // 👈 Agregar total_purchases
           };
         } catch (err) {
           console.error("Error en login de credenciales:", err);
@@ -85,12 +92,15 @@ const handler = NextAuth({
 
           if (account) {
             account.apiToken = data.token;
+            // 👇 También podrías agregar total_purchases aquí si la API de Google lo devuelve
+            if (data.user?.total_purchases) {
+              user.total_purchases = data.user.total_purchases;
+            }
           }
 
           return true;
         } catch (err) {
           console.error("Error en Google login:", err);
-          // Lanza error para redirigir a la página de error
           throw new Error("No se pudo iniciar sesión con Google. Intenta más tarde.");
         }
       }
@@ -99,6 +109,11 @@ const handler = NextAuth({
     },
 
     async jwt({ token, user, account }) {
+      // 👇 Agregar total_purchases al token JWT
+      if (user?.total_purchases !== undefined) {
+        token.total_purchases = user.total_purchases;
+      }
+      
       if (account?.apiToken) {
         token.apiToken = account.apiToken;
       }
@@ -117,20 +132,19 @@ const handler = NextAuth({
         typeof token.userId === "string" || typeof token.userId === "number"
           ? token.userId
           : undefined;
+      session.total_purchases = typeof token.total_purchases === "number" ? token.total_purchases : undefined; // 👈 Agregar a la sesión
       return session;
     },
   },
 
   pages: {
     signIn: "/",
-    error: "/auth/error", // 👈 página de error personalizada
+    error: "/auth/error",
   },
-
-
 
   session: {
     strategy: "jwt",
-    maxAge: 24 * 60 * 60, // 1 día
+    maxAge: 24 * 60 * 60,
   },
   jwt: {
     maxAge: 24 * 60 * 60,

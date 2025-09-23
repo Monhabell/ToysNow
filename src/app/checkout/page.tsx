@@ -92,25 +92,29 @@ const CheckoutForm = () => {
     // Agrega más departamentos y ciudades según necesites
   };
 
+  const No_compras = session?.total_purchases || 0;
+
   // Load order and delivery info from storage
   useEffect(() => {
-    const orderData = sessionStorage.getItem('currentOrder');
-    if (!orderData) {
-      router.push('/');
-      return;
-    }
+  const orderData = sessionStorage.getItem('currentOrder');
+  if (!orderData) {
+    router.push('/');
+    return;
+  }
 
-    const parsedOrder = JSON.parse(orderData);
-    setOrder(parsedOrder);
-    calculateDeliveryTime();
+  const parsedOrder = JSON.parse(orderData);
+  setOrder(parsedOrder);
+  calculateDeliveryTime();
 
-    const savedDeliveryInfo = localStorage.getItem('deliveryInfo');
-    if (savedDeliveryInfo) {
-      const parsedDeliveryInfo = JSON.parse(savedDeliveryInfo);
-      setDeliveryInfo(parsedDeliveryInfo);
-      calculateShippingCost(parsedDeliveryInfo.city);
-    }
-  }, [router]);
+  const savedDeliveryInfo = localStorage.getItem('deliveryInfo');
+  if (savedDeliveryInfo) {
+    const parsedDeliveryInfo = JSON.parse(savedDeliveryInfo);
+    setDeliveryInfo(parsedDeliveryInfo);
+    calculateShippingCost(parsedDeliveryInfo.city);
+  }
+}, [router]);
+
+
 
   // Handle preferenceId change to open MercadoPago payment
   useEffect(() => {
@@ -136,6 +140,11 @@ const CheckoutForm = () => {
 
   // Calculate shipping cost based on city
   const calculateShippingCost = (city: string) => {
+      
+      if (No_compras === 0) {
+      setShippingCost(0);
+      return;
+    }
     const shippingRates: Record<string, number> = {
       'Bogotá': 15500,
       'Soacha': 20000,
@@ -195,6 +204,7 @@ const CheckoutForm = () => {
   };
 
 
+
   const applyCoupon = async () => {
     if (!couponCode.trim()) {
       setError('Por favor ingresa un código de cupón');
@@ -209,7 +219,7 @@ const CheckoutForm = () => {
 
     const user = session?.apiToken;
 
-    console.log(productData)
+    
 
     const dataCupon = { user, productData, couponCode: couponCode.toUpperCase() };
 
@@ -756,7 +766,13 @@ const CheckoutForm = () => {
 
                 <div className="flex justify-between text-gray-300">
                   <span>Envío</span>
-                  <span>${shippingCost.toLocaleString()}</span>
+                  <div className="text-right">
+                    {No_compras === 0 ? (
+                      <span className="text-green-500 font-semibold">¡GRATIS! (Primera compra)</span>
+                    ) : (
+                      <span>${shippingCost.toLocaleString()}</span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex justify-between text-lg font-bold text-gold-500 pt-2 mt-2 border-t border-gray-700">
